@@ -1,0 +1,513 @@
+/*Start Css  31-05-25*/
+.advance-search {
+	flex-wrap: nowrap !important;
+	gap: 6px;
+	justify-content: center;
+}
+.table th,
+.table td {
+	padding: 3px;
+}
+
+.advance-search input[type="date"] {
+	width: 130px;
+	padding: 5px;
+}
+.advance-search input[type="text"] {
+	width: 130px;
+	padding: 5px;
+}
+.advance-search select {
+	width: 100px;
+	padding: 5px;
+}
+.top-div {
+	margin: 20px 0;
+	display: flex;
+	gap: 10px;
+	justify-content: space-between;
+}
+.advance-search-btn {
+	background: #007485;
+}
+
+.slider {
+	width: 95%;
+}
+.back-btn {
+	background: linear-gradient(45deg, #28a745, #009321);
+	border: none;
+	padding: 10px 20px;
+}
+table#datatable1 thead th {
+	text-wrap: nowrap;
+}
+table#propertiesTable{
+
+	font-size: 14px;
+}
+
+.notification-box {
+    background: #fff;
+    padding: 15px 20px;
+    margin: 10px 0;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    max-height: 320px;
+    
+    overflow-y: hidden; /* Allows scrolling if more content */
+}
+
+/* Fix: Add class selector properly for hover effect */
+.notification-box:hover {
+    box-shadow: 0 0 10px rgba(0, 147, 33, 0.4); /* Green shadow with blur */
+}
+
+.notification-box ul {
+	list-style: none;
+	padding: 0;
+}
+.notification-box ul li {
+	margin-bottom: 10px;
+	padding: 10px;
+	border-bottom: 1px dashed #ccc;
+}
+
+table#datatable1 {
+	margin: 20px 0;
+
+}
+.table-main-div {
+	overflow: scroll;
+}
+.dashboard_main .card-body {
+	text-align: start;
+}
+.dashboard_main .card-body .li-css ul li {
+	list-style: none;
+}
+.dashboard_main .card-body .li-css ul {
+	padding: 0;
+}
+.dashboard_main .card-body .li-css ul li::before {
+	content: "➙";
+	padding-right: 10px;
+}
+.rotate {
+	text-align: center;
+    
+}
+/*End   Css  31-05-25*/
+
+.personal-div {
+	padding: 20px;
+	border: 1px solid black;
+	margin-top: 0 !important;
+}
+.personal-main-div {
+	position: relative;
+}
+.personal-main-div #toggleButton {
+	position: absolute;
+	right: 20px;
+	top: -12px;
+}
+
+/*.col.main.pt-5.mt-3 {*/
+/*    padding-left: 234px;*/
+/*}*/
+
+.table thead th {
+	vertical-align: bottom;
+	border-bottom: 2px solid #dee2e6;
+	width: 0%;
+}
+.li-css a {
+	color: white;
+}
+
+/*.row.mb-3 a {
+    color: white;
+    margin-left: -34px;
+}
+
+
+.card-body.bg-info ul {
+    margin-left: 27px;
+}
+
+.card-body.bg-info a {
+    color: white !important;
+    margin-left: -45px;
+}  */
+
+.text-center .btn.btn-primary {
+	margin-top: 7px;
+}
+.log-table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.log-table th,
+.log-table td {
+	border: 1px solid #ddd;
+	padding: 8px;
+	vertical-align: top; /* Ensures that the text is aligned at the top */
+}
+
+.log-table th {
+	background-color: #f2f2f2;
+	text-align: left;
+}
+
+.log-table td {
+	word-wrap: break-word; /* Ensures long text wraps within the table cell */
+	max-width: 200px; /* Limits the width of the table cells */
+}
+
+.log-table .changes-cell {
+	white-space: normal; /* Allows the text to wrap */
+}
+
+hr {
+	border: 0;
+	border-top: 1px solid #ddd;
+	margin: 10px 0;
+}
+
+.radio-buttons {
+	display: flex;
+	gap: 10px; /* Space between the buttons */
+	align-items: center; /* Center-align items vertically */
+}
+
+.radio-buttons div {
+	display: flex;
+	align-items: center;
+}
+
+.radio-buttons input[type="radio"] {
+	margin-right: 5px; /* Space between radio button and label */
+}
+
+.button-container a {
+	background-color: #138496; /* Default button color */
+	margin-right: 15px;
+	color: white; /* Default text color */
+	border: none; /* Optional: remove default button borders */
+	padding: 10px 20px; /* Optional: add padding for better appearance */
+	cursor: pointer; /* Optional: change cursor to pointer */
+}
+
+.button-container a.active {
+	background-color: white !important; /* Change background color to white */
+	color: black !important; /* Change text color if needed */
+	border: solid black 1px !important;
+}
+legend {
+	display: inline-block !important;
+	width: auto;
+	padding: 5px;
+}
+fieldset#more-information {
+	border: solid 1px;
+	padding: 31px;
+}
+
+button#toggleMoreInfo {
+	position: absolute;
+	top: -40px;
+	right: 5px;
+}
+fieldset#more-information {
+	position: relative;
+}
+
+.navbar.fixed-top.navbar-expand-md {
+	position: fixed;
+	top: 0;
+	right: 0;
+	left: 0;
+	z-index: 888888;
+	background: #007485 !important;
+	box-shadow: 1px 2px 16px rgba(5, 101, 115, 0.5);
+}
+.row.row-offcanvas.row-offcanvas-left {
+	min-height: 414px;
+}
+#sidebar #collapsingNavbar {
+	padding-top: 0px !important;
+}
+
+.navbar .navbar-brand {
+	font-size: 24px;
+	font-weight: bold;
+}
+#sidebar ul li {
+	line-height: 35px;
+	padding: 10px 15px;
+	border-bottom: 1px solid #007485;
+}
+#sidebar ul li:last-child {
+	border-bottom: none !important;
+}
+#sidebar ul li:hover {
+	background: #007485;
+	transition: all 0.5s ease;
+}
+#sidebar ul li a {
+	color: #2c2c2c;
+	font-size: 16px;
+	text-transform: capitalize;
+	font-weight: 600;
+	padding: 0;
+}
+#sidebar ul li:hover a {
+	color: #fff;
+	transition: all 0.5s ease;
+}
+.dashboard_main {
+	padding-left: 30px;
+}
+.dashboard_main .heading {
+	font-size: 36px;
+	font-weight: 600;
+	margin: 25px 0px;
+}
+.dashboard_main .row.mb-3 .py-2 {
+	text-align: center;
+}
+.dashboard_main .row.mb-3 .py-2 h6 {
+	font-size: 18px;
+	margin: 7px 0px;
+	font-weight: 600;
+	color: #fff;
+}
+.dashboard_main .row.mb-3 .py-2 h1 {
+	font-weight: 600;
+	color: #fff;
+}
+.dashboard_main .row.mb-3 .py-2 .rotate i {
+	color: #fff;
+}
+.dashboard_main .row.mb-3 .py-2 a {
+	text-decoration: none;
+}
+.dashboard_main .row.mb-3 .py-2 a:hover {
+	text-decoration: none;
+	transition: all 0.5s ease;
+	opacity: 0.9;
+}
+
+.dashboard_main .row.mb-3 .py-2 .card-body {
+	box-shadow: rgba(0, 0, 0, 0.3) 0 0 20px;
+}
+.main .heading {
+	font-size: 36px;
+	font-weight: 600;
+	margin-top: 30px;
+	margin-bottom: 25px;
+	color: #007485;
+	text-transform: uppercase;
+}
+.main .table-responsive table tr td a {
+	color: #17a2b8;
+	text-decoration: none;
+	font-weight: 600;
+}
+.main .table-responsive table tr td a:hover {
+	color: #000;
+	transition: all 0.5s ease;
+}
+
+.main .table-responsive table tr td a.btn.btn-success {
+	color: #fff;
+	padding: 5px 10px;
+	margin-bottom: 10px;
+}
+.main .table-responsive table tr td a.btn.btn-danger {
+	color: #fff;
+	padding: 5px 10px;
+	margin-left: 0px;
+	margin-bottom: 0px;
+}
+
+#main.container-fluid {
+	min-height: 500px;
+	padding-top: 40px;
+}
+
+footer.container-fluid {
+	background: #007485 !important;
+	padding: 15px;
+}
+
+footer.container-fluid p {
+	margin: 0;
+	color: #fff;
+	font-size: 16px;
+	text-align: center !important;
+}
+
+.col-sm-6 #searchfield {
+	width: auto;
+	margin-bottom: 20px;
+}
+
+.property-submit-btn {
+	background: linear-gradient(45deg, #28a745, #009321) !important;
+	border: none !important;
+	padding: 8px 25px;
+}
+
+.property-submit-btn:hover {
+	opacity: 0.8;
+	transition: all 0.5s ease;
+}
+
+.col-sm-12.text-center {
+	margin-bottom: 20px;
+}
+.loader-gif-file {
+	background: rgba(255, 255, 255, 0.8);
+	position: fixed;
+	z-index: 9999999;
+	right: 0;
+	left: 0;
+	top: 0;
+	bottom: 0;
+	text-align: center;
+}
+
+.loader-gif-file img {
+	width: 10%;
+	top: 34vh;
+	position: relative;
+}
+
+#sidebar {
+	background: #c8d3d5 !important;
+	padding: 0px !important;
+	height: 100vh;
+	position: fixed;
+	left: 0;
+	z-index: 777777;
+	box-shadow: 5px 2px 0px rgb(0, 116, 133);
+	overflow: scroll;
+}
+
+.add-additional-detail {
+	padding-left: 0;
+}
+.images-form .row {
+	margin: 0;
+}
+
+.add-additional-detail button#add {
+	background: #007485;
+	border-color: #007485;
+}
+
+.add-additional-detail button#add:hover {
+	background: #c8d3d5;
+	border-color: #c8d3d5;
+	color: #007485;
+}
+.images-form .row {
+	margin: 0;
+	flex-wrap: nowrap;
+	flex-direction: row-reverse;
+}
+.images-form .row .img-fluid {
+	width: 150px;
+	height: 110px !important;
+	border-radius: 10px;
+	margin-left: 0px;
+	margin-right: 10px;
+}
+
+.col.main.pt-5.mt-3 {
+	/*padding-left: 377px !important;*/
+	padding-left: 18% !important;
+	padding-top: 40px !important;
+}
+
+.navbar .navbar-brand .img-fluid {
+	width: 220px;
+}
+/**************start media qurey******************/
+
+@media (max-width: 800px) {
+	#sidebar {
+		height: 100%;
+		width: 0px !important;
+	}
+	.row {
+		display: block;
+		margin-left: 5px;
+	}
+	.col.main.pt-5.mt-3 {
+		padding-left: 0px !important;
+		margin-left: 0px;
+	}
+}
+@media (max-width: 767px) {
+	.nav {
+		display: none;
+	}
+	.show.nav {
+		display: block;
+	}
+
+	.main .heading {
+		margin-top: 42px;
+		text-align: start;
+	}
+	.main {
+		padding-top: 0px !important;
+	}
+}
+
+/*Start Css 31-03-25*/
+@media (max-width: 575px) {
+	.dashboard_main .row {
+		margin: 0 !important;
+	}
+	div#piechart_3d {
+		overflow: auto;
+	}
+	.dashboard_main .col-xl-3 {
+		padding: 15px 0 !important;
+	}
+	.dashboard_main {
+		margin: 0;
+		padding: 0;
+	}
+	.table-scroll-div {
+		overflow: auto;
+	}
+	.row-offcanvas {
+		margin: 0 !important;
+	}
+	.heading {
+		font-size: 30px !important;
+	}
+	.back-btn {
+		margin: 0 !important;
+	}
+	div.dataTables_wrapper div.dataTables_length {
+		margin-right: 0;
+	}
+	div.dataTables_wrapper div.dataTables_filter {
+		width: 100%;
+	}
+	div.dataTables_wrapper div.dataTables_filter label {
+		width: 100%;
+	}
+
+	.content-box {
+		padding: 0 !important;
+	}
+}
+
