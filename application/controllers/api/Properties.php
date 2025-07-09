@@ -1,0 +1,185 @@
+<?php
+defined('BASEPATH') OR exit('No direct script access allowed');
+require APPPATH . 'libraries/REST_Controller.php';
+
+class Properties extends REST_Controller
+{
+    public function __construct()
+    {
+        parent::__construct();
+        $this->load->model('Api_model');
+        $this->load->helper('url');
+
+        $checkToken = $this->checkForToken();
+        if (!$checkToken) { die(); }
+    }
+
+    /** Add Property API **/
+    public function addProperty_post()
+    {
+
+       $return = array('status' => 'error', 'message' => 'Missing required fields', 'result' => '');
+
+        $json = file_get_contents("php://input");
+        $data = json_decode($json, true);
+
+        if (!$data || !isset($data['property_type']) || !isset($data['phone'])) {
+            $return['message'] = "Missing required fields: property_type or phone.";
+            return $this->response($return, REST_Controller::HTTP_OK);
+        }
+
+        // Property table fields
+        $propertyFields = [
+            'userid', 'name', 'property_builder', 'description', 'property_for', 'project_n',
+            'built', 'land', 'carpet', 'additional', 'additional_value', 'address', 'person',
+            'phone', 'person_address', 'city', 'state', 'property_type', 'category', 'zip_code',
+            'bhk', 'budget', 'budget_in_words', 'amenities', 'type', 'image_one', 'image_two',
+            'image_three', 'image_four', 'status', 'approvel', 'show_in_slider', 'show_in_gallery',
+            'icon', 'bathrooms', 'bedrooms', 'sqft', 'measureUnit', 'services', 'verified',
+            'residential', 'commercial', 'hot_deals', 'clone_id', 'main_site', 'lead_id',
+            'new_properties_id', 'construction_status'
+        ];
+
+        $propertyData = [];
+        foreach ($propertyFields as $field) {
+            if (isset($data[$field])) {
+                $propertyData[$field] = $data[$field];
+            }
+        }
+
+        // Insert property
+        $property_id = $this->Api_model->add_data_in_table($propertyData, 'properties');
+
+        if (!$property_id) {
+            $return['message'] = 'Failed to insert property';
+            return $this->response($return, REST_Controller::HTTP_OK);
+        }
+
+        // Property meta table fields
+        $metaFields = [
+            'floor_no', 'total_floors', 'property_age', 'kothi_story_type', 'furnishing_status',
+            'ownership_type', 'gated_community', 'available_from', 'has_lift', 'parking_available',
+            'commercial_approval', 'width_length', 'road_width', 'commercial_useType',
+            'shutters_count', 'roof_height', 'loading_bay', 'locality', 'landmark', 'direction',
+            'facing', 'in_society', 'hospital_type', 'floor_available', 'medical_facilities',
+            'hospital_license', 'possession_status', 'map_link'
+        ];
+
+        $metaData = ['properties_id' => $property_id];
+        foreach ($metaFields as $field) {
+            if (isset($data[$field])) {
+                $metaData[$field] = $data[$field];
+            }
+        }
+
+        // Insert property meta
+        $this->Api_model->add_data_in_table($metaData, 'properties_meta');
+
+        $return['status'] = 'done';
+        $return['message'] = 'Property saved successfully';
+      // $return['result'] = ['property_id' => $property_id];
+
+        return $this->response($return, REST_Controller::HTTP_OK);
+    }
+
+    public function editProperty_post()
+    {
+        $return = array('status' => 'error', 'message' => 'Missing required fields', 'result' => '');
+
+        // Read property ID
+        $property_id = $this->input->post('id');
+        if (!$property_id) {
+            $return['message'] = "Missing required field: property ID.";
+            return $this->response($return, REST_Controller::HTTP_OK);
+        }
+
+        // Handle image uploads
+        $imageFields = ['image_one', 'image_two', 'image_three', 'image_four'];
+        $uploadPath = './uploads/';
+        $allowedTypes = 'jpg|jpeg|png|webp';
+
+        $this->load->library('upload');
+
+        foreach ($imageFields as $field) {
+            $oldImage = $this->input->post($field . '_old');  // hidden input: image_one_old
+
+            if (!empty($_FILES[$field]['name'])) {
+                $config['upload_path'] = $uploadPath;
+                $config['allowed_types'] = $allowedTypes;
+                $config['file_name'] = time() . '_' . basename($_FILES[$field]['name']);
+
+                $this->upload->initialize($config);
+
+                if ($this->upload->do_upload($field)) {
+                    $uploadData = $this->upload->data();
+                    $uploadedFileName = $uploadData['file_name'];
+
+                    $this->input->post($field, true); // Optional XSS filtering
+                    $this->db->set($field, $uploadedFileName);
+
+                    // Delete old image if needed
+                    if (!empty($oldImage) && file_exists($uploadPath . $oldImage)) {
+                        unlink($uploadPath . $oldImage);
+                    }
+                }
+            } else {
+                // Keep old image if no new file uploaded
+                if (!empty($oldImage)) {
+                    $this->db->set($field, $oldImage);
+                }
+            }
+        }
+
+        // Property table fields
+        $propertyFields = [
+            'userid', 'name', 'property_builder', 'description', 'property_for', 'project_n',
+            'built', 'land', 'carpet', 'additional', 'additional_value', 'address', 'person',
+            'phone', 'person_address', 'city', 'state', 'property_type', 'category', 'zip_code',
+            'bhk', 'budget', 'budget_in_words', 'amenities', 'type',
+            'status', 'approvel', 'show_in_slider', 'show_in_gallery',
+            'icon', 'bathrooms', 'bedrooms', 'sqft', 'measureUnit', 'services', 'verified',
+            'residential', 'commercial', 'hot_deals', 'clone_id', 'main_site', 'lead_id',
+            'new_properties_id', 'construction_status'
+        ];
+
+        foreach ($propertyFields as $field) {
+            $value = $this->input->post($field);
+            if ($value !== null) {
+                $this->db->set($field, $value);
+            }
+        }
+
+        // Update the `properties` table
+        $this->db->where('id', $property_id);
+        $this->db->update('properties');
+
+        // Property meta fields
+        $metaFields = [
+            'floor_no', 'total_floors', 'property_age', 'kothi_story_type', 'furnishing_status',
+            'ownership_type', 'gated_community', 'available_from', 'has_lift', 'parking_available',
+            'commercial_approval', 'width_length', 'road_width', 'commercial_useType',
+            'shutters_count', 'roof_height', 'loading_bay', 'locality', 'landmark', 'direction',
+            'facing', 'in_society', 'hospital_type', 'floor_available', 'medical_facilities',
+            'hospital_license', 'possession_status', 'map_link'
+        ];
+
+        $metaData = [];
+        foreach ($metaFields as $field) {
+            $value = $this->input->post($field);
+            if ($value !== null) {
+                $metaData[$field] = $value;
+            }
+        }
+
+        if (!empty($metaData)) {
+            $this->db->where('properties_id', $property_id);
+            $this->db->update('properties_meta', $metaData);
+        }
+
+        $return['status'] = 'done';
+        $return['message'] = 'Property updated successfully';
+        return $this->response($return, REST_Controller::HTTP_OK);
+    }
+
+
+}
