@@ -11,6 +11,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 	  $message = $this->session->flashdata('message');
 	  if($message != ''){
 	      echo '<div class="alert alert-success">'.$message.'</div>';
+	      $this->session->unset_userdata('message');
 	  }
 	  echo validation_errors(); ?>
 	  
@@ -40,16 +41,16 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 				</div>
             </div> 
             
+           <div class="col-sm-6">
+            <div class="form-group">
+                <label>Password*</label>
+                <input type="text" name="password" value="" class="form-control" placeholder="Enter new password (leave blank to keep current)">
+            </div>
+        </div>
+
             <div class="col-sm-6">
                 <div class="form-group">
-					<label>Password*</label>
-                    <input type="text" name="password" value="" class="form-control" placeholder="Password"> 				
-				</div>
-            </div> 
-            
-            <div class="col-sm-6">
-                <div class="form-group">
-					<label>Varify User </label>
+					<label>Verify User </label>
 					<Select name="varified_user" class="form-control">
 						<option value="Yes" <?php if($info->varified_user=='Yes'){echo 'selected';} ?>>Yes </option>
 						<option value="No" <?php if($info->varified_user=='No'){echo 'selected';} ?>>No </option>

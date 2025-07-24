@@ -157,13 +157,14 @@ defined('BASEPATH') or exit('No direct script access allowed');
                      <div class="col-sm-3">
                      <div class="form-group">
                         <label for="timeline">Time line</label>
-                        <select id="timeline" name="timeline" class="form-control">
-                             <option value="">Select</option>
-                            <option value="Urgent">Urgent</option>
-                            <option value="Within week">Within week</option>
-                            <option value=">Within month">Within month</option>
-                             <option value=">1 to 3 months">1 to 3 months</option>
-                            <option value=">Up to 6 months">Up to 6 months</option>
+                       <select id="timeline" name="timeline" class="form-control">
+                            <option value="">Select</option>
+                            <option value="Immediate">Immediate</option>
+                            <option value="Within Week">Within Week</option>
+                            <option value="Within Month">Within Month</option>
+                            <option value="1-3 Months">1-3 Months</option>
+                            <option value="3-6 Months">3-6 Months</option>
+                            <option value="6+ Months">6+ Months</option>
                         </select>
                     </div>
                 </div></div>

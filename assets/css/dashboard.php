@@ -301,7 +301,7 @@ if (in_array('Manager', $roles) || in_array('Admin', $roles)) {
 <div class="col-xl-12 col-sm-12 py-2">
     <h6 style="color: #333; font-weight: bold; margin-bottom: 10px; font-size: 1.25rem; text-align: center;">Meetings</h6>
     <div class="table-scroll-div">
-    <table id="1" class="table table-striped table-bordered table-sm display" cellspacing="0" width="100%">
+    <table id="datatable1" class="table table-striped table-bordered table-sm display" cellspacing="0" width="100%">
         <thead>
             <tr>
                 <th>Sr. No.</th>

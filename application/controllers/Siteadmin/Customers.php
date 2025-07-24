@@ -30,7 +30,7 @@ class Customers extends CI_Controller {
 	        $updateData = array(
 				'varified_user'=> $this->input->post('status')
 			);
-			$result = $this->AdminModel->updateTable($id,'id','rent',$updateData);
+			$result = $this->AdminModel->updateTable($id,'id','users',$updateData);
 
  }  
  
@@ -77,55 +77,60 @@ class Customers extends CI_Controller {
     $this->load->view('includes/admin/template', $data);
  }
 public function editCustomer() {
-    $data['title'] = 'Edit Customer'; 
- 
-	$sessionLogin = $this->session->userdata('adminLogged');
-	if(!($sessionLogin)) { redirect(base_url('site-admin'));   }
-	
-	$id = $this->uri->segment('4');
-	
-	
-if ($this->input->post('save')) {
-    $this->form_validation->set_rules('cname', 'Name', 'trim|required|min_length[3]|max_length[25]');
-    $this->form_validation->set_rules('email', 'Email', 'trim|required|valid_email');
-    $this->form_validation->set_rules('number', 'Number', 'trim|required|numeric|exact_length[10]');
-    
-    $this->form_validation->set_error_delimiters('<div class="alert alert-danger">', '</div>');
-    
-    if ($this->form_validation->run() != FALSE) {
-        $checkPassword = $this->AdminModel->getDataFromTable('users', 'password', 'id', $id);
-        $existingPassword = $checkPassword[0]->password;
-        $newPassword = $this->input->post('password');
-        $hashedPassword = $existingPassword;
-        
-        if (!empty($newPassword)) {
-            $hashedPassword = md5($newPassword);
+        $data['title'] = 'Edit Customer';
+
+        $sessionLogin = $this->session->userdata('adminLogged');
+        if (!($sessionLogin)) {
+            redirect(base_url('site-admin'));
         }
 
-        $updateData = array(
-            'name' => $this->input->post('cname'),
-            'email' => $this->input->post('email'),
-            'mobile' => $this->input->post('number'),
-            'password' => $hashedPassword,
-            'varified_user' => $this->input->post('varified_user')
-        );
+        $id = $this->uri->segment('4');
 
-        $result = $this->AdminModel->updateTable($id, 'id', 'users', $updateData);
-        if ($result) {
-            $this->session->set_flashdata('message', 'Customer updated successfully.');
-            redirect(base_url('admin/customer/edit') . '/' . $id);
+        if ($this->input->post('save')) {
+            $this->form_validation->set_rules('cname', 'Name', 'trim|required|min_length[3]|max_length[25]');
+            $this->form_validation->set_rules('email', 'Email', 'trim|required|valid_email');
+            $this->form_validation->set_rules('number', 'Number', 'trim|required|numeric|exact_length[10]');
+
+            $this->form_validation->set_error_delimiters('<div class="alert alert-danger">', '</div>');
+
+            if ($this->form_validation->run() !== FALSE) {
+                // Get existing password from DB
+                $query = $this->db->get_where('users', ['id' => $id]);
+                $existingPassword = $query->row()->password;
+
+                $newPassword = $this->input->post('password');
+                $hashedPassword = $existingPassword;
+
+                if (!empty($newPassword)) {
+                    $hashedPassword = md5($newPassword); // Or use password_hash for better security
+                }
+
+                // Prepare update data
+                $updateData = array(
+                    'name' => $this->input->post('cname'),
+                    'email' => $this->input->post('email'),
+                    'mobile' => $this->input->post('number'),
+                    'password' => $hashedPassword,
+                    'varified_user' => $this->input->post('varified_user')
+                );
+
+                // Perform update without model
+                $this->db->where('id', $id);
+                $result = $this->db->update('users', $updateData);
+
+                if ($result) {
+                    $this->session->set_flashdata('message', 'Customer updated successfully.');
+                    redirect(base_url('admin/customer/edit') . '/' . $id);
+                }
+            }
         }
+
+        // This part should NOT be outside the method logic
+        $data['customer'] = $this->AdminModel->getDataFromTableByField($id, 'users', 'id');
+        $data['mainContent'] = 'siteAdmin/customerEdit';
+        $this->load->view('includes/admin/template', $data);
     }
-}
 
-	
-
-	$data['customer'] = $this->AdminModel->getDataFromTableByField($id,'users','id');
-	
-	$data['mainContent'] = 'siteAdmin/customerEdit'; 
-    $this->load->view('includes/admin/template', $data);
- }
- 
  public function deleteCustomer(){
     $id = $this->uri->segment('4');
     $result =  $this->AdminModel->deleteRow($id,'users','id');

@@ -43,7 +43,7 @@ if (in_array('Admin', $roles) || in_array('Manager', $roles)) { ?>
         <?php
         }
         if (strpos($role, 'Admin')!==false) { ?>
-            <li class="nav-item"><a class="nav-link" href="<?php echo base_url('admin/deal'); ?>">Deal</a></li>
+          <!--  <li class="nav-item"><a class="nav-link" href="<?php echo base_url('admin/deal'); ?>">Deal</a></li>-->
             <li class="nav-item"><a class="nav-link" href="<?php echo base_url('admin/user'); ?>">Users</a></li>
             
             <?php

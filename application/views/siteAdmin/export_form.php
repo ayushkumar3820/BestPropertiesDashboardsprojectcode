@@ -49,6 +49,15 @@
                         <input type="date" name="to_date" id="to_date" class="form-control" required>
                     </div>
 
+                    <div class="form-group" id="status_filter_group" style="display: none;">
+                        <label for="status_filter">Status Filter</label>
+                        <select name="status_filter" class="form-control">
+                            <option value="all" selected>All</option>
+                            <option value="active">Active</option>
+                            <option value="deactivate">Deactivate</option>
+                        </select>
+                    </div>
+
                     <div class="form-group text-right">
                         <button type="submit" class="btn btn-success">
                             <i class="fa fa-download"></i> Export
@@ -101,5 +110,26 @@
         const format = (date) => date.toISOString().split('T')[0];
         fromInput.value = format(fromDate);
         toInput.value = format(toDate);
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const tableSelect = document.querySelector('select[name="table_name"]');
+        const statusFilterGroup = document.getElementById('status_filter_group');
+
+        function toggleStatusFilter() {
+            if (tableSelect.value === 'properties') {
+                statusFilterGroup.style.display = 'block';
+            } else {
+                statusFilterGroup.style.display = 'none';
+            }
+        }
+
+        // Initial check
+        toggleStatusFilter();
+
+        // On change
+        tableSelect.addEventListener('change', toggleStatusFilter);
     });
 </script>

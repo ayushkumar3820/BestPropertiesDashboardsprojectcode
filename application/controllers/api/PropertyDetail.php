@@ -308,6 +308,8 @@ public function __construct()
             $data = json_decode($json, true);
 
             $id = $data['id'] ?? null;
+            $userId = $data['userid'] ?? null; // added for scheduling check
+
             if (!is_numeric($id)) {
                 $return['message'] = 'Please pass a valid ID';
             } else {
@@ -340,11 +342,36 @@ public function __construct()
                     // Add unique_id to the first (main) property item
                     $getPropertyDetails[0]['unique_id'] = $unique_id;
 
+                    // ✅ Check if the property is scheduled for the user
+                    $is_scheduled = false;
+                    if (!empty($userId)) {
+                        $this->db->where('userId', $userId);
+                        $this->db->like('property_ids', $id); // loosely matches in comma-separated values
+                        $query = $this->db->get('leads_comment');
+                        $is_scheduled = $query->num_rows() > 0;
+                    }
+
+                    $getPropertyDetails[0]['is_scheduled'] = $is_scheduled;
+
+                    $propertyUserId = $getPropertyDetails[0]['userid'] ?? null;
+                    $userInfo = null;
+                    if (!empty($propertyUserId)) {
+                        $this->db->select('name, email, mobile');
+                        $this->db->from('users');
+                        $this->db->where('id', $propertyUserId);
+                        $userQuery = $this->db->get();
+                        if ($userQuery->num_rows() > 0) {
+                            $userInfo = $userQuery->row_array();
+                        }
+                    }
+
+
                     $return['status'] = 'done';
                     $return['message'] = 'Success';
                     $return['result'] = array(
                         'main_property' => $getPropertyDetails,
-                        'additional_properties' => $additionalPropertyDetails
+                        'additional_properties' => $additionalPropertyDetails,
+                        'userInfo' => $userInfo
                     );
                 }
             }
@@ -405,6 +432,7 @@ public function __construct()
         $this->response($return, REST_Controller::HTTP_OK);
     	
     }
+
     public function getAnymessage_post()
     {
         $return = array('status' => 'error', 'message' => 'Please send all required parameters', 'result' => '');

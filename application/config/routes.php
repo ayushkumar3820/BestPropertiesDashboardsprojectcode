@@ -49,6 +49,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |		my-controller/my-method	-> my_controller/my_method
 */
 $route['default_controller'] = 'Front/reactView';
+$route['resetPassword/(:any)'] = 'Front/reactView';
 $route['404_override'] = 'Front/error';
 $route['translate_uri_dashes'] = FALSE;
  
@@ -91,6 +92,7 @@ $route['single-all-properties'] = 'api/PropertyDetail/getPropertiesSingleOne';
 $route['submit-agent-properties'] = 'api/PropertyDetail/submitAgentProperties';
 $route['submit-properties'] = 'api/PropertyDetail/submitNewAgentPropertie';
 $route['check-url'] = 'api/PropertyDetail/checkPropertyurl';
+$route['add-property-buy-sale-or-rent'] = 'api/PropertyDetail/add_property_sale_buy_or_rent';
 
 
 /*get data live table */
@@ -118,6 +120,17 @@ $route['single-property/(:num)'] = 'Front/reactView';
 $route['privacy-policy'] = 'Front/reactView';
 $route['data-deletion'] = 'Front/reactView';
 $route['term-and-condition'] = 'Front/reactView';
+$route['about'] = 'Front/reactView';
+$route['disclaimer'] = 'Front/reactView';
+$route['requirment'] = 'Front/reactView';
+$route['wishlist'] = 'Front/reactView';
+$route['dashboards'] = 'Front/reactView';
+$route['home-loan'] = 'Front/reactView';
+$route['forget-password'] = 'Front/reactView';
+$route['sell-with-us'] = 'Front/reactView';
+$route['budget'] = 'Front/reactView';
+
+
 /*
 $route['properties/(:any)'] = 'Front/detailProperties';
 $route['search'] = 'Front/searchProperties';
@@ -139,8 +152,14 @@ $route['admin/logout'] = 'Siteadmin/Login/logout';
 
 $route['admin/properties'] = 'Siteadmin/Properties/index';
 $route['admin/import_export'] = 'Siteadmin/Properties/import_export';
-$route['admin/properties/add'] = 'Siteadmin/Properties/addProperties';
-$route['admin/properties/edit/(:num)'] = 'Siteadmin/Properties/editProperties/$1';
+//$route['admin/properties/add'] = 'Siteadmin/Properties/addProperties';
+$route['admin/properties/add'] = 'Siteadmin/Properties/addProperties1';
+
+$route['admin/properties/updateStatus'] = 'Siteadmin/Properties/updateStatus';
+$route['admin/properties/updateBulkStatus'] = 'Siteadmin/Properties/updateBulkStatus';
+
+$route['admin/properties/edit/(:num)'] = 'Siteadmin/Properties/editProperties1/$1';
+//$route['admin/properties/edit/(:num)'] = 'Siteadmin/Properties/editProperties/$1';
 $route['admin/properties/delete/(:num)'] = 'Siteadmin/Properties/deleteProperties/$1';
 $route['admin/properties/export_page'] = 'Siteadmin/Properties/export_page';
 $route['admin/properties/export_data'] = 'Siteadmin/Properties/export_data';
@@ -267,29 +286,18 @@ $route['new-home-page'] = 'Home/index';
 $route['for-sale'] = 'For_Sale/index';
 $route['buy'] = 'Buy/index';
 $route['for-rent-new'] = 'For_Rent/index';
-$route['sell-with-us'] = 'Sell_With_US/index';
-$route['home-loan'] = 'Home_Loan/index';
+//$route['sell-with-us'] = 'Sell_With_US/index';
+
 $route['log-in'] = 'Login/index';
 $route['contact-us'] = 'Contact_us/index';
+
+
 
 // Schedule Demo
 $route['schedule-demo'] = 'Schedule_demo/submit_form';
 
-
 //whatsapp api
 $route['whatsapp-api.php'] = 'Whatsapp_api/index';
-
-
-// Add these routes for Swagger
-$route['api/docs'] = 'swagger/index';
-$route['api/docs/swagger.json'] = 'swagger/json';
-$route['api/docs/swagger.yaml'] = 'swagger/yaml';
-
-// Your existing API routes
-$route['api/test'] = 'SwaggerTest/test';
-
-
-
 
 
 

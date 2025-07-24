@@ -26,7 +26,7 @@
 							<th>Name</th>
 							<th>Email</th>
 							<th>Phone</th>
-							<th class="hidden d-none">Verify</th>
+							<th>Verify</th>
 							<th>Action</th>
 						</tr>
 					</thead>
@@ -51,7 +51,7 @@
 										<?php echo $customers->mobile; ?>
 									</td>
 									
-									<td class="d-none"><input type="hidden" name="list_id" value="" class="listId<?php echo $customers->id; ?>">
+									<td><input type="hidden" name="list_id" value="" class="listId<?php echo $customers->id; ?>">
 										<label class="switch">
 											<input type="checkbox" value="No" <?php if ($customers->varified_user == 'Yes') { ?>checked<?php } ?> name="varified_user" class="status"
 												data-id="<?php echo $customers->id; ?>">

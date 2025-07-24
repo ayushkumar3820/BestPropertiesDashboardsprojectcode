@@ -28,6 +28,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
       <h1 class="d-sm-block heading"><?php echo $title; ?></h1>
       <?php
       $info = $leads[0];
+      $info->additional_info = !empty($info->additional_info) ? json_decode($info->additional_info, true) : [];
 	  $message = $this->session->flashdata('message1');
 	  if($message != ''){
 	      echo '<div class="alert alert-success">'.$message.'</div>';
@@ -72,6 +73,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 <label for="status">Status</label> 
                 <select id="status" name="status" class="form-control">
                      <option value="New" <?php if($info->status=='New') { echo 'selected'; }?>>New</option>
+                     <option value="Pending" <?php if($info->status=='Pending') { echo 'selected'; }?>>Pending</option>
                      <option value="Contacted" <?php if($info->status=='Contacted') { echo 'selected'; }?>>Contacted</option>
                      <option value="Qualified" <?php if($info->status=='Qualified') { echo 'selected'; }?>>Qualified</option>
                      <option value="Site Visit Scheduled" <?php if($info->status=='Site Visit Scheduled') { echo 'selected'; }?>>Site Visit Scheduled</option>
@@ -95,18 +97,18 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                     <label>City</label>
                     <input type="text" name="city" value="<?php echo $info->city; ?>" class="form-control" placeholder="City">
                 </div>
-            </div>
-<div class="col-sm-3">
-    <div class="form-group">
-        <label>Property Type</label>
-        <select id="propertyType" name="propertyType" class="form-control">
-           
-            <option value="Residential" <?php if ($info->propertyType == 'Residential') echo 'selected'; ?>>Residential</option>
-            <option value="Commercial" <?php if ($info->propertyType == 'Commercial') echo 'selected'; ?>>Commercial</option>
+        </div>
+        <div class="col-sm-3">
+            <div class="form-group">
+                <label>Property Type</label>
+                <select id="propertyType" name="propertyType" class="form-control">
 
-        </select>
-    </div>
-</div>
+                    <option value="Residential" <?php if ($info->propertyType == 'Residential') echo 'selected'; ?>>Residential</option>
+                    <option value="Commercial" <?php if ($info->propertyType == 'Commercial') echo 'selected'; ?>>Commercial</option>
+
+                </select>
+            </div>
+        </div>
 
 <div class="col-sm-3" id="residentialDiv" style="display:<?php if ($info->propertyType=='Residential') { echo 'block'; } else { echo 'none'; } ?>;">
     <div class="form-group">
@@ -210,18 +212,54 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             </div>
         </div>
             <div class="col-sm-3">
+                <?php
+                    function match_timeline($optionValue, $input) {
+                        $map = [
+                            'Urgent' => 'Immediate',
+                            'Within week' => 'Within Week',
+                            'Within weeks' => 'Within Week',
+                            'Within month' => 'Within Month',
+                            'Within months' => '1-3 Months',
+                            'Up to 6 months' => '3-6 Months',
+                            'Later' => '6+ Months'
+                        ];
+
+                        $normalizedInput = $map[$input] ?? $input;
+
+                        return strtolower($optionValue) === strtolower($normalizedInput) ? 'selected' : '';
+                    }
+                ?>
             <div class="form-group">
                 <label>Time line</label>
-                <select name="timeline" class="form-control">
+               <select name="timeline" class="form-control">
                     <option value="">Select</option>
-                    <option <?php if($info->timeline=='Urgent'){ echo 'selected'; }?> value="Urgent">Urgent</option>
-                    <option <?php if($info->timeline=='Within week'){ echo 'selected'; }?> value="Within week">Within week</option>
-                    <option <?php if($info->timeline=='Within months'){ echo 'selected'; }?> value="Within months">Within months</option>
-                    <option <?php if($info->timeline=='Up to 6 months'){ echo 'selected'; }?> value="Up to 6 months">Up to 6 months</option>
- 
-                </select> 				
+                    <option <?= match_timeline('Immediate', $info->timeline); ?> value="Immediate">Immediate</option>
+                    <option <?= match_timeline('Within Week', $info->timeline); ?> value="Within Week">Within Week</option>
+                    <option <?= match_timeline('Within Month', $info->timeline); ?> value="Within Month">Within Month</option>
+                    <option <?= match_timeline('1-3 Months', $info->timeline); ?> value="1-3 Months">1-3 Months</option>
+                    <option <?= match_timeline('3-6 Months', $info->timeline); ?> value="3-6 Months">3-6 Months</option>
+                    <option <?= match_timeline('6+ Months', $info->timeline); ?> value="6+ Months">6+ Months</option>
+                </select>
             </div>
         </div>
+
+            <?php if (!empty($info->additional_info)): ?>
+                <div class="col-sm-12">
+                    <h4 class="mt-4">Additional Info</h4>
+                    <div class="row">
+                        <?php foreach ($info->additional_info as $key => $value): ?>
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label><?= ucwords(str_replace('_', ' ', $key)) ?></label>
+                                    <input type="text" name="additional_info[<?= htmlspecialchars($key) ?>]" value="<?= htmlspecialchars($value) ?>" class="form-control" placeholder="<?= ucwords(str_replace('_', ' ', $key)) ?>">
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            <?php endif; ?>
+
+
         
         
         

@@ -70,7 +70,11 @@ public function index() {
 
     $filters = [];
     $like = [];
-    $or_like = [];
+
+    // Agent filter
+    if (stristr($this->session->userdata('role'), 'Agent')) {
+        $filters['properties.userid'] = $this->session->userdata('id');
+    }
 
     // POST filter
     if ($this->input->server('REQUEST_METHOD') === 'POST') {
@@ -83,6 +87,11 @@ public function index() {
         if (!empty($post['address'])) {
             $like['properties.address'] = $post['address'];
         }
+        /*if (!empty($post['bhk'])) {
+            $filters['properties.bhk'] = $post['bhk'];
+        }*/
+        // If specific BHK selected
+      $or_like = [];  // group OR conditions here
 
         if (!empty($post['bhk'])) {
             $bhk = $post['bhk'];
@@ -91,29 +100,31 @@ public function index() {
             $or_like[] = ['column' => 'properties.bhk', 'value' => $bhk, 'type' => 'where'];
             $or_like[] = ['column' => 'properties.name', 'value' => $keyword, 'type' => 'like'];
         }
-
         if (!empty($post['type'])) {
             $like['properties.type'] = $post['type'];
         }
-
-        if (!empty($post['property_for'])) {
+       if (!empty($post['property_for'])) {
             $like['properties.property_for'] = $post['property_for'];
         }
-
-        if (!empty($post['min_budget'])) {
-            $filters['properties.budget >='] = (int)$post['min_budget'];
+       if (!empty($post['min_budget'])) {
+            $filters['properties.budget >='] = (int) $post['min_budget'];
         }
 
         if (!empty($post['max_budget'])) {
-            $filters['properties.budget <='] = (int)$post['max_budget'];
+            $filters['properties.budget <='] = (int) $post['max_budget'];
         }
+        /*if (!empty($post['services'])) {
+            $filters['properties.services'] = $post['services'];
+        }
+        if (!empty($post['description'])) {
+            $like['properties.description'] = $post['description'];
+        }*/
     }
 
     // Build full query manually to allow LEFT JOIN
-    $this->db->select('properties.*, properties_clone.main_site as clone_site, properties_clone.property_url, users.name AS user_name');
+    $this->db->select('properties.*, properties_clone.main_site, properties_clone.property_url');
     $this->db->from('properties');
     $this->db->join('properties_clone', 'properties.clone_id = properties_clone.id', 'left');
-    $this->db->join('users', 'properties.userid = users.id', 'left'); // FIXED JOIN
 
     // Apply filters
     if (!empty($filters)) {
@@ -122,24 +133,11 @@ public function index() {
         }
     }
 
-    // Apply LIKE conditions
+    // Apply like conditions
     if (!empty($like)) {
         foreach ($like as $key => $value) {
             $this->db->like($key, $value);
         }
-    }
-
-    // Apply OR LIKE and WHERE conditions
-    if (!empty($or_like)) {
-        $this->db->group_start();
-        foreach ($or_like as $condition) {
-            if ($condition['type'] === 'where') {
-                $this->db->or_where($condition['column'], $condition['value']);
-            } elseif ($condition['type'] === 'like') {
-                $this->db->or_like($condition['column'], $condition['value']);
-            }
-        }
-        $this->db->group_end();
     }
 
     $this->db->order_by('properties.id', 'desc');
@@ -151,7 +149,7 @@ public function index() {
     $this->load->view('includes/admin/template', $data);
 }
 
-public function updateStatus(){
+  public function updateStatus(){
 
             $id = $this->input->post('list_id');
 	        $updateData = array(
@@ -505,31 +503,36 @@ public function editProperties1() {
     $data['title'] = 'Property Edit';
     $data['projects'] = $this->AdminModel->getProjects();
 
+    // Get property ID from URL
     $id = $this->uri->segment('4');
-    $data['properties'] = $this->AdminModel->getDataFromTableByField($id, 'properties', 'id');
-    $clone_id = $data['properties'][0]->clone_id;
 
-    $properties_id = $data['properties'][0]->id;
-    $data['properties_meta'] = $this->AdminModel->getDataFromTableByField($properties_id, 'properties_meta', 'properties_id');
+    // Get main property data
+    $propertyData = $this->AdminModel->getDataFromTableByField($id, 'properties', 'id');
+    if (!$propertyData) {
+        show_404(); // or redirect with error message
+    }
 
+    $data['properties'] = $propertyData;
 
+    // Get metadata from properties_meta using the same ID as properties_id
+    $metaData = $this->AdminModel->getDataFromTableByField($id, 'properties_meta', 'properties_id');
+    $data['properties_meta'] = !empty($metaData) ? $metaData[0] : null;
+
+    // Get clone data if applicable
+    $clone_id = $propertyData[0]->clone_id;
     if ($clone_id != 0) {
         $data['clone_data'] = $this->AdminModel->getCloneData($clone_id);
     } else {
         $data['clone_data'] = null;
     }
 
-    if ($data['properties'][0]->property_type == "Serviced Apartment") {
-        $data['properties'][0]->property_type = "Studio Apartment";
-    }
-
+    // Restrict access for Agent roles
     $role = $this->session->userdata('role');
-    if ($data['properties'] && stristr($role, 'Agent')) {
-        if ($data['properties'][0]->userid != $this->session->userdata('id')) {
-            redirect(base_url('admin/dashboard'));
-        }
+    if (stristr($role, 'Agent') && $propertyData[0]->userid != $this->session->userdata('id')) {
+        redirect(base_url('admin/dashboard'));
     }
 
+    // Load the edit view
     $data['mainContent'] = 'siteAdmin/propertiesEdit1';
     $this->load->view('includes/admin/template', $data);
 }
@@ -735,8 +738,8 @@ public function export_page()
 {
     $role = $this->session->userdata('role');
     if (!check_permission($role, 'contact')) {
-            redirect(base_url('admin/dashboard'));
-        }
+    redirect(base_url('admin/dashboard'));
+}
 
     $data['title'] = 'Export Properties Data';
     $data['mainContent'] = 'siteAdmin/export_form'; // View path: views/siteAdmin/export_form.php
@@ -753,7 +756,6 @@ public function export_data()
     $table = $this->input->post('table_name');
     $from = $this->input->post('from_date');
     $to = $this->input->post('to_date');
-    $status_filter = $this->input->post('status_filter') ?? 'all'; // default to 'all'
 
     // Validate inputs
     if (empty($table) || empty($from) || empty($to)) {
@@ -768,26 +770,23 @@ public function export_data()
         redirect('admin/properties/export_page');
     }
 
-    // Load DB utility
+    // Fetch records
     $this->load->dbutil();
     $this->db->from($table);
-    $this->db->where('DATE(created_at) >=', $from);
-    $this->db->where('DATE(created_at) <=', $to);
 
-    // Apply status filter only for 'properties' table
+    // Apply date filter based on table name
     if ($table === 'properties') {
-        if ($status_filter === 'active') {
-            $this->db->where('status', 'active');
-        } elseif ($status_filter === 'deactivate') {
-            $this->db->where('status', 'deactivate');
-        }
-        // If 'all', don't apply any status condition
+        $this->db->where('DATE(created_at) >=', $from);
+        $this->db->where('DATE(created_at) <=', $to);
+    } else { // properties_clone
+        $this->db->where('DATE(created_at) >=', $from);
+        $this->db->where('DATE(created_at) <=', $to);
     }
 
     $query = $this->db->get();
 
     if ($query->num_rows() == 0) {
-        $this->session->set_flashdata('message', 'No data found for the selected filters.');
+        $this->session->set_flashdata('message', 'No data found for the selected date range.');
         redirect('admin/properties/export_page');
     }
 
@@ -797,7 +796,7 @@ public function export_data()
     $filename = "{$table}_export_" . date('Ymd_His') . ".csv";
     $csv_data = $this->dbutil->csv_from_result($query, $delimiter, $newline);
 
-    // Download CSV
+    // Download helper
     $this->load->helper('download');
     force_download($filename, $csv_data);
 }

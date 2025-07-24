@@ -8,7 +8,6 @@ $advanceSearchVisible = !empty($_POST) ? 'block' : 'none';
             <h1 class="d-sm-block heading m-0"><?php echo $title; ?></h1>
         </div>
         <div class="top-btn-div">
-            <a href="#" class="btn btn-sm btn-info back-btn advance-search-btn">Advance Search</a>
             <a href="<?php echo base_url('admin/leads/add');?>" class="btn btn-sm btn-info back-btn">Add New</a>
             <a href="https://bestpropertiesmohali.com/admin/leads/export_page" style="float: right;margin-left: 4px;" class="btn btn-sm btn-success back-btn">Export</a>
         </div>
@@ -29,7 +28,9 @@ $role = $this->session->userdata('role');
 $roles = explode(',', str_replace(' ', '', $role)); 
 if (in_array('Admin', $roles)) {
 ?>
-
+<div class="row" style="margin:10px;">
+    <a href="#" class="advance-search-btn" style="background: #00748500 !important;">Advance Search</a>
+</div>
 <form method="post" action="" class="mb-3" id="filterForm">
     <div class="row1 advance-search" style="display: <?php echo $advanceSearchVisible; ?>;">
         <div class="row">

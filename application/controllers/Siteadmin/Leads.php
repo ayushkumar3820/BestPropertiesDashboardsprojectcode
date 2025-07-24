@@ -331,28 +331,37 @@ class Leads extends CI_Controller
             );
 
             if ($this->form_validation->run() != false) {
-                $updateData = [
-                    "budget" => $this->input->post("budget"),
-                    "max_budget" => $this->input->post("budgetmax"),
-                    "preferred_location" => $this->input->post(
-                        "preferred_location"
-                    ),
-                    "Project_Builder" => $this->input->post("Project_Builder"),
-                    "propertyType_sub" => $this->input->post(
-                        "propertyType_sub"
-                    ),
-                    "propertyType" => $this->input->post("propertyType"),
-                    "requirement" => $this->input->post("requirement"),
-                    "Profession" => $this->input->post("Profession"),
-                    "description" => $this->input->post("description"),
-                    "status" => $this->input->post("status"),
-                    "city" => $this->input->post("city"),
-                    "source" => $this->input->post("source"),
-                    "priority" => $this->input->post("priority"),
-                    "timeline" => $this->input->post("timeline"),
-                    "leads_type" => $this->input->post("leads_type"),
-                ];
 
+
+                // Extract and clean additional_info
+                $additionalInfo = $this->input->post('additional_info');
+                $filteredInfo = [];
+                if (is_array($additionalInfo)) {
+                    $filteredInfo = array_filter($additionalInfo, function ($val) {
+                        return trim($val) !== '';
+                    });
+                }
+                $encodedAdditionalInfo = json_encode($filteredInfo);
+
+
+                $updateData = [
+                    "budget"             => $this->input->post("budget"),
+                    "max_budget"         => $this->input->post("budgetmax"),
+                    "preferred_location" => $this->input->post("preferred_location"),
+                    "Project_Builder"    => $this->input->post("Project_Builder"),
+                    "propertyType_sub"   => $this->input->post("propertyType_sub"),
+                    "propertyType"       => $this->input->post("propertyType"),
+                    "requirement"        => $this->input->post("requirement"),
+                    "Profession"         => $this->input->post("Profession"),
+                    "description"        => $this->input->post("description"),
+                    "status"             => $this->input->post("status"),
+                    "city"               => $this->input->post("city"),
+                    "source"             => $this->input->post("source"),
+                    "priority"           => $this->input->post("priority"),
+                    "timeline"           => $this->input->post("timeline"),
+                    "leads_type"         => $this->input->post("leads_type"),
+                    "additional_info"    => $encodedAdditionalInfo
+                ];
                 $currentData = $data["leads"][0];
                 $logContent = [];
 
@@ -524,6 +533,7 @@ class Leads extends CI_Controller
                                 "phone" => $lead->mobile,
                                 "new_properties_id" => $new_properties_id, // Add here
                             ];
+
 
                             $this->AdminModel->addDataInTable(
                                 $propertyData,

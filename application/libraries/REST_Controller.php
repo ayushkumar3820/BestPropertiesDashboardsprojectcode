@@ -8,14 +8,14 @@ $currentURL = '';
 if(isset($_SERVER['HTTP_ORIGIN'])){ $currentURL = $_SERVER['HTTP_ORIGIN']; }
 elseif(isset($_SERVER['HTTP_REFERER'])){ $currentURL = $_SERVER['HTTP_REFERER']; }
 
-	
+
 if(in_array($currentURL, $allowedOrigins) && $currentURL != ''){
     $http_origin = $currentURL;
 }
 
 header("Access-Control-Allow-Origin: $http_origin");
 //header("Access-Control-Allow-Origin: *");
-header('Access-Control-Allow-Methods: GET, POST, PUT');
+header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
 //header('Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Authorization');
 header('Access-Control-Allow-Headers: Origin, Content-Type, Authorization');
 header('Content-Type: application/json');

@@ -13,28 +13,27 @@ $propertyAdvanceSearchVisible = !empty($_POST) ? 'block' : 'none';
                 <a href="<?php echo base_url('admin/approvel'); ?>" class="btn btn-sm btn-info back-btn">Approval</a>
                 <button type="button" onclick="export_properties()" class="btn btn-sm btn-primary back-btn">Export</button>
                 <a href="<?php echo base_url('admin/properties/import_page'); ?>" class="btn btn-sm btn-success back-btn">Import</a>
-                <a href="javascript:void(0);" class="btn btn-sm btn-info back-btn advance-search-toggle">Advance Search</a>
             <?php endif; ?>
         </div>
     </div>
     <div class="clearfix"></div>
 
 <?php
-// This part handles the initial message after delete/add/update
-$message = $this->session->flashdata('message');
-if (!empty($message)) {
-    $alertClass = (strpos(strtolower($message), 'delete') !== false) ? 'alert-danger' : 'alert-success';
-    ?>
-    <div class="alert <?php echo $alertClass; ?> alert-dismissible fade show" role="alert" id="flashMessage">
-        <?php echo $message; ?>
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">×</span>
-        </button>
-    </div>
-<?php
-}
+    // This part handles the initial message after delete/add/update
+    $message = $this->session->flashdata('message');
+    if (!empty($message)) {
+        $alertClass = (strpos(strtolower($message), 'delete') !== false) ? 'alert-danger' : 'alert-success';
+        ?>
+        <div class="alert <?php echo $alertClass; ?> alert-dismissible fade show" role="alert" id="flashMessage">
+            <?php echo $message; ?>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">×</span>
+            </button>
+        </div>
+        <?php
+        $this->session->unset_userdata('message'); // Clear flashdata to prevent re-display on refresh
+    }
 ?>
-
 <script>
     // This script makes the initial PHP flash message disappear after 3 seconds
     $(document).ready(function() {
@@ -47,6 +46,23 @@ if (!empty($message)) {
         }
     });
 </script>
+
+     <div class="row" style="margin-bottom:20px;">
+        <div class="col-md-3">
+            <select id="bulk_status" class="form-control">
+                <option value="">Change Status</option>
+                <option value="active">Active</option>
+                <option value="deactivate">Deactive</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <button id="applyStatus" class="btn btn-primary">Apply to Selected</button>
+        </div>
+    </div>
+
+    <div class="row" style="margin:10px;">
+        <a href="javascript:void(0);" class="advance-search-toggle">Advance Search</a>
+    </div>
 
     <form method="post" action="" class="advance-search-form mt-3" style="display: <?php echo $propertyAdvanceSearchVisible; ?>;" id="propertyFilterForm">
         <div class="row">
@@ -100,23 +116,38 @@ if (!empty($message)) {
         </div>
     </form>
 
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="table-responsive">
+
+    <!-- Tabs Navigation -->
+    <ul class="nav nav-tabs mb-3" id="propertyTabs" role="tablist">
+      <li class="nav-item">
+        <a class="nav-link active" id="all-tab" data-toggle="tab" href="#allProperties" role="tab">All</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" id="active-tab" data-toggle="tab" href="#activeProperties" role="tab">Live</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" id="deactive-tab" data-toggle="tab" href="#deactiveProperties" role="tab">Deactive</a>
+      </li>
+    </ul>
+
+
+<div class="tab-content" id="propertyTabsContent">
+  <div class="tab-pane fade show active" id="allProperties" role="tabpanel">
+    <div class="table-responsive">
                 <table id="propertiesTable" class="table table-striped table-bordered table-sm display" nowrap="true">
                     <thead>
                         <tr>
                             <th><input type="checkbox" id="checkAll" /></th>
                             <th>Sr. No.</th>
-                            <th>ID</th>
                             <th>Property Name</th>
                             <th>Property Address</th>
-                            <th>Property For</th>
+                            <th>Property For/ ID</th>
                             <th>Phone</th>
                             <th>Budget</th>
                             <th>Area</th>
                             <th>Data Source</th>
                             <th>Status</th>
+                            <th class="d-none">Raw Status</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -125,26 +156,87 @@ if (!empty($message)) {
                             <tr>
                                 <td><input type="checkbox" class="property_checkbox" value="<?php echo $property->id; ?>"></td>
                                 <td><?php echo $i++; ?></td>
-                                 <td><?php echo $property->id; ?></td>
-                                <td><?php echo $property->name; ?></td>
-                                <td><?php echo $property->address; ?></td>
-                                <td><?php echo $property->property_for; ?></td>
-                                <td><?php echo $property->phone; ?></td>
-                                <td><?php echo $property->budget; ?></td>
-                                <td><?php echo $property->built; ?></td>
                                 <td>
-                                    <?php if (!empty($property->main_site)): ?>
-                                        <a href="<?php echo $property->property_url; ?>" target="_blank"><?php echo $property->main_site; ?></a>
-                                    <?php else: ?>
-                                        Manual
-                                    <?php endif; ?>
+                                  <a href="/admin/properties/edit/<?php echo $property->id; ?>">
+                                    <?php echo $property->name; ?>
+                                  </a>
                                 </td>
+                                 <td><?php echo $property->address; ?></td>
+                                <td>
+                                    <?php echo htmlspecialchars($property->property_for); ?><br>
+                                    <small>ID: <?php echo htmlspecialchars($property->id); ?></small>
+                                </td>
+                                <td><?php echo $property->phone; ?></td>
+                                <td>
+                                    <?php
+                                        $value = '-';
+
+                                        $budget = trim($property->budget);
+                                        $budget_in_words = trim($property->budget_in_words);
+
+                                        if (!empty($budget)) {
+                                            // Split to check if unit is already present
+                                            $parts = preg_split('/\s+/', $budget);
+                                            $num = isset($parts[0]) ? trim($parts[0]) : '';
+                                            $unit = isset($parts[1]) ? strtolower(trim($parts[1])) : '';
+
+                                            if (is_numeric($num)) {
+                                                $numericVal = (int)$num;
+
+                                                if ($numericVal > 100 ) {
+                                                    $value = $budget; // Show raw if too large
+                                                } elseif (!in_array($unit, ['lakh', 'lakhs', 'crore', 'crores'])) {
+                                                    $value = ($numericVal <= 20) ? $numericVal . ' Cr' : $numericVal . ' Lakh';
+                                                } else {
+                                                    $value = $budget; // Unit already present
+                                                }
+                                            } else {
+                                                $value = $budget; // Non-numeric values
+                                            }
+                                        } elseif (!empty($budget_in_words)) {
+                                            $value = $budget_in_words;
+                                        }
+
+                                        echo htmlspecialchars($value);
+                                        ?>
+                                </td>
+                                <td>
+                                    <?php
+                                    if (!empty($property->built)) {
+                                        echo htmlspecialchars($property->built);
+                                    } elseif (!empty($property->carpet)) {
+                                        echo htmlspecialchars($property->carpet);
+                                    } elseif (!empty($property->land)) {
+                                        echo htmlspecialchars($property->land);
+                                    } else {
+                                        echo '-';
+                                    }
+                                    ?>
+                                </td>
+                             <td>
+                            <?php if (!empty($property->main_site)): ?>
+                                <?php if (strtolower(trim($property->main_site)) == 'frontend'): ?>
+                                    <div>Frontend</div>
+                                    <div>
+                                        <small>By: <?php echo !empty($property->user_name) ? htmlspecialchars($property->user_name) : 'N/A'; ?></small>
+                                    </div>
+                                <?php else: ?>
+                                    <a href="<?php echo $property->property_url; ?>" target="_blank">
+                                        <?php echo htmlspecialchars($property->clone_site); ?>
+                                    </a>
+                                <?php endif; ?>
+                            <?php else: ?>
+                                Manual
+                            <?php endif; ?>
+                        </td>
                                 <td>
                                     <label class="switch">
                                         <input type="checkbox" value="deactivate" <?php if ($property->status == 'active') echo 'checked'; ?> name="status" class="status" data-id="<?php echo $property->id; ?>">
                                         <span class="slider round"></span>
                                     </label>
                                 </td>
+                                <td class="d-none"><?php echo $property->status; ?></td>
+
                                 <td>
                                     <a href="<?php echo base_url('admin/properties/edit/' . $property->id); ?>" class="btn btn-warning btn-sm" style="color:white;">
                                         <i class="fas fa-edit"></i>
@@ -162,21 +254,9 @@ if (!empty($message)) {
                         <?php endforeach; endif; ?>
                     </tbody>
                 </table>
-                <div class="row">
-                    <div class="col-md-3">
-                        <select id="bulk_status" class="form-control">
-                            <option value="">Select Status</option>
-                            <option value="active">Active</option>
-                            <option value="deactivate">Deactive</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <button id="applyStatus" class="btn btn-primary">Apply to Selected</button>
-                    </div>
-                </div>
             </div>
-        </div>
     </div>
+</div>
 
     <!-- Import Modal -->
     <div style="margin-top: 28%;" class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModalLabel" aria-hidden="true">
@@ -206,17 +286,50 @@ if (!empty($message)) {
 <script type="text/javascript" src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+
 <script>
+// Custom sorting for Status column
+jQuery.extend(jQuery.fn.dataTableExt.oSort, {
+    "status-type-pre": function(data) {
+        return data.indexOf('checked') !== -1 ? 'active' : 'deactivate';
+    },
+    "status-type-asc": function(a, b) {
+        return a < b ? -1 : a > b ? 1 : 0;
+    },
+    "status-type-desc": function(a, b) {
+        return a < b ? 1 : a > b ? -1 : 0;
+    }
+});
+
 jQuery(document).ready(function() {
     // Initialize DataTables
-    jQuery('#propertiesTable').DataTable({
+    var table = $('#propertiesTable').DataTable({
         "dom": '<"top"lf>rt<"bottom"ip><"clear">',
-        "pageLength": 10,
-         "columnDefs": [
-                { "orderable": false, "targets": [0, 11] },
-                { "type": "num", "targets": 2 },
-                { "type": "string", "targets": 10 }
-            ]
+        "pageLength": 25,
+        "columnDefs": [
+            { "orderable": false, "targets": [0, 10] }, // Disable sorting on checkbox and Raw Status
+            { "type": "string", "targets": 2 },
+            { "type": "status-type", "targets": 9 } // Custom sorting for Status column
+        ]
+    });
+
+    function filterProperties(status) {
+        if (status === 'all') {
+            table.column(10).search('').draw(); // Clear filter for "All Properties"
+        } else {
+            table.column(10).search('^' + status + '$', true, false).draw(); // Exact match for status
+        }
+    }
+
+  $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
+        var target = $(e.target).attr("href");
+        if (target === '#allProperties') {
+            filterProperties('all');
+        } else if (target === '#activeProperties') {
+            filterProperties('active');
+        } else if (target === '#deactiveProperties') {
+            filterProperties('deactivate');
+        }
     });
 
     // Toggle advanced search form
@@ -285,10 +398,10 @@ jQuery(document).ready(function() {
             },
             success: function(data) {
                 // FIX: Do NOT reload the page. Show a dynamic message instead.
-                
+
                 // 1. Create the success message element
                 var successMsg = '<div class="alert alert-success alert-dismissible fade show" role="alert" id="dynamic-alert" style="position: fixed; top: 20px; right: 20px; z-index: 9999;">Status updated successfully!<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button></div>';
-                
+
                 // 2. Add it to the body of the page
                 $('body').append(successMsg);
 
@@ -308,31 +421,35 @@ jQuery(document).ready(function() {
     });
 });
 
-// Export properties
 function export_properties() {
-    $.ajax({
-        url: '<?php echo base_url("admin/properties/export"); ?>',
-        method: 'POST',
-        data: $('#propertyFilterForm').serialize(),
-        xhrFields: {
-            responseType: 'blob'
-        },
-        success: function(data, status, xhr) {
-            const filename = xhr.getResponseHeader('Content-Disposition')?.split('filename=')[1]?.replace(/"/g, '') || 'properties_export.csv';
-            const url = window.URL.createObjectURL(data);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-            window.URL.revokeObjectURL(url);
-        },
-        error: function(xhr) {
-            alert("Error exporting properties.");
-        }
-    });
+    window.location.href = 'properties/export_page';
 }
+
+// // Export properties
+// function export_properties() {
+//     $.ajax({
+//         url: '<?php echo base_url("admin/properties/export_page"); ?>',
+//         method: 'POST',
+//         data: $('#propertyFilterForm').serialize(),
+//         xhrFields: {
+//             responseType: 'blob'
+//         },
+//         success: function(data, status, xhr) {
+//             const filename = xhr.getResponseHeader('Content-Disposition')?.split('filename=')[1]?.replace(/"/g, '') || 'properties_export.csv';
+//             const url = window.URL.createObjectURL(data);
+//             const a = document.createElement('a');
+//             a.href = url;
+//             a.download = filename;
+//             document.body.appendChild(a);
+//             a.click();
+//             a.remove();
+//             window.URL.revokeObjectURL(url);
+//         },
+//         error: function(xhr) {
+//             alert("Error exporting properties.");
+//         }
+//     });
+//}
 </script>
 
 <style>

@@ -15,6 +15,95 @@ class Properties extends REST_Controller
     }
 
     /** Add Property API **/
+    public function addAdminProperty_post()
+    {
+        $return = array('status' => 'error', 'message' => 'Missing required fields', 'result' => '');
+
+        // Handle image uploads
+        $imageFields = ['image_one', 'image_two', 'image_three', 'image_four'];
+        $uploadPath = './uploads/';
+        $allowedTypes = 'jpg|jpeg|png|webp';
+
+        $this->load->library('upload');
+
+        $uploadedImages = [];
+
+        foreach ($imageFields as $field) {
+            if (!empty($_FILES[$field]['name'])) {
+                $config['upload_path'] = $uploadPath;
+                $config['allowed_types'] = $allowedTypes;
+                $config['file_name'] = time() . '_' . basename($_FILES[$field]['name']);
+
+                $this->upload->initialize($config);
+
+                if ($this->upload->do_upload($field)) {
+                    $uploadData = $this->upload->data();
+                    $uploadedImages[$field] = $uploadData['file_name'];
+                }
+            }
+        }
+
+        // Property table fields
+        $propertyFields = [
+            'userid', 'name', 'property_builder', 'description', 'property_for', 'project_n',
+            'built', 'land', 'carpet', 'additional', 'additional_value', 'address', 'person',
+            'phone', 'person_address', 'city', 'state', 'property_type', 'category', 'zip_code',
+            'bhk', 'budget', 'budget_in_words', 'amenities', 'type',
+            'status', 'approvel', 'show_in_slider', 'show_in_gallery',
+            'icon', 'bathrooms', 'bedrooms', 'sqft', 'measureUnit', 'services', 'verified',
+            'residential', 'commercial', 'hot_deals', 'clone_id', 'main_site', 'lead_id',
+            'new_properties_id', 'construction_status'
+        ];
+
+        foreach ($propertyFields as $field) {
+            $value = $this->input->post($field);
+            if ($value !== null) {
+                $this->db->set($field, $value);
+            }
+        }
+
+        // Set uploaded images
+        foreach ($uploadedImages as $field => $filename) {
+            $this->db->set($field, $filename);
+        }
+
+        // Insert into `properties` table
+        $this->db->insert('properties');
+        $property_id = $this->db->insert_id();
+
+        if (!$property_id) {
+            $return['message'] = 'Failed to add property.';
+            return $this->response($return, REST_Controller::HTTP_OK);
+        }
+
+        // Property meta fields
+        $metaFields = [
+            'floor_no', 'total_floors', 'property_age', 'kothi_story_type', 'furnishing_status',
+            'ownership_type', 'gated_community', 'available_from', 'has_lift', 'parking_available',
+            'commercial_approval', 'width_length', 'road_width', 'commercial_useType',
+            'shutters_count', 'roof_height', 'loading_bay', 'locality', 'landmark', 'direction',
+            'facing', 'in_society', 'hospital_type', 'floor_available', 'medical_facilities',
+            'hospital_license', 'possession_status', 'map_link','other_property_type'
+        ];
+
+        $metaData = ['properties_id' => $property_id];
+        foreach ($metaFields as $field) {
+            $value = $this->input->post($field);
+            if ($value !== null) {
+                $metaData[$field] = $value;
+            }
+        }
+
+        // Insert into `properties_meta`
+        $this->db->insert('properties_meta', $metaData);
+
+        $return['status'] = 'done';
+        $return['message'] = 'Property added successfully';
+        return $this->response($return, REST_Controller::HTTP_OK);
+    }
+
+
+    /** Add Property API **/
     public function addProperty_post()
     {
 
@@ -62,7 +151,7 @@ class Properties extends REST_Controller
             'commercial_approval', 'width_length', 'road_width', 'commercial_useType',
             'shutters_count', 'roof_height', 'loading_bay', 'locality', 'landmark', 'direction',
             'facing', 'in_society', 'hospital_type', 'floor_available', 'medical_facilities',
-            'hospital_license', 'possession_status', 'map_link'
+            'hospital_license', 'possession_status', 'map_link','other_property_type'
         ];
 
         $metaData = ['properties_id' => $property_id];
@@ -160,7 +249,7 @@ class Properties extends REST_Controller
             'commercial_approval', 'width_length', 'road_width', 'commercial_useType',
             'shutters_count', 'roof_height', 'loading_bay', 'locality', 'landmark', 'direction',
             'facing', 'in_society', 'hospital_type', 'floor_available', 'medical_facilities',
-            'hospital_license', 'possession_status', 'map_link'
+            'hospital_license', 'possession_status', 'map_link','other_property_type'
         ];
 
         $metaData = [];

@@ -49,18 +49,18 @@ class Buyer extends REST_Controller
                 'requirement' => $data['requirement'] ?? null,
                 'status' => $data['status'] ?? null,
                 'city' => $data['city'] ?? null,
-                'state' => $data['state'] ?? null,
+                'state' => $data['state'] ?? 'Punjab',
                 'rDate' => isset($data['rDate']) ? date('Y-m-d H:i:s', strtotime($data['rDate'])) : null,
                 'propertyType_sub' => $data['propertyType_sub'] ?? null,
                 'propertyType' => $data['propertyType'] ?? null,
-                'source' => $data['source'] ?? null,
+                'source' => $data['source'] ?? 'Website',
                 'Profession' => $data['Profession'] ?? null,
                 'deal' => $data['deal'] ?? null,
                 'timeline' => $data['timeline'] ?? null,
-                'priority' => $data['priority'] ?? null,
+                'priority' => $data['priority'] ?? 'Cold',
                 'userid' => $data['userid'] ?? null,
                 'Project_Builder' => $data['Project_Builder'] ?? null,
-                'leads_type' => $data['leads_type'] ?? null,
+                'leads_type' => $data['leads_type'] ?? 'Buyer',
                 'description' => $data['description'] ?? null
             ];
 
@@ -118,21 +118,48 @@ class Buyer extends REST_Controller
                 if($propertyType == ''){
                     $return['message'] = 'Missing propertyType.';
                 } else {
-                   $updateRequirement = array(
-                        'uName'              => $data['uName'],
-                        'address'            => $data['address'],
-                        'mobile'             => $data['mobile'],
-                        'requirement'        => $data['requirement'],
-                        'status'             => $data['status'],
-                        'city'               => $data['city'],
-                        'rDate'              => $data['rDate'],
-                        'userid'             => $data['userid'],
-                        'timeline'           => $data['timeline'],
-                        'propertyType'       => $data['property_type'],
-                        'propertyType_sub'   => $data['property_type_sub']
-                    );
+                  $dbFields = [
+                        'uName', 'address', 'mobile', 'preferred_location', 'budget', 'max_budget',
+                        'Payment_Method', 'requirement', 'leads_type', 'description', 'status',
+                        'city', 'state', 'rDate', 'userType', 'email', 'Project_Builder',
+                        'propertyType_sub', 'propertyType', 'source', 'Profession', 'deal',
+                        'timeline', 'priority', 'userid'
+                    ];
 
-                    $this->Api_model->updateTable('mobile',$mobile,'buyers',$updateRequirement);
+                    // Step 2: Split data into updateable fields and additional_info
+                    $updateRequirement = [];
+                    $additionalInfo = [];
+
+                    foreach ($data as $key => $value) {
+                    // Skip if key is "infotype" or value is empty/null
+                    if ($key === 'infotype' || $value === '' || is_null($value)) {
+                        continue;
+                    }
+
+                    // Handle special keys mapping
+                    if ($key === 'property_type') {
+                        $updateRequirement['propertyType'] = $value;
+                    } elseif ($key === 'property_type_sub') {
+                        $updateRequirement['propertyType_sub'] = $value;
+                    }
+                    // Direct field match
+                    elseif (in_array($key, $dbFields)) {
+                        $updateRequirement[$key] = $value;
+                    }
+                    // Everything else goes in additional_info
+                    else {
+                        $additionalInfo[$key] = $value;
+                    }
+                }
+
+                // Step 3: Add additional_info JSON if any
+                if (!empty($additionalInfo)) {
+                    $updateRequirement['additional_info'] = json_encode($additionalInfo);
+                }
+
+                    // Step 4: Update database
+                    $this->Api_model->updateTable('mobile', $data['mobile'], 'buyers', $updateRequirement);
+
                     $return['status'] = 'done';
                     $return['message'] = 'Buyer requirement updated.';
                 }
@@ -140,5 +167,222 @@ class Buyer extends REST_Controller
         }
 
         $this->response($return, REST_Controller::HTTP_OK);
+    }
+
+
+   public function scheduleVisit_post() {
+        $json = file_get_contents("php://input");
+        $data = json_decode($json, true);
+
+        $response = ['status' => 'error', 'message' => 'Invalid request'];
+
+        if (!$data || !isset($data['phone']) || !isset($data['visitDate']) || !isset($data['property_id'])) {
+            $response['message'] = 'Missing required fields';
+            echo json_encode($response);
+            return;
+        }
+
+        $phone = $data['phone'];
+        $property_id = $data['property_id'];
+        $user_id = $data['Userid'];
+        $property_name = isset($data['property_name']) ? $data['property_name'] : 'Unknown Property';
+        $firstname = isset($data['firstname']) ? $data['firstname'] : 'Guest';
+        $visitDate = date('Y-m-d H:i:s', strtotime($data['visitDate']));
+        $comment = 'Visit Scheduled for property: ' . $property_name . ' (ID: ' . $property_id . ')';
+
+        // Check if buyer already exists
+        $this->db->where('mobile', $phone);
+        $buyer = $this->db->get('buyers')->row();
+
+        if (!$buyer) {
+            $newBuyer = [
+                'uName' => $firstname,
+                'mobile' => $phone,
+                'requirement' => $property_name,
+                'leads_type' => 'Buyer',
+                'status' => 'New',
+                'rDate' => date('Y-m-d H:i:s'),
+            ];
+            $this->db->insert('buyers', $newBuyer);
+            $lead_id = $this->db->insert_id();
+        } else {
+            $lead_id = $buyer->id;
+        }
+
+        // Check for existing meeting
+        $this->db->where('leadId', $lead_id);
+        $this->db->where('choice', 'Meeting');
+        $this->db->like('comment', "(ID: $property_id)");
+        $existing = $this->db->get('leads_comment')->row();
+
+        if ($existing) {
+            // 🟨 Update: append property_id to property_ids if not already present
+            $existing_ids = $existing->property_ids ? explode(',', $existing->property_ids) : [];
+
+            if (!in_array($property_id, $existing_ids)) {
+                $existing_ids[] = $property_id;
+            }
+
+            $property_ids_updated = implode(',', $existing_ids);
+
+            $meetingData = [
+                'leadId'  => $lead_id,
+                'comment' => $comment,
+                'nextdt'  => $visitDate,
+                'choice'  => 'Meeting',
+                'status'  => 'Rescheduled',
+                'property_ids' => $property_ids_updated,
+                'userId' => $user_id
+            ];
+
+            $this->db->where('id', $existing->id);
+            $this->db->update('leads_comment', $meetingData);
+
+            $this->db->where('id', $lead_id);
+            $this->db->update('buyers', [
+                'uName' => $firstname,
+                'requirement' => $property_name,
+                'status' => 'Rescheduled',
+            ]);
+
+            $response['message'] = 'Meeting rescheduled successfully';
+        } else {
+            // 🟩 Insert: create new row with property_ids
+            $meetingData = [
+                'leadId'  => $lead_id,
+                'comment' => $comment,
+                'nextdt'  => $visitDate,
+                'choice'  => 'Meeting',
+                'status'  => 'Scheduled',
+                'property_ids' => $property_id,
+                'userId' => $user_id
+            ];
+
+            $this->db->insert('leads_comment', $meetingData);
+            $response['message'] = 'Meeting scheduled successfully';
+
+        }
+
+        $response['status'] = 'success';
+        echo json_encode($response);
+    }
+
+    //all scheduled visit properties as requested properties
+    public function getRequestedProperties_get() {
+
+        // Default error response
+        $response = ['status' => 'error', 'message' => 'Invalid request'];
+
+        $user_id = $this->input->get('Userid', true); // true enables XSS filtering
+
+        // Input validation
+        if (empty($user_id)) {
+            $response = [
+                'status' => 'error',
+                'message' => 'Missing Userid'
+            ];
+            return $this->response($response, REST_Controller::HTTP_BAD_REQUEST);
+        }
+
+        // Step 1: Get property_ids from leads_comment for given user_id
+        $this->db->select('property_ids');
+        $this->db->from('leads_comment');
+        $this->db->where('userId', $user_id);
+        $query = $this->db->get();
+        $results = $query->result();
+
+        // Step 2: Collect all IDs into a single array
+        $property_ids = [];
+
+        foreach ($results as $row) {
+            if (!empty($row->property_ids)) {
+                $ids = explode(',', $row->property_ids);
+                $property_ids = array_merge($property_ids, $ids);
+            }
+        }
+
+        // Step 3: Remove duplicates and empty values
+        $property_ids = array_unique(array_filter($property_ids));
+
+        // Step 4: Return if no valid IDs found
+        if (empty($property_ids)) {
+            $response['message'] = 'No valid property IDs found for this user';
+            return $this->response($response, REST_Controller::HTTP_OK);
+        }
+
+        // Step 5: Get matching property records
+        $this->db->where_in('id', $property_ids);
+        $this->db->where('is_deleted', 0); // Optional: only active properties
+        $properties = $this->db->get('properties')->result();
+
+        // Final Response
+        $response = [
+            'status' => 'success',
+            'message' => 'Requested properties fetched successfully',
+            'result' => $properties
+        ];
+
+        return $this->response($response, REST_Controller::HTTP_OK);
+    }
+
+    public function deleteRequestedProperty_delete()
+    {
+        $response = ['status' => 'error', 'message' => 'Invalid request'];
+
+        // Get raw JSON input
+        $input = json_decode(trim(file_get_contents("php://input")), true);
+        $user_id = $input['Userid'] ?? null;
+        $property_id = $input['property_id'] ?? null;
+
+        // Input validation
+        if (empty($user_id) || empty($property_id)) {
+            $response['message'] = 'Missing Userid or property_id';
+            return $this->response($response, REST_Controller::HTTP_BAD_REQUEST);
+        }
+
+        // Step 1: Fetch all leads_comment rows for user
+        $this->db->select('id, property_ids');
+        $this->db->from('leads_comment');
+        $this->db->where('userId', $user_id);
+        $query = $this->db->get();
+        $rows = $query->result();
+
+        if (empty($rows)) {
+            $response['message'] = 'No records found for the given user';
+            return $this->response($response, REST_Controller::HTTP_OK);
+        }
+
+        $updated = false;
+        $deleted = false;
+
+        foreach ($rows as $row) {
+            $property_ids = array_filter(explode(',', $row->property_ids));
+            $new_ids = array_diff($property_ids, [$property_id]); // remove only that property_id
+
+            if (count($new_ids) === 0) {
+                // If no properties left, delete the row
+                $this->db->where('id', $row->id);
+                $this->db->delete('leads_comment');
+                $deleted = true;
+            } elseif (implode(',', $property_ids) !== implode(',', $new_ids)) {
+                // Update only if change occurred
+                $this->db->where('id', $row->id);
+                $this->db->update('leads_comment', ['property_ids' => implode(',', $new_ids)]);
+                $updated = true;
+            }
+        }
+
+        if ($deleted || $updated) {
+            $response = [
+                'status' => 'success',
+                'message' => $deleted
+                    ? 'Property deleted successfully'
+                    : 'Property removed successfully'
+            ];
+        } else {
+            $response['message'] = 'Property not found in user\'s requested list';
+        }
+
+        return $this->response($response, REST_Controller::HTTP_OK);
     }
 }
