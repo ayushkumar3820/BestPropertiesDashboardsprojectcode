@@ -345,6 +345,7 @@ public function addProperties() {
 
 
 public function addProperties1() {
+    //is file ki fuctionlaity yaha se chl rahi he api/Properties/addAdminProperty/'
     $data['title'] = 'Add Property';
     $data['projects'] = $this->AdminModel->getProjects();
 
@@ -430,6 +431,8 @@ public function addProperties1() {
                 'carpet'            => $this->input->post('carpet'),
                 'additional'        => $this->input->post('additional'),
                 'additional_value'  => $this->input->post('custom_value'),
+                 'property_age'  => $this->input->post('property_age'),
+                
                 'address'           => $this->input->post('address'),
                 'city'              => $this->input->post('city'),
                 'state'             => $this->input->post('state'),

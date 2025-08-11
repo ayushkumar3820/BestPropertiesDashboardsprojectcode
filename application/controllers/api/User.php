@@ -7,6 +7,7 @@ error_reporting(E_ALL);
 require APPPATH . 'libraries/REST_Controller.php';
 class User extends REST_Controller
 {
+     private $salt = 'c1!s4vFdxM8DdmOj0lvxp3cFwQx';
     public function __construct()
     {
         parent::__construct();
@@ -435,6 +436,7 @@ public function getWishlist_ids_get() {
 
     return $this->response($return, REST_Controller::HTTP_OK);
 }
+
 public function adminlogin_post()
 {
     $email = $this->post('email');
@@ -448,21 +450,45 @@ public function adminlogin_post()
         return;
     }
 
-   $user = $this->Api_model->getRecordByColumn('email', $email, 'adminLogin');
+    // Get user data by email
+    $user = $this->Api_model->getRecordByColumn('email', $email, 'adminLogin');
 
     if ($user) {
-        $this->response([
-            'status' => true,
-            'message' => 'Login successful.',
-            'data' => $user[0]
-        ], REST_Controller::HTTP_OK);
+        $storedHash = $user[0]['password'];
+        $inputPassword = trim($password);
+        $hashedInput = hash_hmac("sha512", $inputPassword, $this->salt);
+        
+        if ($hashedInput === $storedHash) {
+            // Check for token
+            $token = $user[0]['token'];
+            if (empty($token)) {
+                $rawToken = date('YmdHis') . rand(1000, 9999);
+                $token = hash_hmac("sha256", $rawToken, $this->salt);
+                $this->Api_model->updateTable('id', $user[0]['id'], 'adminLogin', ['token' => $token]);
+                $user[0]['token'] = $token; // update locally for response
+            }
+
+            unset($user[0]['password']); 
+
+            $this->response([
+                'status' => true,
+                'message' => 'Login successful.',
+                'data' => $user[0]
+            ], REST_Controller::HTTP_OK);
+        } else {
+            $this->response([
+                'status' => false,
+                'message' => 'Invalid password.'
+            ], REST_Controller::HTTP_UNAUTHORIZED);
+        }
     } else {
         $this->response([
             'status' => false,
-            'message' => 'Invalid email or password.'
+            'message' => 'Invalid email.'
         ], REST_Controller::HTTP_UNAUTHORIZED);
     }
 }
+
 
 
 

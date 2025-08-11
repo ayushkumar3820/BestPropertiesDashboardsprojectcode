@@ -1528,3 +1528,16 @@
     </script>
 </body>
 </html>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('#BHK').on('change', function() {
+        var bhkValue = $(this).val();
+        if (bhkValue != '') {
+            $('#bhk_property_age').show(); // Show the Property Age dropdown
+        } else {
+            $('#bhk_property_age').hide(); // Hide if no BHK selected
+        }
+    });
+});
+</script>

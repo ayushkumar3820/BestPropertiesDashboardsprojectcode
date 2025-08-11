@@ -119,14 +119,17 @@ class Leads extends CI_Controller
         $this->load->view("includes/admin/template", $data);
     }
 
-    public function meeting()
-    {
-        $data["meeting_tasks"] = $this->AdminModel->get_tasks_with_conditions(
-            "meeting"
-        );
-        $data["mainContent"] = "siteAdmin/meeting_tasks_view";
-        $this->load->view("includes/admin/template", $data);
-    }
+public function meeting()
+{
+    $data["meeting_tasks"] = $this->AdminModel->get_tasks_with_conditions("meeting");
+
+    // Meetings by date
+    $data["calendar_events"] = $this->AdminModel->get_calendar_meetings();
+
+    $data["mainContent"] = "siteAdmin/meeting_tasks_view";
+    $this->load->view("includes/admin/template", $data);
+}
+
 
     public function follow()
     {

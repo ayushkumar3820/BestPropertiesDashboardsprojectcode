@@ -18,24 +18,24 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     </a>
 <?php endif; ?>
 
-
-     
-
 </div>
         <!-- <a href="<?php echo base_url('admin/leadtask/271');?>" style="float: right;margin: 14px 2px;" class="btn btn-sm btn-info back-btn">Manage Task</a>-->
         <a href="<?php echo base_url('admin/leads/');?>" style="float: right;margin: 14px 2px;" class="btn btn-sm btn-info back-btn">Back</a>
        <!--  <a href="<?php echo base_url('admin/meetings/').$this->uri->segment('4');?>" style="float: right;margin: 14px 2px;" class="btn btn-sm btn-info back-btn">Meetings</a>-->
       <h1 class="d-sm-block heading"><?php echo $title; ?></h1>
-      <?php
-      $info = $leads[0];
-      $info->additional_info = !empty($info->additional_info) ? json_decode($info->additional_info, true) : [];
-	  $message = $this->session->flashdata('message1');
-	  if($message != ''){
-	      echo '<div class="alert alert-success">'.$message.'</div>';
-	      $this->session->set_flashdata('message1','');
-	  }
-	  echo validation_errors(); ?>
-	  
+     <?php
+$info = $leads[0];
+$info->additional_info = !empty($info->additional_info) ? json_decode($info->additional_info, true) : [];
+
+$message = $this->session->flashdata('message1');
+if ($message != '') {
+    echo '<div class="alert alert-success">' . $message . '</div>';
+    $this->session->set_flashdata('message1', '');
+}
+
+echo validation_errors();
+?>
+
 	  <div class="clearfix"></div>
 	  
 <form class="form" method="post" action="<?php echo base_url('admin/leads/edit/'.$this->uri->segment('4'));?>">

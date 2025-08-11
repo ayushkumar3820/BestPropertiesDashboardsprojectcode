@@ -1,7 +1,130 @@
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-10 col-md-12">
-            <div class="content-box py-4 px-5">
+
+
+<div class="col main pt-5 mt-3 dashboard_main">
+    <?php
+   
+// Get view type: monthly or weekly
+$view = isset($_GET['view']) ? $_GET['view'] : 'monthly';
+
+// Get current date or date from GET
+$currentDate = isset($_GET['date']) ? $_GET['date'] : date('Y-m-d');
+$timestamp = strtotime($currentDate);
+
+// Determine start/end dates
+if ($view === 'monthly') {
+    $start = strtotime(date('Y-m-01', $timestamp));
+    $end = strtotime(date('Y-m-t', $timestamp));
+} else {
+    // Weekly view: start from Monday
+    $start = strtotime('monday this week', $timestamp);
+    $end = strtotime('sunday this week', $timestamp);
+}
+
+// Previous and Next dates
+if ($view === 'monthly') {
+    $prevDate = date('Y-m-d', strtotime('-1 month', $timestamp));
+    $nextDate = date('Y-m-d', strtotime('+1 month', $timestamp));
+} else {
+    $prevDate = date('Y-m-d', strtotime('-1 week', $timestamp));
+    $nextDate = date('Y-m-d', strtotime('+1 week', $timestamp));
+}
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PHP Calendar</title>
+    <style>
+        table { border-collapse: collapse; width: 100%; }
+        th, td { padding: 10px; text-align: center; border: 1px solid #ccc; }
+        .controls { text-align: center; margin: 20px 0; }
+        .today { background-color: #d4edda; font-weight: bold; }
+        button { padding: 6px 10px; margin: 0 5px; }
+    </style>
+</head>
+<body>
+
+<div class="controls">
+    <form method="get" style="display: inline;">
+        <input type="hidden" name="view" value="<?= $view ?>">
+        <input type="hidden" name="date" value="<?= $prevDate ?>">
+        <button type="submit">Previous</button>
+    </form>
+
+    <strong><?= date('F Y', $timestamp) ?></strong>
+
+    <form method="get" style="display: inline;">
+        <input type="hidden" name="view" value="<?= $view ?>">
+        <input type="hidden" name="date" value="<?= $nextDate ?>">
+        <button type="submit">Next</button>
+    </form>
+</div>
+
+<div class="controls">
+    <a href="?view=monthly&date=<?= $currentDate ?>"><button>Monthly View</button></a>
+    <a href="?view=weekly&date=<?= $currentDate ?>"><button>Weekly View</button></a>
+</div>
+
+<table>
+    <tr>
+        <?php foreach (['Sun','Mon','Tue','Wed','Thu','Fri','Sat'] as $day): ?>
+            <th><?= $day ?></th>
+        <?php endforeach; ?>
+    </tr>
+    <tr>
+    <?php
+    $day = $start;
+    $endReached = false;
+
+    // Align first row
+    if (date('w', $start) != 0) {
+        for ($i = 0; $i < date('w', $start); $i++) {
+            echo "<td></td>";
+        }
+    }
+
+    while (!$endReached) {
+        $isToday = (date('Y-m-d', $day) == date('Y-m-d')) ? 'today' : '';
+        $formattedDate = date('Y-m-d', $day);
+
+        echo "<td class='$isToday'>";
+        echo date('j', $day);
+
+        // Check if any meeting exists for this date
+        if (!empty($calendar_events[$formattedDate])) {
+            echo "<br><ul style='padding-left:0; list-style:none; font-size:12px;'>";
+
+            foreach ($calendar_events[$formattedDate] as $meeting) {
+              
+                $lead_id = isset($meeting['leadId']) ? $meeting['leadId'] : 0;
+                $desc = $meeting['comment'];
+
+                $url = base_url("admin/leads/view/{$lead_id}");
+                echo "<li><a href='$url'>• $desc</a></li>";
+            }
+
+            echo "</ul>";
+        }
+
+        echo "</td>";
+
+        if (date('w', $day) == 6) echo "</tr><tr>";
+
+        if ($day >= $end) {
+            $endReached = true;
+        } else {
+            $day = strtotime("+1 day", $day);
+        }
+    }
+
+    echo "</tr>";
+    ?>
+</table>
+
+
+</body>
+</html>
+
                 <h6 class="section-title">Meetings</h6>
                 <?php if (!empty($meeting_tasks)): ?>
                 <div class="table-main-div">
@@ -62,9 +185,6 @@
                     <p class="text-muted text-center">No tasks found.</p>
                 <?php endif; ?>
             </div>
-        </div>
-    </div>
-</div>
 
 <!-- Add custom CSS -->
 <style>

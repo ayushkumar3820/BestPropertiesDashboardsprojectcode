@@ -66,6 +66,7 @@ class User extends CI_Controller {
                 'phone' => $this->input->post('mobile'),
                 'address' => $this->input->post('address'),
                 'password' => $pwdSalt,
+                
                 'role' => $roles_string
             );
 
@@ -87,30 +88,22 @@ class User extends CI_Controller {
 
 public function userEdit() {
     $data['title'] = 'Edit User'; 
-
     $id = $this->uri->segment(4);
-    $data['user'] = $this->AdminModel->getDataFromTableByField($id, 'adminLogin', 'id');
+
+    $user = $this->AdminModel->getDataFromTableByField($id, 'adminLogin', 'id');
+    $user[0] = (object)$user[0]; // Convert to object
+    $data['user'] = $user;
 
     if ($this->input->post('save')) {
         $this->form_validation->set_rules('name', 'Name','trim|required|min_length[3]|max_length[250]');
         $this->form_validation->set_rules('email', 'Email', 'trim|required');
         $this->form_validation->set_rules('mobile', 'Mobile Number ', 'required|regex_match[/^[0-9]{10}$/]');
-        $this->form_validation->set_message('address', 'allow only space,comma,dot,numbers and alphabets.');
         $this->form_validation->set_rules('password', 'Password', 'min_length[8]|max_length[25]');
-
         $this->form_validation->set_error_delimiters('<div class="alert alert-danger">', '</div>');
 
-        if ($this->form_validation->run() != FALSE) { 
-
+        if ($this->form_validation->run()) { 
             $roles = $this->input->post('role');
-
-            if (is_array($roles)) {
-                $roles_string = implode(',', $roles);
-            } else if (is_string($roles)) {
-                $roles_string = $roles;
-            } else {
-                $roles_string = '';
-            }
+            $roles_string = is_array($roles) ? implode(',', $roles) : $roles;
 
             $updateData = array(
                 'fullName' => $this->input->post('name'),
@@ -120,13 +113,16 @@ public function userEdit() {
                 'role'     => $roles_string
             );
 
-            $pass = $this->input->post('password');
-            if ($pass) {
+            $pass = trim($this->input->post('password'));
+            if (!empty($pass)) {
                 $pwdSalt = hash_hmac("sha512", $pass, $this->salt);
                 $updateData['password'] = $pwdSalt;
+            } else {
+                $updateData['password'] = $user[0]->password;
             }
 
             $result = $this->AdminModel->updateTable($id, 'id', 'adminLogin', $updateData);
+
             if ($result) {
                 $this->session->set_flashdata('message', 'User updated successfully.');
             } else {
@@ -139,6 +135,7 @@ public function userEdit() {
     $data['mainContent'] = 'siteAdmin/userEdit'; 
     $this->load->view('includes/admin/template', $data);
 }
+
 
  
   public function userDelete(){

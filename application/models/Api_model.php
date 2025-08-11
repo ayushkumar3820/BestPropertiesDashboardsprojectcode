@@ -20,6 +20,40 @@ class Api_model extends CI_Model
         }
 		return $data;
 	} 
+	
+	public function getRecordsByWhereIn($where, $ids, $table, $columns = '*')
+	{
+			$this->db->select($columns);
+			$this->db->from($table);
+			$this->db->where_in($where, $ids);
+			$data = $this->db->get();
+			if($data == FALSE){ return array(); } 
+			else { return $data->result_array(); }
+	}
+	
+	public function get_tasks_with_conditions($type, $status = '', $today = '') {
+        //$today = date('Y-m-d 00:00:01'); 
+        $this->db->select('leads_comment.*,buyers.uName,  buyers.preferred_location, buyers.budget');
+        $this->db->from('leads_comment');
+        $this->db->join('buyers', 'leads_comment.leadId = buyers.id', 'left');
+    
+        $this->db->where('leads_comment.choice', $type);
+        
+        if ($today != '') { 
+            $this->db->where('leads_comment.nextdt >=', $today); 
+        }
+        
+        if($status != ''){
+            $this->db->where('leads_comment.status', $status);
+        }
+    
+        $this->db->order_by('leads_comment.nextdt', 'DESC');
+    
+        $query = $this->db->get();
+        return $query->result_array();
+    }
+	
+	
 	function getRecordByMultipleColumn($where,$table,$columns='*',$sort='',$orderby='',$limit='') {
 		$this->db->select($columns);
 		$this->db->from($table);
@@ -66,6 +100,11 @@ class Api_model extends CI_Model
         return $this->db->insert_id();
     }
     
+function add_data_in_tables($table, $data) {
+    $this->db->insert($table, $data);
+    return $this->db->insert_id();
+}
+
     
 /*function for get values with image url*/
 
@@ -128,11 +167,16 @@ public function getAdditionalPropertiesByType($propertyType, $currentId, $limit 
         $query = $this->db->get();
         return $query->result_array();
     }
+public function get_meeting_list() {
+    return $this->db->get('meetings')->result_array();
+}
+
+
     
-    public function insertData($table, $data)
-{
+ public function insertData($table, $data){
     return $this->db->insert($table, $data);
 }
+
 
 }
 

@@ -82,6 +82,10 @@ $route['residential-commercial'] = 'api/Projects/getSomeeFieldRC';
 $route['agent-projects'] = 'api/Projects/getProjectField';
 $route['our_services_img'] = 'api/Home_img/get_images';
 $route['upcoming-projects'] = 'api/Projects/getUpcomingProjects';
+$route['get-all-meeting'] = 'api/Projects/getAllMeetings';
+$route['test-api'] = 'api/TestAPI/propertyTest';
+$route['add-leads-data'] = 'api/Leads/addBuyers';
+$route['get-user-leads'] = 'api/Leads/getLeadsData';
 
 $route['some-field'] = 'api/PropertyDetail/getSomeeFieldProperties';
 $route['only-single-properties'] = 'api/PropertyDetail/getProperties';
@@ -97,7 +101,6 @@ $route['add-property-buy-sale-or-rent'] = 'api/PropertyDetail/add_property_sale_
 
 /*get data live table */
 $route['submit-data-properties'] = 'api/Data_properties/moveFilteredProperties';
-
 
 //$route['agent-properties'] = 'properties/getAgentField';
 /* front view */
@@ -291,13 +294,14 @@ $route['for-rent-new'] = 'For_Rent/index';
 $route['log-in'] = 'Login/index';
 $route['contact-us'] = 'Contact_us/index';
 
-
-
 // Schedule Demo
 $route['schedule-demo'] = 'Schedule_demo/submit_form';
 
 //whatsapp api
 $route['whatsapp-api.php'] = 'Whatsapp_api/index';
+
+//Meeting api
+$route['api/meetings'] = 'Siteadmin/Leads/meeting_api';
 
 
 

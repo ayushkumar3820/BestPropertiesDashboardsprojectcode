@@ -144,8 +144,10 @@ public function updatePropertyStatusBulk($ids = array(), $status = '') {
 		$this->db->where($column,$value);
 		$this->db->order_by($orderBy,$orderByValue);
 		$query = $this->db->get();
-		return $query->result(); 
+			return $query->result(); 
+		  //return $query->result_array(); // <-- this is better for API
 	}
+
 	public function getDataFromTableByFieldByDelete($value,$table,$column,$orderBy='id',$orderByValue='asc'){
 	    $this->db->select('*');
 		$this->db->from($table);
@@ -244,6 +246,32 @@ public function deleteRow($value, $table, $field) {
         $query = $this->db->get();
         return $query->result_array();
     }
+
+
+
+public function get_calendar_meetings()
+{
+    $this->db->select('nextdt, comment, leadId'); 
+    $query = $this->db->get('leads_comment');
+
+    $results = $query->result_array();
+
+    $meetings = [];
+
+    foreach ($results as $row) {
+        $date = date('Y-m-d', strtotime($row['nextdt']));
+        if (!isset($meetings[$date])) {
+            $meetings[$date] = [];
+        }
+        $meetings[$date][] = [
+            'comment' => $row['comment'],
+            'leadId' => $row['leadId']
+        ];
+    }
+
+    return $meetings;
+}
+
 
 public function get_tasks_with_conditionsOLD($condition = null, $subjectId = null) {
     $today = date('Y-m-d'); 
@@ -454,10 +482,9 @@ public function getRoleBasedNotifications($userId, $allowedStatuses = [])
     $query = $this->db->get();
     return $query->result_array();
 }
-
-
-
-
+public function get_meeting_list() {
+    return $this->db->get('meetings')->result_array();
+}
 
 }
 ?>

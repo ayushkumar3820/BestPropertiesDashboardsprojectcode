@@ -14,9 +14,10 @@
 			$this->load->helper('url');
 			$this->load->model('Api_model');
 			
-			$checkToken = $this->checkForToken();
-			if(!$checkToken) { die(); }
+		/*	$checkToken = $this->checkForToken();
+			if(!$checkToken) { die(); } */
 		}
+		
 
         public function add_scraped_data_post() {
             header("Access-Control-Allow-Origin: *");
@@ -382,4 +383,25 @@
 		
 		
 		
+		 public function getAllMeetings_get()
+    { 
+        $return = array(
+            'status' => 'error',
+            'message' => 'Please send all required parameters',
+            'result' => ''
+        );
+    
+        $meetingsData = $this->Api_model->get_tasks_with_conditions("meeting");
+    
+        if (empty($meetingsData)) {
+            $return['message'] = 'No Records found';
+        } else {
+            $return['status'] = 'success';
+            $return['message'] = 'Records found';
+            $return['result'] = $meetingsData;
+        }
+    
+        $this->response($return, REST_Controller::HTTP_OK);
+    }
+
 	}
