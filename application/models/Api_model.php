@@ -33,7 +33,7 @@ class Api_model extends CI_Model
 	
 	public function get_tasks_with_conditions($type, $status = '', $today = '') {
         //$today = date('Y-m-d 00:00:01'); 
-        $this->db->select('leads_comment.*,buyers.uName,  buyers.preferred_location, buyers.budget');
+        $this->db->select('leads_comment.*,buyers.uName,  buyers.preferred_location, buyers.budget,buyers.mobile');
         $this->db->from('leads_comment');
         $this->db->join('buyers', 'leads_comment.leadId = buyers.id', 'left');
     

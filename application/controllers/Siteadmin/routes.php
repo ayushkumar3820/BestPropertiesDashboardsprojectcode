@@ -87,6 +87,8 @@ $route['only-single-properties'] = 'api/PropertyDetail/getProperties';
 
 $route['single-all-properties'] = 'api/PropertyDetail/getPropertiesSingleOne';
 
+
+
 /*API add data */
 $route['submit-agent-properties'] = 'api/PropertyDetail/submitAgentProperties';
 $route['submit-properties'] = 'api/PropertyDetail/submitNewAgentPropertie';
@@ -164,6 +166,11 @@ $route['admin/leads/export_page'] = 'Siteadmin/Leads/export_page';
 $route['admin/leads/export_data'] = 'Siteadmin/Leads/export_data';
 $route['admin/leads/export'] = 'Siteadmin/Leads/export_leads';
 //$route['admin/leads/Comment/edit/(:num)'] = 'Siteadmin/Leads/AddleadsComment/$1';
+
+
+/*Lead App Api Task*/
+
+$router['admin/task']='Siteadmin/lead/create';
 
 /*Lead Task*/
 $route['admin/task'] = 'Siteadmin/leadtask/index';

@@ -82,10 +82,32 @@ $route['residential-commercial'] = 'api/Projects/getSomeeFieldRC';
 $route['agent-projects'] = 'api/Projects/getProjectField';
 $route['our_services_img'] = 'api/Home_img/get_images';
 $route['upcoming-projects'] = 'api/Projects/getUpcomingProjects';
-$route['get-all-meeting'] = 'api/Projects/getAllMeetings';
 $route['test-api'] = 'api/TestAPI/propertyTest';
 $route['add-leads-data'] = 'api/Leads/addBuyers';
+/*App API*/ 
+
+//leads api
 $route['get-user-leads'] = 'api/Leads/getLeadsData';
+
+
+
+
+//meeting api 
+$route['get-all-meeting'] = 'api/Projects/getAllMeetings';
+$route['post-meeting'] = 'api/Projects/postAllMeetings';        
+$route['update-meeting'] = 'api/Projects/updateAllMeetings';     
+$route['delete-meeting'] = 'api/Projects/deleteAllMeetings';     
+
+
+
+
+
+
+
+
+
+
+
 
 $route['some-field'] = 'api/PropertyDetail/getSomeeFieldProperties';
 $route['only-single-properties'] = 'api/PropertyDetail/getProperties';
