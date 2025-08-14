@@ -1,5 +1,5 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 /*
 | -------------------------------------------------------------------------
 | URI ROUTING
@@ -93,10 +93,10 @@ $route['get-user-leads'] = 'api/Leads/getLeadsData';
 
 
 //meeting api 
-$route['get-all-meeting'] = 'api/Projects/getAllMeetings';
-$route['post-meeting'] = 'api/Projects/postAllMeetings';        
-$route['update-meeting'] = 'api/Projects/updateAllMeetings';     
-$route['delete-meeting'] = 'api/Projects/deleteAllMeetings';     
+$route['get-all-meeting'] = 'api/AppApiMeeting/getAllMeetings';
+$route['post-meeting'] = 'api/AppApiMeeting/postAllMeetings';
+$route['update-meeting'] = 'api/AppApiMeeting/updateAllMeetings';
+$route['delete-meeting'] = 'api/AppApiMeeting/deleteAllMeetings';
 
 
 
