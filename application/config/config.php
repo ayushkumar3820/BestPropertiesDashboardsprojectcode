@@ -23,10 +23,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | a PHP script and you can easily do that on your own.
 |
 */
-$config['base_url'] = 'http://localhost/bestpropertiesmohali/';
-
-// $config['base_url'] = 'bestpropertiesmohali';
-// $config['base_url'] = "https://".$_SERVER['HTTP_HOST']."";
+//$config['base_url'] = 'https://bestpropertiesmohali.com/';
+$config['base_url'] = "https://".$_SERVER['HTTP_HOST']."";
 
 /* api token */
 $config['ApiToken'] = 'Bearer 9j1h8hgjO0KUin2bhj58d97jiOh67f5h48hj78hg8vg5j63fo0h930';
@@ -41,7 +39,7 @@ $config['ApiToken'] = 'Bearer 9j1h8hgjO0KUin2bhj58d97jiOh67f5h48hj78hg8vg5j63fo0
 | variable so that it is blank.
 |
 */
-$config['index_page'] = ' ';
+$config['index_page'] = 'index.php';
 
 /*
 |--------------------------------------------------------------------------
@@ -139,7 +137,7 @@ $config['subclass_prefix'] = 'MY_';
 |
 | For more information about Composer, please visit http://getcomposer.org/
 |
-| Note: This will NOT disab2le or override the CodeIgniter-specific
+| Note: This will NOT disable or override the CodeIgniter-specific
 |	autoloading (application/config/autoload.php)
 */
 $config['composer_autoload'] = FALSE;
@@ -229,7 +227,7 @@ $config['allow_get_array'] = TRUE;
 | your log files will fill up very fast.
 |
 */
-$config['log_threshold'] = 1;
+$config['log_threshold'] = 0;
 
 /*
 |--------------------------------------------------------------------------
@@ -240,7 +238,7 @@ $config['log_threshold'] = 1;
 | application/logs/ directory. Use a full server path with trailing slash.
 |
 */
-$config['log_path'] = APPPATH . 'logs/'; 
+$config['log_path'] = '';
 
 /*
 |--------------------------------------------------------------------------

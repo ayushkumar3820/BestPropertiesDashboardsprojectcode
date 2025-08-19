@@ -5,7 +5,7 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 */
 require APPPATH . 'libraries/REST_Controller.php';
-class Projects extends REST_Controller
+class AppApiMeeting extends REST_Controller
 {
     public function __construct()
     {
@@ -20,222 +20,177 @@ class Projects extends REST_Controller
         }
     }
 
+ 
 
+public function getAllMeetings_get()
+{
+    // Default response
+    $response = [
+        'status'  => 'error',
+        'message' => 'User ID is required',
+        'result'  => []
+    ];
 
+    // Get userId and role from query params
+    $userId = $this->input->get('userId'); 
+    $role   = $this->input->get('role');  
 
-
-
-
-
-
-
-    public function getAllMeetings_get()
-    {
-        $return = array(
-            'status' => 'error',
-            'message' => 'Please send all required parameters',
-            'result' => ''
-        );
-
-        $meetingsData = $this->Api_model->get_tasks_with_conditions("meeting");
-
-        if (empty($meetingsData)) {
-            $return['message'] = 'No Records found';
-        } else {
-            $return['status'] = 'success';
-            $return['message'] = 'Records found';
-            $return['result'] = $meetingsData;
-        }
-
-        $this->response($return, REST_Controller::HTTP_OK);
+    // If no userId provided → stop
+    if (empty($userId)) {
+        return $this->response($response, REST_Controller::HTTP_BAD_REQUEST);
     }
 
+    // Get all meetings from model
+    $allMeetings = $this->Api_model->get_tasks_with_conditions("meeting");
 
-
-
-
-    // post  METHOD (replace your existing postAllMeetings_post method)
-    public function postAllMeetings_post()
-    {
-        header("Access-Control-Allow-Origin: *");
-        header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
-        header("Access-Control-Allow-Headers: Content-Type, Authorization");
-
-        if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
-            http_response_code(200);
-            exit;
+    // Filter meetings
+    $validMeetings = [];
+    foreach ($allMeetings as $meeting) {
+        // Skip if status is completed or cancel
+        if (in_array(strtolower($meeting['status']), ['completed', 'cancel'])) {
+            continue;
         }
 
-        $return = [
-            'status' => 'error',
-            'message' => 'Please send all required parameters',
-            'result' => ''
+        // Skip if not matching this user
+        if ($meeting['userId'] != $userId) {
+            continue;
+        }
+
+        // Skip if role filter is applied and doesn't match
+        if (!empty($role) && isset($meeting['role']) && $meeting['role'] != $role) {
+            continue;
+        }
+
+        // Add valid meeting
+        $validMeetings[] = $meeting;
+    }
+
+    // Prepare final response
+    if (!empty($validMeetings)) {
+        $response['status']  = 'success';
+        $response['message'] = 'Records found';
+        $response['result']  = $validMeetings;
+    } else {
+        $response['message'] = 'No Records found';
+    }
+
+    // Send JSON response
+    return $this->response($response, REST_Controller::HTTP_OK);
+}
+
+    // POST METHOD
+
+public function postAllMeetings_post()
+{
+    // Set CORS headers
+    header("Access-Control-Allow-Origin: *");
+    header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
+    header("Access-Control-Allow-Headers: Content-Type, Authorization");
+    
+    // Handle OPTIONS request
+    if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+        http_response_code(200);
+        exit;
+    }
+    
+    // Default response
+    $return = [
+        'status' => 'error',
+        'message' => 'Please send all required parameters',
+        'result' => ''
+    ];
+    
+    // Get and decode JSON input
+    $json = file_get_contents('php://input');
+    $data = json_decode($json, true);
+    
+    // Check if JSON is valid
+    if (!$data) {
+        $return['message'] = 'Invalid JSON data';
+        $this->response($return, REST_Controller::HTTP_BAD_REQUEST);
+        return;
+    }
+    
+    // Extract required fields
+    $leadId = $data['leadId'] ?? null;
+    $comment = $data['comment'] ?? null;
+    $nextdt = $data['nextdt'] ?? null;
+    $choice = $data['choice'] ?? null;
+    $status = $data['status'] ?? 'active';
+    $userId = $data['userId'] ?? null;
+    $propertyIds = $data['property_ids'] ?? null;
+    
+    // Validate required fields
+    if (empty($leadId) || empty($comment) || empty($nextdt) || empty($userId)) {
+        $return['message'] = 'leadId, comment, nextdt, and userId are required';
+        $this->response($return, REST_Controller::HTTP_BAD_REQUEST);
+        return;
+    }
+    
+    // Prepare data for database insert
+    $insertData = [
+        'leadid' => $leadId,
+        'comment' => $comment,
+        'nextdt' => $nextdt,
+        'choice' => $choice,
+        'status' => $status,
+       
+        'userId'       => $userId,  
+        'property_ids' => $propertyIds
+    ];
+    
+    // Insert data into leads_comment table
+    $result = $this->db->insert('leads_comment', $insertData);
+    
+    if ($result) {
+        // Success response
+        $return['status'] = 'success';
+        $return['message'] = 'Meeting comment saved successfully';
+        $return['result'] = [
+            'comment_id' => $this->db->insert_id(),
+            'leadId' => $leadId
         ];
-
-        $json = file_get_contents('php://input');
-        $data = json_decode($json, true);
-
-        // Extract fields from 
-        $leadId = $data['leadId'] ?? null;
-        $comment = $data['comment'] ?? null;
-        $nextdt = $data['nexpayloadtdt'] ?? null;
-        $choice = $data['choice'] ?? null;
-        $status = $data['status'] ?? 'active';
-        $userId = $data['userId'] ?? null;
-        $propertyIds = $data['property_ids'] ?? null;
-
-        // Buyer-related fields
-        $uName = $data['uName'] ?? null;
-        $preferred_location = $data['preferred_location'] ?? null;
-        $budget = $data['budget'] ?? null;
-        $mobile = $data['mobile'] ?? null;
-
-        // Validation
-        if (empty($leadId) || empty($comment) || empty($nextdt)) {
-            $return['message'] = 'leadId, comment, and nextdt are required fields';
-            return $this->response($return, REST_Controller::HTTP_BAD_REQUEST);
-        }
-
-        // --- Step 1: Check if buyer exists ---
-        $buyerExists = $this->db->where('id', $leadId)->get('buyers')->num_rows();
-
-        if ($buyerExists == 0) {
-            // Insert new buyer
-            $buyerData = [
-                'id' => $leadId,
-                'uName' => $uName,
-                'preferred_location' => $preferred_location,
-                'budget' => $budget,
-                'mobile' => $mobile
-            ];
-            $this->db->insert('buyers', $buyerData);
-        } else {
-            // Optional: update buyer details
-            $buyerUpdate = [
-                'uName' => $uName,
-                'preferred_location' => $preferred_location,
-                'budget' => $budget,
-                'mobile' => $mobile
-            ];
-            $this->db->where('id', $leadId)->update('buyers', $buyerUpdate);
-        }
-
-        // --- Step 2: Insert into leads_comment ---
-        $commentData = [
-            'leadid' => $leadId,
-            'comment' => $comment,
-            'nextdt' => $nextdt,
-            'choice' => $choice,
-            'status' => $status,
-            'userid' => $userId,
-            'property_ids' => $propertyIds
-        ];
-
-        $this->db->insert('leads_comment', $commentData);
-
-        if ($this->db->affected_rows() > 0) {
-            $return['status'] = 'success';
-            $return['message'] = 'Buyer and comment saved successfully';
-            $return['result'] = ['comment_id' => $this->db->insert_id()];
-        } else {
-            $return['message'] = 'Failed to save comment';
-        }
-
-        return $this->response($return, REST_Controller::HTTP_OK);
-    }
-
-
-
-
-
-
-
-    // 2.  UPDATE METHOD (add this new method)
-    public function updateAllMeetings_put()
-    {
-        $id = $this->put('id');
-
-        $data = array(
-            'comment' => $this->put('comment'),
-            'nextdt' => $this->put('nextdt'),
-            'choice' => $this->put('choice'),
-            'status' => $this->put('status'),
-            'property_ids' => $this->put('property_ids')
-        );
-
-        // Only set userId if it's valid and exists
-        $userId = $this->put('userId');
-        if (!empty($userId)) {
-            $userExists = $this->db->where('id', $userId)->count_all_results('users');
-            if ($userExists > 0) {
-                $data['userId'] = $userId;
-            }
-        }
-
-        $this->db->where('id', $id);
-        if ($this->db->update('leads_comment', $data)) {
-            $this->response(['status' => 'success', 'message' => 'Meeting updated successfully'], REST_Controller::HTTP_OK);
-        } else {
-            $this->response(['status' => 'error', 'message' => 'Failed to update meeting'], REST_Controller::HTTP_BAD_REQUEST);
-        }
-    }
-
-
-
-
-    // 3. NEW DELETE METHOD (add this new method)
-
-    public function deleteAllMeetings_delete()
-    {
-        // CORS headers
-        header("Access-Control-Allow-Origin: *");
-        header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
-        header("Access-Control-Allow-Headers: Content-Type, Authorization");
-
-        if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
-            http_response_code(200);
-            exit;
-        }
-
-        $return = array(
-            'status' => 'error',
-            'message' => 'Please send all required parameters',
-            'result' => ''
-        );
-
-        // Get JSON input
-        $json = file_get_contents('php://input');
-        $data = json_decode($json, true);
-
-        $meetingId = $data['meeting_id'] ?? null;
-
-        if (empty($meetingId)) {
-            $return['message'] = 'meeting_id is required';
-            $this->response($return, REST_Controller::HTTP_BAD_REQUEST);
-            return;
-        }
-
-        // Check if meeting exists
-        $existingMeeting = $this->Api_model->getRecordByColumn('id', $meetingId, 'meetings');
-        if (!$existingMeeting) {
-            $return['message'] = 'Meeting not found';
-            $this->response($return, REST_Controller::HTTP_NOT_FOUND);
-            return;
-        }
-
-        // Simple delete (or soft delete if you want)
-        $deleted = $this->Api_model->updateTable('id', $meetingId, 'meetings', ['status' => 'deleted']);
-
-        if ($deleted) {
-            $return['status'] = 'success';
-            $return['message'] = 'Meeting deleted successfully';
-            $return['result'] = ['meeting_id' => $meetingId];
-        } else {
-            $return['message'] = 'Failed to delete meeting';
-        }
-
         $this->response($return, REST_Controller::HTTP_OK);
+    } else {
+        // Error response
+        $return['message'] = 'Failed to save comment to database';
+        $this->response($return, REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+    }
+}
+
+
+
+public function deleteMeeting_delete()
+{
+    // Get ID from query param
+    $id = $this->input->get('id');
+
+    // Default response
+    $response = [
+        'status'  => 'error',
+        'message' => 'Meeting ID is required',
+        'result'  => []
+    ];
+
+    // If no ID provided
+    if (empty($id)) {
+        return $this->response($response, REST_Controller::HTTP_BAD_REQUEST);
     }
 
+    // Try deleting from DB
+    $this->db->where('id', $id);
+    $deleted = $this->db->delete('leads_comment');
 
+    if ($deleted) {
+        $response['status']  = 'success';
+        $response['message'] = 'Meeting deleted successfully';
+    } else {
+        $response['message'] = 'Failed to delete meeting (maybe ID not found)';
+    }
+
+    return $this->response($response, REST_Controller::HTTP_OK);
+}
+
+
+    
 }

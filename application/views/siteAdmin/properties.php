@@ -167,39 +167,47 @@ $propertyAdvanceSearchVisible = !empty($_POST) ? 'block' : 'none';
                                     <small>ID: <?php echo htmlspecialchars($property->id); ?></small>
                                 </td>
                                 <td><?php echo $property->phone; ?></td>
-                                <td>
-                                    <?php
-                                        $value = '-';
+  <td>
+    <?php
+        $value = '-';
 
-                                        $budget = trim($property->budget);
-                                        $budget_in_words = trim($property->budget_in_words);
+        $budget = trim($property->budget_in_words);
+        $budget_in_words = trim($property->budget_in_words);
 
-                                        if (!empty($budget)) {
-                                            // Split to check if unit is already present
-                                            $parts = preg_split('/\s+/', $budget);
-                                            $num = isset($parts[0]) ? trim($parts[0]) : '';
-                                            $unit = isset($parts[1]) ? strtolower(trim($parts[1])) : '';
+        if (!empty($budget)) {
+            // Split number aur unit alag karo
+            $parts = preg_split('/\s+/', $budget);
+            $num = isset($parts[0]) ? trim($parts[0]) : '';
+            $unit = isset($parts[1]) ? strtolower(trim($parts[1])) : '';
 
-                                            if (is_numeric($num)) {
-                                                $numericVal = (int)$num;
+            if (is_numeric($num)) {
+                $numericVal = (float)$num; // float rakha decimal handle karne ke liye
 
-                                                if ($numericVal > 100 ) {
-                                                    $value = $budget; // Show raw if too large
-                                                } elseif (!in_array($unit, ['lakh', 'lakhs', 'crore', 'crores'])) {
-                                                    $value = ($numericVal <= 20) ? $numericVal . ' Cr' : $numericVal . ' Lakh';
-                                                } else {
-                                                    $value = $budget; // Unit already present
-                                                }
-                                            } else {
-                                                $value = $budget; // Non-numeric values
-                                            }
-                                        } elseif (!empty($budget_in_words)) {
-                                            $value = $budget_in_words;
-                                        }
+                if (!empty($unit)) {
+                    // Agar unit diya hua hai (crore/lakh) → wahi dikhado
+                    $value = $numericVal . ' ' . ucfirst($unit);
+                } else {
+                    // Agar unit nahi hai to apna rule lagao
+                    if ($numericVal <= 20) {
+                        $value = $numericVal . ' Cr';
+                    } else {
+                        $value = $numericVal . ' Lakh';
+                    }
+                }
+            } else {
+                // Non-numeric case me jo likha hai wahi dikhado
+                $value = $budget;
+            }
+        } elseif (!empty($budget_in_words)) {
+            $value = $budget_in_words;
+        }
 
-                                        echo htmlspecialchars($value);
-                                        ?>
-                                </td>
+        echo htmlspecialchars($value);
+    ?>
+</td>
+
+
+
                                 <td>
                                     <?php
                                     if (!empty($property->built)) {

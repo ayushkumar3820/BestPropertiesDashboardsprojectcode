@@ -15,92 +15,114 @@ class Properties extends REST_Controller
     }
 
     /** Add Property API **/
-    public function addAdminProperty_post()
-    {
-        $return = array('status' => 'error', 'message' => 'Missing required fields', 'result' => '');
+public function addAdminProperty_post()
+{
+    $return = ['status' => 'error', 'message' => 'Missing required fields', 'result' => ''];
 
-        // Handle image uploads
-        $imageFields = ['image_one', 'image_two', 'image_three', 'image_four'];
-        $uploadPath = './uploads/';
-        $allowedTypes = 'jpg|jpeg|png|webp';
+    // Ensure session is loaded in REST controller
+    if (!isset($this->session)) {
+        $this->load->library('session');
+    }
 
-        $this->load->library('upload');
+    // ---- Image Uploads ----
+    $imageFields  = ['image_one', 'image_two', 'image_three', 'image_four'];
+    $uploadPath   = './uploads/';
+    $allowedTypes = 'jpg|jpeg|png|webp';
 
-        $uploadedImages = [];
+    $this->load->library('upload');
+    $uploadedImages = [];
 
-        foreach ($imageFields as $field) {
-            if (!empty($_FILES[$field]['name'])) {
-                $config['upload_path'] = $uploadPath;
-                $config['allowed_types'] = $allowedTypes;
-                $config['file_name'] = time() . '_' . basename($_FILES[$field]['name']);
-
-                $this->upload->initialize($config);
-
-                if ($this->upload->do_upload($field)) {
-                    $uploadData = $this->upload->data();
-                    $uploadedImages[$field] = $uploadData['file_name'];
-                }
+    foreach ($imageFields as $field) {
+        if (!empty($_FILES[$field]['name'])) {
+            $config = [
+                'upload_path'   => $uploadPath,
+                'allowed_types' => $allowedTypes,
+                'file_name'     => time() . '_' . basename($_FILES[$field]['name']),
+            ];
+            $this->upload->initialize($config);
+            if ($this->upload->do_upload($field)) {
+                $uploadData = $this->upload->data();
+                $uploadedImages[$field] = $uploadData['file_name'];
             }
         }
+    }
 
-        // Property table fields
-        $propertyFields = [
-            'userid', 'name', 'property_builder', 'description', 'property_for', 'project_n',
-            'built', 'land', 'carpet', 'additional', 'additional_value', 'address', 'person',
-            'phone', 'person_address', 'city', 'state', 'property_type', 'category', 'zip_code',
-            'bhk', 'budget', 'budget_in_words', 'amenities', 'type',
-            'status', 'approvel', 'show_in_slider', 'show_in_gallery',
-            'icon', 'bathrooms', 'bedrooms', 'sqft', 'measureUnit', 'services', 'verified',
-            'residential', 'commercial', 'hot_deals', 'clone_id', 'main_site', 'lead_id',
-            'new_properties_id', 'construction_status'
-        ];
+    // ---- Collect Property Fields (excluding userid; set separately) ----
+    $propertyFields = [
+        'name','property_builder','description','property_for','project_n',
+        'built','land','carpet','additional','additional_value','address','person',
+        'phone','person_address','city','state','property_type','category','zip_code',
+        'bhk','budget','budget_in_words','amenities','type',
+        'status','approvel','show_in_slider','show_in_gallery',
+        'icon','bathrooms','bedrooms','sqft','measureUnit','services','verified',
+        'residential','commercial','hot_deals','clone_id','main_site','lead_id',
+        'new_properties_id','construction_status'
+    ];
 
-        foreach ($propertyFields as $field) {
-            $value = $this->input->post($field);
-            if ($value !== null) {
-                $this->db->set($field, $value);
-            }
+    $data = [];
+
+    // Always set userid (POST -> Session -> Header fallback)
+    $userid = $this->input->post('userid', true);
+    if (empty($userid) && isset($this->session) && method_exists($this->session, 'userdata')) {
+        $userid = $this->session->userdata('id');
+    }
+    if (empty($userid)) {
+        // optional header fallback if you pass user id via header
+        $headerUserId = $this->input->get_request_header('X-User-Id', true);
+        if (!empty($headerUserId)) {
+            $userid = $headerUserId;
         }
+    }
+    if (!empty($userid)) {
+        $data['userid'] = $userid;
+    }
 
-        // Set uploaded images
-        foreach ($uploadedImages as $field => $filename) {
-            $this->db->set($field, $filename);
+    // Copy posted fields (ignore null/empty strings)
+    foreach ($propertyFields as $field) {
+        $val = $this->input->post($field);
+        if ($val !== null && $val !== '') {
+            $data[$field] = $val;
         }
+    }
 
-        // Insert into `properties` table
-        $this->db->insert('properties');
-        $property_id = $this->db->insert_id();
+    // Merge uploaded images
+    foreach ($uploadedImages as $field => $filename) {
+        $data[$field] = $filename;
+    }
 
-        if (!$property_id) {
-            $return['message'] = 'Failed to add property.';
-            return $this->response($return, REST_Controller::HTTP_OK);
-        }
+    // ---- Insert into properties ----
+    $this->db->insert('properties', $data);
+    $property_id = $this->db->insert_id();
 
-        // Property meta fields
-        $metaFields = [
-            'floor_no', 'total_floors', 'property_age', 'kothi_story_type', 'furnishing_status',
-            'ownership_type', 'gated_community', 'available_from', 'has_lift', 'parking_available',
-            'commercial_approval', 'width_length', 'road_width', 'commercial_useType',
-            'shutters_count', 'roof_height', 'loading_bay', 'locality', 'landmark', 'direction',
-            'facing', 'in_society', 'hospital_type', 'floor_available', 'medical_facilities',
-            'hospital_license', 'possession_status', 'map_link','other_property_type'
-        ];
-
-        $metaData = ['properties_id' => $property_id];
-        foreach ($metaFields as $field) {
-            $value = $this->input->post($field);
-            if ($value !== null) {
-                $metaData[$field] = $value;
-            }
-        }
-
-        // Insert into `properties_meta`
-        $this->db->insert('properties_meta', $metaData);
-
-        $return['status'] = 'done';
-        $return['message'] = 'Property added successfully';
+    if (!$property_id) {
+        $return['message'] = 'Failed to add property.';
         return $this->response($return, REST_Controller::HTTP_OK);
     }
+
+    // ---- Property Meta ----
+    $metaFields = [
+        'floor_no','total_floors','property_age','kothi_story_type','furnishing_status',
+        'ownership_type','gated_community','available_from','has_lift','parking_available',
+        'commercial_approval','width_length','road_width','commercial_useType',
+        'shutters_count','roof_height','loading_bay','locality','landmark','direction',
+        'facing','in_society','hospital_type','floor_available','medical_facilities',
+        'hospital_license','possession_status','map_link','other_property_type'
+    ];
+
+    $metaData = ['properties_id' => $property_id];
+    foreach ($metaFields as $field) {
+        $val = $this->input->post($field);
+        if ($val !== null && $val !== '') {
+            $metaData[$field] = $val;
+        }
+    }
+
+    $this->db->insert('properties_meta', $metaData);
+
+    $return['status']  = 'done';
+    $return['message'] = 'Property added successfully';
+    return $this->response($return, REST_Controller::HTTP_OK);
+}
 
 
 

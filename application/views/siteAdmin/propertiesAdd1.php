@@ -267,6 +267,10 @@
                                     <option value="2+1BHK">2+1BHK</option>
                                     <option value="3BHK">3BHK</option>
                                     <option value="3+1BHK">3+1BHK</option>
+                                    <option value="4BHK">4BHK</option>
+                                    <option value="4+1BHK">4+1BHK</option>
+                                    <option value="5BHK">5BHK</option>
+                                    <option value="5+1BHK">5+1BHK</option>
                                     <option value="Other">Other</option>
                                 </select>
                             </div>

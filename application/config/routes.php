@@ -83,11 +83,13 @@ $route['agent-projects'] = 'api/Projects/getProjectField';
 $route['our_services_img'] = 'api/Home_img/get_images';
 $route['upcoming-projects'] = 'api/Projects/getUpcomingProjects';
 $route['test-api'] = 'api/TestAPI/propertyTest';
-$route['add-leads-data'] = 'api/Leads/addBuyers';
+$route['leads-user-data'] = 'api/TestAPI/leadUserData';
 /*App API*/ 
 
 //leads api
 $route['get-user-leads'] = 'api/Leads/getLeadsData';
+$route['add-user-leads'] = 'api/Leads/addLeadsData';
+$route['delete-user-leads/(:num)'] = 'api/Leads/deleteLeadsData';
 
 
 
@@ -95,7 +97,6 @@ $route['get-user-leads'] = 'api/Leads/getLeadsData';
 //meeting api 
 $route['get-all-meeting'] = 'api/AppApiMeeting/getAllMeetings';
 $route['post-meeting'] = 'api/AppApiMeeting/postAllMeetings';
-$route['update-meeting'] = 'api/AppApiMeeting/updateAllMeetings';
 $route['delete-meeting'] = 'api/AppApiMeeting/deleteAllMeetings';
 
 
@@ -111,9 +112,7 @@ $route['delete-meeting'] = 'api/AppApiMeeting/deleteAllMeetings';
 
 $route['some-field'] = 'api/PropertyDetail/getSomeeFieldProperties';
 $route['only-single-properties'] = 'api/PropertyDetail/getProperties';
-
 $route['single-all-properties'] = 'api/PropertyDetail/getPropertiesSingleOne';
-
 /*API add data */
 $route['submit-agent-properties'] = 'api/PropertyDetail/submitAgentProperties';
 $route['submit-properties'] = 'api/PropertyDetail/submitNewAgentPropertie';
@@ -179,10 +178,8 @@ $route['admin/properties'] = 'Siteadmin/Properties/index';
 $route['admin/import_export'] = 'Siteadmin/Properties/import_export';
 //$route['admin/properties/add'] = 'Siteadmin/Properties/addProperties';
 $route['admin/properties/add'] = 'Siteadmin/Properties/addProperties1';
-
 $route['admin/properties/updateStatus'] = 'Siteadmin/Properties/updateStatus';
 $route['admin/properties/updateBulkStatus'] = 'Siteadmin/Properties/updateBulkStatus';
-
 $route['admin/properties/edit/(:num)'] = 'Siteadmin/Properties/editProperties1/$1';
 //$route['admin/properties/edit/(:num)'] = 'Siteadmin/Properties/editProperties/$1';
 $route['admin/properties/delete/(:num)'] = 'Siteadmin/Properties/deleteProperties/$1';

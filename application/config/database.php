@@ -75,10 +75,10 @@ $query_builder = TRUE;
 
 $db['default'] = array(
 	'dsn'	=> '',
-	'hostname' => 'localhost',          
-	'username' => 'root',               
-	'password' => '',                   
-	'database' => 'bestProperrtyDatabase', 
+	'hostname' => 'localhost',
+	'username' => 'u190592051_apibestprprty',
+	'password' => 'S5&[1aiC4o',
+	'database' => 'u190592051_apibestprprty',
 	'dbdriver' => 'mysqli',
 	'dbprefix' => '',
 	'pconnect' => FALSE,

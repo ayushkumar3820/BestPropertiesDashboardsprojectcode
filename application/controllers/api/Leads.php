@@ -1,134 +1,176 @@
 <?php
-	defined('BASEPATH') OR exit('No direct script access allowed');
-	require APPPATH . 'libraries/REST_Controller.php';
-	
-	class Leads extends REST_Controller
-	{
-	public function __construct()
+defined('BASEPATH') or exit('No direct script access allowed');
+require APPPATH . 'libraries/REST_Controller.php';
+
+class Leads extends REST_Controller
 {
-    parent::__construct();
-    $this->load->database();
-    $this->load->helper('url');
-    $this->load->model('Api_model');
+    public function __construct()
+    {
+        parent::__construct();
+        $this->load->helper('url');
+        $this->load->model('Api_model');
 
-    // CORS Headers
-    header("Access-Control-Allow-Origin: *");
-    header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
-    header("Access-Control-Allow-Headers: Content-Type, Content-Length, Accept-Encoding, Authorization");
-
-    // Handle preflight OPTIONS request
-    if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-        exit(0);
+        $checkToken = $this->checkForToken();
+        if (!$checkToken) {
+            die();
+        }
     }
-	
-    $checkToken = $this->checkForToken();
-    if(!$checkToken) {
-        die();
+
+    public function index_post()
+    {
+        echo 'index function';
     }
-}
 
-		
-		public function getLeadsData_post()
-		{
-			$return = array('status' => 'error', 'message' => 'Please send all required parameters', 'result' => '');
-			
-			$json = file_get_contents('php://input');
-			$data = json_decode($json, true);
-			
-			$token = removeAllSpecialCharcter($data['token'] ?? '');
-			$userId = removeAllSpecialCharcter($data['user_id'] ?? '');
-			
-			if ($token == '') {
-				$return['message'] = 'Please pass the valid token.';
-				} elseif (!$userId || !is_numeric($userId)) {
-				$return['message'] = 'Please pass a valid user id.';
-				} else {
-				$checkToken = $this->Api_model->getRecordByColumn('token', $token, 'adminLogin');
-				
-				if ($checkToken) {
-					$assignedLeads = $this->Api_model->getRecordByColumn('userid', $userId, 'assigned_leads', 'leadid');
-					
-					if ($assignedLeads) {
-						$leadIds = array_column($assignedLeads, 'leadid');
-                        $leadsData = $this->Api_model->getRecordsByWhereIn('id', $leadIds, 'buyers');
-						
-						if ($leadsData) {
-							$return['status'] = 'done';
-							$return['message'] = 'Done.';
-							$return['result'] = $leadsData;
-						} else {
-							$return['status'] = 'Fail';
-							$return['message'] = 'No records found.';
-							$return['result'] = '';
-						}
-					} else {
-						$return['message'] = 'No leads assigned to this user.';
-					}
-				} else {
-					$return['message'] = 'This token has been expired.';
-				}
-			}
-			
-			$this->response($return, REST_Controller::HTTP_OK);
-		}
-		
-// 		Add Leads 
+    public function getLeadsData_post()
+    {
+        $return = array('status' => 'error', 'message' => 'Please send all required parameters', 'result' => '');
 
-public function addBuyers_post()
-{
-    error_reporting(E_ALL);
-    ini_set('display_errors', 1);
+        $json = file_get_contents('php://input');
+        $data = json_decode($json, true);
 
-    $return = ['status' => 'error', 'message' => 'Please send all required parameters', 'result' => ''];
+        $token = removeAllSpecialCharcter($data['token'] ?? '');
+        $userId = removeAllSpecialCharcter($data['user_id'] ?? '');
+
+        if ($token == '') {
+            $return['message'] = 'Please pass the valid token.';
+        } elseif (!$userId || !is_numeric($userId)) {
+            $return['message'] = 'Please pass a valid user id.';
+        } else {
+            $checkToken = $this->Api_model->getRecordByColumn('token', $token, 'adminLogin');
+
+            if ($checkToken) {
+                $assignedLeads = $this->Api_model->getRecordByColumn('userid', $userId, 'assigned_leads', 'leadid');
+
+                if ($assignedLeads) {
+                    $leadIds = array_column($assignedLeads, 'leadid');
+                    $leadsData = $this->Api_model->getRecordsByWhereIn('id', $leadIds, 'buyers');
+
+                    if ($leadsData) {
+                        $return['status'] = 'done';
+                        $return['message'] = 'Done.';
+                        $return['result'] = $leadsData;
+                    } else {
+                        $return['status'] = 'Fail';
+                        $return['message'] = 'No records found.';
+                        $return['result'] = '';
+                    }
+                } else {
+                    $return['message'] = 'No leads assigned to this user.';
+                }
+            } else {
+                $return['message'] = 'This token has been expired.';
+            }
+        }
+
+        $this->response($return, REST_Controller::HTTP_OK);
+    }
+
+    public function addLeadsData_post()
+    {
+        $return = ['status' => 'error', 'message' => '', 'result' => ''];
+        $json   = file_get_contents('php://input');
+        $data   = json_decode($json, true);
+    
+        if (!is_array($data)) {
+            return $this->response(['status' => 'error', 'message' => 'Invalid JSON format.'], REST_Controller::HTTP_OK);
+        }
+    
+        // Standardize keys to lowercase
+        $data = array_change_key_case($data, CASE_LOWER);
+    
+        // Trim all string inputs safely
+        $data = array_map(function ($v) {
+            return is_string($v) ? trim($v) : $v;
+        }, $data);
+    
+        // Required fields (lowercase now)
+        $required = [
+            'uname', 'address', 'mobile', 'preferred_location', 'propertytype',
+            'propertytype_sub', 'budget', 'max_budget', 'payment_method',
+            'project_builder', 'status', 'source', 'priority', 'timeline',
+            'leads_type', 'requirement', 'description', 'usertype',
+            'profession', 'city', 'email'
+        ];
+    
+        foreach ($required as $field) {
+            if (!isset($data[$field]) || $data[$field] === '') {
+                return $this->response(
+                    ['status' => 'error', 'message' => "Please provide {$field}."],
+                    REST_Controller::HTTP_OK
+                );
+            }
+        }
+    
+        // Mobile number validation
+        if (!preg_match('/^[0-9]{10}$/', $data['mobile'])) {
+            return $this->response(
+                ['status' => 'error', 'message' => 'Please provide a valid 10-digit mobile number.'],
+                REST_Controller::HTTP_OK
+            );
+        }
+    
+        // Email validation
+        if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+            return $this->response(
+                ['status' => 'error', 'message' => 'Please provide a valid email address.'],
+                REST_Controller::HTTP_OK
+            );
+        }
+    
+        // Insert into DB
+        $insertId = $this->Api_model->add_data_in_table($data, 'buyers');
+    
+        if ($insertId) {
+            $return = [
+                'status'  => 'done',
+                'message' => 'Buyer added successfully.',
+                'result'  => $insertId
+            ];
+        }
+    
+        return $this->response($return, REST_Controller::HTTP_OK);
+    }
+    
+    public function deleteLeadsData_post() 
+    {
+    $return = array(
+        'status' => 'error',
+        'message' => 'Please send required parameter (id)',
+        'result' => ''
+    );
 
     $json = file_get_contents('php://input');
     $data = json_decode($json, true);
 
-    if (!is_array($data)) {
-        $return['message'] = 'Invalid JSON format.';
-        return $this->response($return, REST_Controller::HTTP_BAD_REQUEST);
-    }
+    $id = $data['id'] ?? null;
 
-    $uName   = trim($data['uName'] ?? '');
-    $address = trim($data['address'] ?? '');
-    $mobile  = trim($data['mobile'] ?? '');
-
-    if ($uName === '' || $address === '' || $mobile === '') {
-        $return['message'] = 'Please provide uName, address, and mobile.';
-        return $this->response($return, REST_Controller::HTTP_OK);
-    }
-    if (!preg_match('/^[0-9]{10}$/', $mobile)) {
-        $return['message'] = 'Please provide a valid 10-digit mobile number.';
+    if (empty($id)) {
         return $this->response($return, REST_Controller::HTTP_OK);
     }
 
-    $insertData = [
-        'uName'      => $uName,
-        'address'    => $address,
-        'mobile'     => $mobile,
-    ];
+    // Check if record exists
+    $lead = $this->Api_model->add_data_in_table('buyers', ['id' => $id])->row();
 
-    if (!method_exists($this->Api_model, 'add_data_in_tables')) {
-        $return['message'] = 'Model method add_data_in_tables not found.';
-        return $this->response($return, REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+    if (!$lead) {
+        $return['message'] = 'Lead not found';
+        return $this->response($return, REST_Controller::HTTP_OK);
     }
 
-    $insertId = $this->Api_model->add_data_in_tables('buyers', $insertData); // table first, data second
+    // Delete record
+    $this->db->where('id', $id);
+    $this->db->delete('leads');
 
-    if ($insertId) {
-        $return['status']  = 'done';
-        $return['message'] = 'Buyer added successfully.';
-        $return['result']  = ['buyer_id' => $insertId];
-    } else {
-        $dbError = $this->db->error();
-        $return['message'] = 'Failed to add buyer. DB Error: ' . $dbError['message'];
-    }
+    $return['status'] = 'success';
+    $return['message'] = 'Lead deleted successfully';
+    $return['result']  = ['id' => $id];
 
     return $this->response($return, REST_Controller::HTTP_OK);
 }
 
-		
-		
-		
 
-	}
+
+
+
+
+
+}

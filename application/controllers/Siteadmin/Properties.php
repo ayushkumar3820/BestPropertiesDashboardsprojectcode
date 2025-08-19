@@ -72,6 +72,8 @@ public function index() {
     $like = [];
     $or_like = [];
 
+
+ 
     // POST filter
     if ($this->input->server('REQUEST_METHOD') === 'POST') {
         $post = $this->input->post();
@@ -114,7 +116,13 @@ public function index() {
     $this->db->from('properties');
     $this->db->join('properties_clone', 'properties.clone_id = properties_clone.id', 'left');
     $this->db->join('users', 'properties.userid = users.id', 'left'); // FIXED JOIN
-
+   
+   
+   $role    = $this->session->userdata('role');
+    $user_id = $this->session->userdata('id');
+    if ($role !== 'Admin') {
+        $this->db->where('properties.userid', $user_id);
+    }
     // Apply filters
     if (!empty($filters)) {
         foreach ($filters as $key => $value) {
