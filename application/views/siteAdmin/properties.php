@@ -58,11 +58,11 @@ $propertyAdvanceSearchVisible = !empty($_POST) ? 'block' : 'none';
         <div class="col-md-3">
             <button id="applyStatus" class="btn btn-primary">Apply to Selected</button>
         </div>
-    </div>
+    
 
     <div class="row" style="margin:10px;">
         <a href="javascript:void(0);" class="advance-search-toggle">Advance Search</a>
-    </div>
+    </div></div>
 
     <form method="post" action="" class="advance-search-form mt-3" style="display: <?php echo $propertyAdvanceSearchVisible; ?>;" id="propertyFilterForm">
         <div class="row">
@@ -79,15 +79,22 @@ $propertyAdvanceSearchVisible = !empty($_POST) ? 'block' : 'none';
                     <option value="Plot" <?php echo (isset($_POST['type']) && $_POST['type'] == 'Plot') ? 'selected' : ''; ?>>Plot</option>
                 </select>
             </div>
-            <div class="form-group col-sm-2" id="bhkGroup" style="display: <?php echo (isset($_POST['type']) && $_POST['type'] == 'Flat') ? 'block' : 'none'; ?>;">
-                <label>BHK:</label>
-                <select name="bhk" class="form-control">
-                    <option value="">Select BHK</option>
-                    <?php for ($i = 1; $i <= 5; $i++): ?>
-                        <option value="<?php echo $i; ?>" <?php echo (isset($_POST['bhk']) && $_POST['bhk'] == $i) ? 'selected' : ''; ?>><?php echo $i; ?> BHK</option>
-                    <?php endfor; ?>
-                </select>
-            </div>
+         <div class="form-group col-sm-2" id="bhkGroup" style="display: <?php echo (isset($_POST['type']) && $_POST['type'] == 'Flat') ? 'block' : 'none'; ?>;">
+    <label>BHK:</label>
+    <select name="bhk" class="form-control">
+        <option value="">Select BHK</option>
+        <?php 
+        $property_typesbhk = rentPropertyType();
+
+        foreach ($property_typesbhk as $option) {
+            $selected = (isset($_POST['bhk']) && $_POST['bhk'] == $option) ? 'selected' : '';
+            echo "<option value='$option' $selected>$option</option>";
+        }
+        ?>
+    </select>
+</div>
+
+
             <div class="form-group col-sm-2">
                 <label>Property For:</label>
                 <select name="property_for" class="form-control">
@@ -154,6 +161,7 @@ $propertyAdvanceSearchVisible = !empty($_POST) ? 'block' : 'none';
                     <tbody>
                         <?php if (!empty($properties)): $i = 1; foreach ($properties as $property): ?>
                             <tr>
+                                
                                 <td><input type="checkbox" class="property_checkbox" value="<?php echo $property->id; ?>"></td>
                                 <td><?php echo $i++; ?></td>
                                 <td>
@@ -258,6 +266,9 @@ $propertyAdvanceSearchVisible = !empty($_POST) ? 'block' : 'none';
                                         <a href="https://bestpropertiesmohali.com/" target="_blank" class="btn btn-success btn-sm">View</a>
                                     <?php endif; ?>
                                 </td>
+                                
+                                
+                                
                             </tr>
                         <?php endforeach; endif; ?>
                     </tbody>

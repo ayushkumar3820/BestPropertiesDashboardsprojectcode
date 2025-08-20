@@ -101,6 +101,8 @@ $route['delete-meeting'] = 'api/AppApiMeeting/deleteAllMeetings';
 
 
 
+//property api delete
+$route["property-delete"] = 'api/Properties/deleteProperty';
 
 
 

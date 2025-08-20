@@ -623,7 +623,7 @@ public function getProperties_post() {
     $propertiesList = $this->Api_model->getRecordByMultipleColumn(
         [], // No WHERE clause (get all)
         'properties',
-        'id, name, type, address, bhk, budget, image_one, sqft',
+        'id, name, type, address, bhk, budget,budget_in_words, image_one, sqft',
         'id',       // Sort column
         'DESC',     // Sort order
         8           // Limit
@@ -687,7 +687,7 @@ public function getPropertiesSingleOne_post() {
         $singlePropertiesDetail = $this->Api_model->getRecordByMultipleColumn(
             ['id' => $propertyId], // Filter by Property ID
             'properties',
-            'id, name, address, bhk, budget, image_one, image_two, image_three, image_four, property_builder, property_for, project_n, city, state, property_type, amenities, sqft'
+            'id, name, address, bhk, budget, budget_in_words,image_one, image_two, image_three, image_four, property_builder, property_for, project_n, city, state, property_type, amenities, sqft'
         );
 
         if (!$singlePropertiesDetail) {

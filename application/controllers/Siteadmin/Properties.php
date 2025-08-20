@@ -86,13 +86,12 @@ public function index() {
             $like['properties.address'] = $post['address'];
         }
 
-        if (!empty($post['bhk'])) {
-            $bhk = $post['bhk'];
-            $keyword = $bhk . 'BHK';
-
-            $or_like[] = ['column' => 'properties.bhk', 'value' => $bhk, 'type' => 'where'];
-            $or_like[] = ['column' => 'properties.name', 'value' => $keyword, 'type' => 'like'];
-        }
+      if (!empty($post['bhk'])) {
+    $filters['properties.bhk'] = $post['bhk'];  // sirf where
+}
+if (!empty($post['bhk']) && !empty($post['property_type']) && $post['property_type'] == 'Apartment / Flat') {
+    $filters['properties.bhk'] = $post['bhk'];
+}
 
         if (!empty($post['type'])) {
             $like['properties.type'] = $post['type'];
@@ -138,6 +137,7 @@ public function index() {
     }
 
     // Apply OR LIKE and WHERE conditions
+    
     if (!empty($or_like)) {
         $this->db->group_start();
         foreach ($or_like as $condition) {
@@ -816,7 +816,7 @@ public function export_data()
 public function import_page()
 {
     $data['title'] = 'Import Properties Data';
-    $data['mainContent'] = 'siteAdmin/import_form';  // same folder as export_form.php
+    $data['mainContent'] = 'siteAdmin/import_form';  
     $this->load->view('includes/admin/template', $data);
 }
 
@@ -864,14 +864,20 @@ public function import_data()
     $rowCount = 0;
     while (($data = fgetcsv($handle)) !== false) {
         $row = [];
-        foreach ($headers as $index => $field) {
-            $value = isset($data[$index]) ? $data[$index] : null;
+       foreach ($headers as $index => $field) {
+    $value = isset($data[$index]) ? trim($data[$index]) : null;
 
-            // Only add the field if it exists in DB table columns
-            if (in_array($field, $table_columns)) {
-                $row[$field] = $value;
-            }
+    // Agar DB column hai to hi add karo
+    if (in_array($field, $table_columns)) {
+
+        // Special case: show_in_gallery blank ho to 0 set karo
+        if ($field === 'show_in_gallery' && ($value === null || $value === '')) {
+            $value = 0;
         }
+
+        $row[$field] = $value;
+    }
+}
 
         if (!empty($row)) {
             $this->db->replace($table, $row);

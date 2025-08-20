@@ -101,21 +101,21 @@ if ( ! function_exists('getProperties')){
 	
 	if ( ! function_exists('rentPropertyType')){
 		function rentPropertyType() {
-        $property_types = array(
-            '1 BHK',
-            '2 BHK',
-            '3 BHK',
-            '1 Room Only',
-            '1 Room with Kitchen',
-            '2 Rooms Only',
-            '2 Rooms with Kitchen',
-            'Boys PG',
-            'Girls PG',
-            'Annex House',
-            'Other'
+        $property_typesbhk = array(
+             "1RK/Studio",
+            "1BHK",
+            "2BHK",
+            "2+1BHK",
+            "3BHK",
+            "3+1BHK",
+            "4BHK",
+            "4+1BHK",
+            "5BHK",
+            "5+1BHK",
+            "Other"
         );
 
-        return $property_types;
+        return $property_typesbhk;
 		}	
 	}
 	

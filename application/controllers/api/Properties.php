@@ -298,4 +298,35 @@ public function addAdminProperty_post()
     }
 
 
+public function deleteProperty_post()
+{
+    $return = array('status' => 'error', 'message' => 'Missing required field: property ID', 'result' => '');
+
+    // Try POST param first
+    $property_id = $this->input->post('id');
+
+    // If not found, try JSON body
+    if (!$property_id) {
+        $json = file_get_contents("php://input");
+        $data = json_decode($json, true);
+        if (isset($data['id'])) {
+            $property_id = $data['id'];
+        }
+    }
+
+    if (!$property_id) {
+        return $this->response($return, REST_Controller::HTTP_OK);
+    }
+
+    // Delete records
+    $this->Api_model->delete('properties_id', $property_id, 'properties_meta');
+    $this->Api_model->delete('id', $property_id, 'properties');
+
+    $return['status'] = 'done';
+    $return['message'] = 'Property deleted successfully';
+    return $this->response($return, REST_Controller::HTTP_OK);
+}
+
+
+
 }
