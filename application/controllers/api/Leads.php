@@ -20,6 +20,8 @@ class Leads extends REST_Controller
     {
         echo 'index function';
     }
+    
+    // Get Leads Data
 
     public function getLeadsData_post()
     {
@@ -64,7 +66,55 @@ class Leads extends REST_Controller
 
         $this->response($return, REST_Controller::HTTP_OK);
     }
+    
+        
+    
+    public function statusGetLeadsData_post()
+    {
+        $return = array('status' => 'error', 'message' => 'Please send all required parameters', 'result' => '');
 
+        $json = file_get_contents('php://input');
+        $data = json_decode($json, true);
+
+        $token = removeAllSpecialCharcter($data['token'] ?? '');
+        $userId = removeAllSpecialCharcter($data['user_id'] ?? '');
+
+        if ($token == '') {
+            $return['message'] = 'Please pass the valid token.';
+        } elseif (!$userId || !is_numeric($userId)) {
+            $return['message'] = 'Please pass a valid user id.';
+        } else {
+            $checkToken = $this->Api_model->getRecordByColumn('token', $token, 'adminLogin');
+
+            if ($checkToken) {
+                $assignedLeads = $this->Api_model->getRecordByColumn('userid', $userId, 'assigned_leads', 'leadid');
+
+                if ($assignedLeads) {
+                    $leadIds = array_column($assignedLeads, 'leadid');
+                    $leadsData = $this->Api_model->getRecordsByWhereIn('id', $leadIds, 'buyers');
+
+                    if ($leadsData) {
+                        $return['status'] = 'done';
+                        $return['message'] = 'Done.';
+                        $return['result'] = $leadsData;
+                    } else {
+                        $return['status'] = 'Fail';
+                        $return['message'] = 'No records found.';
+                        $return['result'] = '';
+                    }
+                } else {
+                    $return['message'] = 'No leads assigned to this user.';
+                }
+            } else {
+                $return['message'] = 'This token has been expired.';
+            }
+        }
+
+        $this->response($return, REST_Controller::HTTP_OK);
+    }
+
+
+    // Add Leads Data
     public function addLeadsData_post()
     {
         $return = ['status' => 'error', 'message' => '', 'result' => ''];
@@ -85,7 +135,7 @@ class Leads extends REST_Controller
     
         // Required fields (lowercase now)
         $required = [
-            'uname', 'address', 'mobile', 'preferred_location', 'propertytype',
+            'userid', 'uname', 'address', 'mobile', 'preferred_location', 'propertytype',
             'propertytype_sub', 'budget', 'max_budget', 'payment_method',
             'project_builder', 'status', 'source', 'priority', 'timeline',
             'leads_type', 'requirement', 'description', 'usertype',
@@ -100,24 +150,18 @@ class Leads extends REST_Controller
                 );
             }
         }
-    
-        // Mobile number validation
         if (!preg_match('/^[0-9]{10}$/', $data['mobile'])) {
             return $this->response(
                 ['status' => 'error', 'message' => 'Please provide a valid 10-digit mobile number.'],
                 REST_Controller::HTTP_OK
             );
         }
-    
-        // Email validation
         if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
             return $this->response(
                 ['status' => 'error', 'message' => 'Please provide a valid email address.'],
                 REST_Controller::HTTP_OK
             );
         }
-    
-        // Insert into DB
         $insertId = $this->Api_model->add_data_in_table($data, 'buyers');
     
         if ($insertId) {
@@ -131,41 +175,88 @@ class Leads extends REST_Controller
         return $this->response($return, REST_Controller::HTTP_OK);
     }
     
-    public function deleteLeadsData_post() 
-    {
+    
+    // Update Leads Data
+public function updateLeadsData_post($id = null)
+{
+    $return = ['status' => 'error', 'message' => '', 'result' => ''];
+
+    // Get raw input
+    $json = file_get_contents('php://input');
+    $data = json_decode($json, true);
+
+    if (!is_array($data)) {
+        return $this->response([
+            'status' => 'error',
+            'message' => 'Invalid JSON format.'
+        ], REST_Controller::HTTP_BAD_REQUEST);
+    }
+
+    if ($id === null) {
+        return $this->response([
+            'status' => 'error',
+            'message' => 'ID is required in URL.'
+        ], REST_Controller::HTTP_BAD_REQUEST);
+    }
+
+    // Database update
+    $updated = $this->Api_model->updateTable('id', $id, 'buyers', $data);
+
+    if ($updated) {
+        $return = [
+            'status' => 'success',
+            'message' => 'Data updated successfully',
+            'result' => $data
+        ];
+    } else {
+        $return = [
+            'status' => 'error',
+            'message' => 'Failed to update data'
+        ];
+    }
+
+    return $this->response($return, REST_Controller::HTTP_OK);
+}
+
+
+
+// Delete Leads Data
+// Delete Leads Data
+public function deleteLeadsData_post($id = null) 
+{
     $return = array(
         'status' => 'error',
         'message' => 'Please send required parameter (id)',
         'result' => ''
     );
 
-    $json = file_get_contents('php://input');
-    $data = json_decode($json, true);
-
-    $id = $data['id'] ?? null;
-
+    // Agar URL me id hi nahi di
     if (empty($id)) {
         return $this->response($return, REST_Controller::HTTP_OK);
     }
 
-    // Check if record exists
-    $lead = $this->Api_model->add_data_in_table('buyers', ['id' => $id])->row();
-
-    if (!$lead) {
-        $return['message'] = 'Lead not found';
+    // buyers table me check
+    $buyerExists = $this->db->where('id', $id)->get('buyers')->row();
+    if (!$buyerExists) {
+        $return['message'] = 'Lead not found in buyers, delete not allowed';
         return $this->response($return, REST_Controller::HTTP_OK);
     }
 
-    // Delete record
+    // buyers table se delete
+    $this->Api_model->delete('id', $id, 'buyers');
+
+    // leads table se bhi delete
     $this->db->where('id', $id);
     $this->db->delete('leads');
-
+     
     $return['status'] = 'success';
     $return['message'] = 'Lead deleted successfully';
     $return['result']  = ['id' => $id];
 
     return $this->response($return, REST_Controller::HTTP_OK);
 }
+
+
 
 
 

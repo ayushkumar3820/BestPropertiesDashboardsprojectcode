@@ -99,7 +99,7 @@
 					'property_url'=>$propertyUrl
 					);
 					
-					$result = $this->Register_model->addDataInTable($contact,'contact');
+					$result = $this->Register_model->addDataInTable($,'contact');
 					
 					if($result ==true){
 						

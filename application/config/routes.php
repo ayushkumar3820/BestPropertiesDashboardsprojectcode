@@ -88,8 +88,10 @@ $route['leads-user-data'] = 'api/TestAPI/leadUserData';
 
 //leads api
 $route['get-user-leads'] = 'api/Leads/getLeadsData';
+$route['status-leads-data'] = 'api/Leads/statusGetLeadsData';
 $route['add-user-leads'] = 'api/Leads/addLeadsData';
-$route['delete-user-leads/(:num)'] = 'api/Leads/deleteLeadsData';
+$route['delete-user-leads/(:num)'] = 'api/Leads/deleteLeadsData/$1';
+$route['update-user-leads/(:num)'] = 'api/Leads/updateLeadsData/$1';
 
 
 
@@ -105,9 +107,8 @@ $route['delete-meeting'] = 'api/AppApiMeeting/deleteAllMeetings';
 $route["property-delete"] = 'api/Properties/deleteProperty';
 
 
-
-
-
+//api contact us 
+$route['getScheduledVisits']['GET'] = 'api/Buyer/getScheduledVisits';
 
 
 

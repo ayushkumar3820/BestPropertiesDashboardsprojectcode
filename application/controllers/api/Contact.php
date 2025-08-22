@@ -95,4 +95,78 @@ class Contact extends REST_Controller
 
     $this->response($return, REST_Controller::HTTP_OK);
 }
+
+
+/** Get contacts **/
+public function contact_get() {
+    $return = array('status' => 'error', 'message' => 'No data found', 'result' => '');
+    
+    // Get query parameters
+    $property_id = $this->get('property_id');
+    $type = $this->get('type');
+    $phone = $this->get('phone');
+    $limit = $this->get('limit') ? $this->get('limit') : 50;
+    $offset = $this->get('offset') ? $this->get('offset') : 0;
+    
+    // Build query
+    $this->db->select('*');
+    $this->db->from('contact'); 
+    
+    // Apply filters if provided
+    if (!empty($property_id)) {
+        $this->db->where('property', $property_id);
+    }
+    
+    if (!empty($type)) {
+        $this->db->where('type', $type);
+    }
+    
+    if (!empty($phone)) {
+        $this->db->where('phone', $phone);
+    }
+    
+    // Add pagination
+    $this->db->limit($limit, $offset);
+    
+    // Order by latest first
+    $this->db->order_by('id', 'DESC');
+    
+    $query = $this->db->get();
+    
+    if ($query->num_rows() > 0) {
+        $contacts = $query->result_array();
+        
+        // Get total count for pagination
+        $this->db->from('contact');
+        if (!empty($property_id)) {
+            $this->db->where('property', $property_id);
+        }
+        if (!empty($type)) {
+            $this->db->where('type', $type);
+        }
+        if (!empty($phone)) {
+            $this->db->where('phone', $phone);
+        }
+        $total_count = $this->db->count_all_results();
+        
+        $return['status'] = 'done';
+        $return['message'] = 'Contacts retrieved successfully.';
+        $return['result'] = array(
+            'contacts' => $contacts,
+            'total_count' => $total_count,
+            'limit' => $limit,
+            'offset' => $offset
+        );
+    } else {
+        $return['message'] = 'No contacts found.';
+        $return['result'] = array(
+            'contacts' => [],
+            'total_count' => 0,
+            'limit' => $limit,
+            'offset' => $offset
+        );
+    }
+    
+    $this->response($return, REST_Controller::HTTP_OK);
+}
 }

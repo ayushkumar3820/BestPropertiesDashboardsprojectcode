@@ -294,90 +294,54 @@ class Buyer extends REST_Controller
 
     //get api function 
 
-public function getScheduledVisits_get()
-{
-    // Force JSON response - this is key to prevent HTML
-    $this->output->set_content_type('application/json');
-    header('Content-Type: application/json');
-    
-    try {
-        // Use REST_Controller's get() method instead of input->get()
-        $phone = $this->get('phone');
-        $property_id = $this->get('property_id'); 
-        $user_id = $this->get('Userid');
+    public function getScheduledVisits_get()
+    {
+        header('Content-Type: application/json'); // ensure JSON
 
-        $this->db->select('lc.*, b.uName, b.mobile');
-        $this->db->from('leads_comment lc');
-        $this->db->join('buyers b', 'b.id = lc.leadId', 'left');
-        $this->db->where('lc.choice', 'Meeting');
+        $phone = $this->input->get('phone', true);
+        $property_id = $this->input->get('property_id', true);
+        $user_id = $this->input->get('Userid', true);
 
-        // Filter by phone number
-        if (!empty($phone)) {
-            $this->db->where('b.mobile', $phone);
-        }
+        $response = ['status' => 'error', 'message' => 'Invalid request', 'result' => []];
 
-        // Filter by property ID  
-        if (!empty($property_id)) {
-            $this->db->like('lc.property_ids', $property_id);
-        }
+        try {
+            // 👉 your DB query logic here
+            $this->db->select('*');
+            $this->db->from('leads_comment');
+            if (!empty($phone)) {
+                $this->db->where('leadId', $phone);
+            }
+            if (!empty($property_id)) {
+                $this->db->like('property_ids', $property_id);
+            }
+            $query = $this->db->get();
+            $data = $query->result();
 
-        // Filter by user ID
-        if (!empty($user_id)) {
-            $this->db->where('lc.userId', $user_id);
-        }
-
-        $this->db->order_by('lc.nextdt', 'DESC');
-        
-        $query = $this->db->get();
-        $data = $query->result();
-
-        if ($data && count($data) > 0) {
-            $formatted_data = [];
-            foreach ($data as $row) {
-                $formatted_data[] = [
-                    'id' => $row->id,
-                    'lead_id' => $row->leadId,
-                    'buyer_name' => $row->uName,
-                    'buyer_mobile' => $row->mobile,
-                    'visit_date' => $row->nextdt,
-                    'comment' => $row->comment,
-                    'status' => $row->status,
-                    'property_ids' => $row->property_ids,
-                    'user_id' => $row->userId
+            if ($data) {
+                $response = [
+                    'status' => 'success',
+                    'message' => 'Data retrieved',
+                    'result' => $data
+                ];
+            } else {
+                $response = [
+                    'status' => 'success',
+                    'message' => 'No data found',
+                    'result' => []
                 ];
             }
-
+        } catch (Exception $e) {
             $response = [
-                'status' => 'success',
-                'message' => 'Data retrieved successfully',
-                'count' => count($formatted_data),
-                'data' => $formatted_data
-            ];
-        } else {
-            $response = [
-                'status' => 'success', 
-                'message' => 'No scheduled visits found',
-                'count' => 0,
-                'data' => []
+                'status' => 'error',
+                'message' => $e->getMessage()
             ];
         }
 
-    } catch (Exception $e) {
-        $response = [
-            'status' => 'error',
-            'message' => 'Database error: ' . $e->getMessage(),
-            'data' => []
-        ];
+        echo json_encode($response);
+        return $this->response($response, REST_Controller::HTTP_OK);
+
     }
 
-    // Use output method to ensure JSON response
-    $this->output
-        ->set_content_type('application/json')
-        ->set_output(json_encode($response));
-    
-    // Don't use return statement with REST_Controller
-    return;
-}
 
 
 

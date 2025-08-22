@@ -26,7 +26,7 @@ public function addAdminProperty_post()
 
     // ---- Image Uploads ----
     $imageFields  = ['image_one', 'image_two', 'image_three', 'image_four'];
-    $uploadPath   = './uploads/';
+    $uploadPath   = './assets/properties/';
     $allowedTypes = 'jpg|jpeg|png|webp';
 
     $this->load->library('upload');
@@ -198,104 +198,130 @@ public function addAdminProperty_post()
         return $this->response($return, REST_Controller::HTTP_OK);
     }
 
-    public function editProperty_post()
-    {
-        $return = array('status' => 'error', 'message' => 'Missing required fields', 'result' => '');
+  public function editProperty_post()
+{
+    $return = array('status' => 'error', 'message' => 'Missing required fields', 'result' => '');
 
-        // Read property ID
-        $property_id = $this->input->post('id');
-        if (!$property_id) {
-            $return['message'] = "Missing required field: property ID.";
-            return $this->response($return, REST_Controller::HTTP_OK);
-        }
-
-        // Handle image uploads
-        $imageFields = ['image_one', 'image_two', 'image_three', 'image_four'];
-        $uploadPath = './uploads/';
-        $allowedTypes = 'jpg|jpeg|png|webp';
-
-        $this->load->library('upload');
-
-        foreach ($imageFields as $field) {
-            $oldImage = $this->input->post($field . '_old');  // hidden input: image_one_old
-
-            if (!empty($_FILES[$field]['name'])) {
-                $config['upload_path'] = $uploadPath;
-                $config['allowed_types'] = $allowedTypes;
-                $config['file_name'] = time() . '_' . basename($_FILES[$field]['name']);
-
-                $this->upload->initialize($config);
-
-                if ($this->upload->do_upload($field)) {
-                    $uploadData = $this->upload->data();
-                    $uploadedFileName = $uploadData['file_name'];
-
-                    $this->input->post($field, true); // Optional XSS filtering
-                    $this->db->set($field, $uploadedFileName);
-
-                    // Delete old image if needed
-                    if (!empty($oldImage) && file_exists($uploadPath . $oldImage)) {
-                        unlink($uploadPath . $oldImage);
-                    }
-                }
-            } else {
-                // Keep old image if no new file uploaded
-                if (!empty($oldImage)) {
-                    $this->db->set($field, $oldImage);
-                }
-            }
-        }
-
-        // Property table fields
-        $propertyFields = [
-            'userid', 'name', 'property_builder', 'description', 'property_for', 'project_n',
-            'built', 'land', 'carpet', 'additional', 'additional_value', 'address', 'person',
-            'phone', 'person_address', 'city', 'state', 'property_type', 'category', 'zip_code',
-            'bhk', 'budget', 'budget_in_words', 'amenities', 'type',
-            'status', 'approvel', 'show_in_slider', 'show_in_gallery',
-            'icon', 'bathrooms', 'bedrooms', 'sqft', 'measureUnit', 'services', 'verified',
-            'residential', 'commercial', 'hot_deals', 'clone_id', 'main_site', 'lead_id',
-            'new_properties_id', 'construction_status'
-        ];
-
-        foreach ($propertyFields as $field) {
-            $value = $this->input->post($field);
-            if ($value !== null) {
-                $this->db->set($field, $value);
-            }
-        }
-
-        // Update the `properties` table
-        $this->db->where('id', $property_id);
-        $this->db->update('properties');
-
-        // Property meta fields
-        $metaFields = [
-            'floor_no', 'total_floors', 'property_age', 'kothi_story_type', 'furnishing_status',
-            'ownership_type', 'gated_community', 'available_from', 'has_lift', 'parking_available',
-            'commercial_approval', 'width_length', 'road_width', 'commercial_useType',
-            'shutters_count', 'roof_height', 'loading_bay', 'locality', 'landmark', 'direction',
-            'facing', 'in_society', 'hospital_type', 'floor_available', 'medical_facilities',
-            'hospital_license', 'possession_status', 'map_link','other_property_type'
-        ];
-
-        $metaData = [];
-        foreach ($metaFields as $field) {
-            $value = $this->input->post($field);
-            if ($value !== null) {
-                $metaData[$field] = $value;
-            }
-        }
-
-        if (!empty($metaData)) {
-            $this->db->where('properties_id', $property_id);
-            $this->db->update('properties_meta', $metaData);
-        }
-
-        $return['status'] = 'done';
-        $return['message'] = 'Property updated successfully';
+    // Read property ID
+    $property_id = $this->input->post('id');
+    if (!$property_id) {
+        $return['message'] = "Missing required field: property ID.";
         return $this->response($return, REST_Controller::HTTP_OK);
     }
+
+    // Handle image uploads
+    $imageFields = ['image_one', 'image_two', 'image_three', 'image_four'];
+    $uploadPath = './assets/properties/';
+    $allowedTypes = 'jpg|jpeg|png|webp';
+
+    $this->load->library('upload');
+
+    foreach ($imageFields as $field) {
+        $oldImage = $this->input->post($field . '_old');  // hidden input: image_one_old
+
+        if (!empty($_FILES[$field]['name'])) {
+            $config['upload_path'] = $uploadPath;
+            $config['allowed_types'] = $allowedTypes;
+            $config['file_name'] = time() . '_' . basename($_FILES[$field]['name']);
+
+            $this->upload->initialize($config);
+
+            if ($this->upload->do_upload($field)) {
+                $uploadData = $this->upload->data();
+                $uploadedFileName = $uploadData['file_name'];
+
+                $this->db->set($field, $uploadedFileName);
+
+                // Delete old image if needed
+                if (!empty($oldImage) && file_exists($uploadPath . $oldImage)) {
+                    unlink($uploadPath . $oldImage);
+                }
+            }
+        } else {
+            if (!empty($oldImage)) {
+                $this->db->set($field, $oldImage);
+            }
+        }
+    }
+
+    // Property table fields (without built & land, handle separately)
+    $propertyFields = [
+        'userid', 'name', 'property_builder', 'description', 'property_for', 'project_n',
+        'carpet', 'additional', 'additional_value', 'address', 'person',
+        'phone', 'person_address', 'city', 'state', 'property_type', 'category', 'zip_code',
+        'bhk', 'budget', 'budget_in_words', 'amenities', 'type',
+        'status', 'approvel', 'show_in_slider', 'show_in_gallery',
+        'icon', 'bathrooms', 'bedrooms', 'sqft', 'measureUnit', 'services', 'verified',
+        'residential', 'commercial', 'hot_deals', 'clone_id', 'main_site', 'lead_id',
+        'new_properties_id', 'construction_status'
+    ];
+
+    foreach ($propertyFields as $field) {
+        $value = $this->input->post($field);
+        if ($value !== null) {
+            $this->db->set($field, $value);
+        }
+    }
+
+// ✅ Custom handling for land (plot area)
+$plot_area = trim($this->input->post('kothi_plot_area'));
+$plot_unit = strtolower(trim($this->input->post('kothi_plot_area_unit')));
+
+if ($plot_area !== '' && $plot_unit !== '') {
+    $allowed_units = ['sq.yard','marla','kanal'];
+    if (!in_array($plot_unit, $allowed_units)) {
+        $plot_unit = 'sq.yard'; // fallback
+    }
+    // अब दोनों को जोड़कर एक ही field में save करो
+    $this->db->set('land', $plot_area . ' ' . $plot_unit);
+}
+
+// ✅ Custom handling for built (covered area)
+$covered_area = trim($this->input->post('kothi_covered_area'));
+$covered_unit = strtolower(trim($this->input->post('kothi_covered_area_unit')));
+
+if ($covered_area !== '' && $covered_unit !== '') {
+    $allowed_units = ['sq.yard','marla','kanal'];
+    if (!in_array($covered_unit, $allowed_units)) {
+        $covered_unit = 'sq.yard';
+    }
+    $this->db->set('built', $covered_area . ' ' . $covered_unit);
+}
+
+
+
+    // Update the `properties` table
+    $this->db->where('id', $property_id);
+    $this->db->update('properties');
+
+    // Property meta fields
+    $metaFields = [
+        'floor_no', 'total_floors', 'property_age', 'kothi_story_type', 'furnishing_status',
+        'ownership_type', 'gated_community', 'available_from', 'has_lift', 'parking_available',
+        'commercial_approval', 'width_length', 'road_width', 'commercial_useType',
+        'shutters_count', 'roof_height', 'loading_bay', 'locality', 'landmark', 'direction',
+        'facing', 'in_society', 'hospital_type', 'floor_available', 'medical_facilities',
+        'hospital_license', 'possession_status', 'map_link','other_property_type'
+    ];
+
+    $metaData = [];
+    foreach ($metaFields as $field) {
+        $value = $this->input->post($field);
+        if ($value !== null) {
+            $metaData[$field] = $value;
+        }
+    }
+
+    if (!empty($metaData)) {
+        $this->db->where('properties_id', $property_id);
+        $this->db->update('properties_meta', $metaData);
+    }
+
+    $return['status'] = 'done';
+    $return['message'] = 'Property updated successfully';
+    return $this->response($return, REST_Controller::HTTP_OK);
+}
+
 
 
 public function deleteProperty_post()
@@ -304,6 +330,7 @@ public function deleteProperty_post()
 
     // Try POST param first
     $property_id = $this->input->post('id');
+    
 
     // If not found, try JSON body
     if (!$property_id) {

@@ -93,8 +93,8 @@ if (!empty($post['bhk']) && !empty($post['property_type']) && $post['property_ty
     $filters['properties.bhk'] = $post['bhk'];
 }
 
-        if (!empty($post['type'])) {
-            $like['properties.type'] = $post['type'];
+        if (!empty($post['property_type'])) {
+            $like['properties.property_type'] = $post['property_type'];
         }
 
         if (!empty($post['property_for'])) {

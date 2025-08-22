@@ -10,6 +10,7 @@ $propertyAdvanceSearchVisible = !empty($_POST) ? 'block' : 'none';
         <div class="top-btn-div">
             <a href="<?php echo base_url('admin/properties/add'); ?>" class="btn btn-sm btn-info back-btn">Add New</a>
             <?php if ($this->session->userdata('role') == 'Admin'): ?>
+                
                 <a href="<?php echo base_url('admin/approvel'); ?>" class="btn btn-sm btn-info back-btn">Approval</a>
                 <button type="button" onclick="export_properties()" class="btn btn-sm btn-primary back-btn">Export</button>
                 <a href="<?php echo base_url('admin/properties/import_page'); ?>" class="btn btn-sm btn-success back-btn">Import</a>
@@ -72,14 +73,17 @@ $propertyAdvanceSearchVisible = !empty($_POST) ? 'block' : 'none';
             </div>
             <div class="form-group col-sm-2">
                 <label>Type:</label>
-                <select name="type" class="form-control" id="propertyType">
+                <select name="property_type" class="form-control" id="propertyType">
                     <option value="">Select Type</option>
-                    <option value="Kothi" <?php echo (isset($_POST['type']) && $_POST['type'] == 'Kothi') ? 'selected' : ''; ?>>Kothi</option>
-                    <option value="Flat" <?php echo (isset($_POST['type']) && $_POST['type'] == 'Flat') ? 'selected' : ''; ?>>Flat</option>
-                    <option value="Plot" <?php echo (isset($_POST['type']) && $_POST['type'] == 'Plot') ? 'selected' : ''; ?>>Plot</option>
+                    <option value="Independent House / Kothi" <?php echo (isset($_POST['property_type']) && $_POST['property_type'] == 'Independent House / Kothi') ? 'selected' : ''; ?>>Independent House / Kothi</option>
+                    <option value="Apartment / Flat" <?php echo (isset($_POST['property_type']) && $_POST['property_type'] == 'Apartment / Flat') ? 'selected' : ''; ?>>Apartment / Flat</option>
+                    <option value="Residential Plot" <?php echo (isset($_POST['property_type']) && $_POST['property_type'] == 'Residential Plot') ? 'selected' : ''; ?>>Residential Plot</option>
+                    
+                    
+                   
                 </select>
             </div>
-         <div class="form-group col-sm-2" id="bhkGroup" style="display: <?php echo (isset($_POST['type']) && $_POST['type'] == 'Flat') ? 'block' : 'none'; ?>;">
+         <div class="form-group col-sm-2" id="bhkGroup" style="display: <?php echo (isset($_POST['property_type']) && $_POST['property_type'] == 'Apartment / Flat') ? 'block' : 'none'; ?>;">
     <label>BHK:</label>
     <select name="bhk" class="form-control">
         <option value="">Select BHK</option>
@@ -151,7 +155,7 @@ $propertyAdvanceSearchVisible = !empty($_POST) ? 'block' : 'none';
                             <th>Property For/ ID</th>
                             <th>Phone</th>
                             <th>Budget</th>
-                            <th>Area</th>
+                            
                             <th>Data Source</th>
                             <th>Status</th>
                             <th class="d-none">Raw Status</th>
@@ -175,39 +179,47 @@ $propertyAdvanceSearchVisible = !empty($_POST) ? 'block' : 'none';
                                     <small>ID: <?php echo htmlspecialchars($property->id); ?></small>
                                 </td>
                                 <td><?php echo $property->phone; ?></td>
-  <td>
+<td>
     <?php
         $value = '-';
 
-        $budget = trim($property->budget_in_words);
-        $budget_in_words = trim($property->budget_in_words);
+        if ($property->id < 1173) {
+            // ---- Budget logic ----
+            $budget = trim($property->budget);
+            $budget_in_words = trim($property->budget_in_words);
 
-        if (!empty($budget)) {
-            // Split number aur unit alag karo
-            $parts = preg_split('/\s+/', $budget);
-            $num = isset($parts[0]) ? trim($parts[0]) : '';
-            $unit = isset($parts[1]) ? strtolower(trim($parts[1])) : '';
+            if (!empty($budget)) {
+                // Split number aur unit alag karo
+                $parts = preg_split('/\s+/', $budget);
+                $num = isset($parts[0]) ? trim($parts[0]) : '';
+                $unit = isset($parts[1]) ? strtolower(trim($parts[1])) : '';
 
-            if (is_numeric($num)) {
-                $numericVal = (float)$num; // float rakha decimal handle karne ke liye
+                if (is_numeric($num)) {
+                    $numericVal = (float)$num; // float rakha decimal handle karne ke liye
 
-                if (!empty($unit)) {
-                    // Agar unit diya hua hai (crore/lakh) → wahi dikhado
-                    $value = $numericVal . ' ' . ucfirst($unit);
-                } else {
-                    // Agar unit nahi hai to apna rule lagao
-                    if ($numericVal <= 20) {
-                        $value = $numericVal . ' Cr';
+                    if (!empty($unit)) {
+                        // Agar unit diya hua hai (crore/lakh) → wahi dikhado
+                        $value = $numericVal . ' ' . ucfirst($unit);
                     } else {
-                        $value = $numericVal . ' Lakh';
+                        // Agar unit nahi hai to apna rule lagao
+                        if ($numericVal <= 20) {
+                            $value = $numericVal . ' Cr';
+                        } else {
+                            $value = $numericVal . ' Lakh';
+                        }
                     }
+                } else {
+                    // Non-numeric case me jo likha hai wahi dikhado
+                    $value = $budget;
                 }
-            } else {
-                // Non-numeric case me jo likha hai wahi dikhado
-                $value = $budget;
+            } elseif (!empty($budget_in_words)) {
+                $value = $budget_in_words;
             }
-        } elseif (!empty($budget_in_words)) {
-            $value = $budget_in_words;
+        } else {
+            // ---- Sirf budget_in_words show karo ----
+            if (!empty($property->budget_in_words)) {
+                $value = $property->budget_in_words;
+            }
         }
 
         echo htmlspecialchars($value);
@@ -216,19 +228,6 @@ $propertyAdvanceSearchVisible = !empty($_POST) ? 'block' : 'none';
 
 
 
-                                <td>
-                                    <?php
-                                    if (!empty($property->built)) {
-                                        echo htmlspecialchars($property->built);
-                                    } elseif (!empty($property->carpet)) {
-                                        echo htmlspecialchars($property->carpet);
-                                    } elseif (!empty($property->land)) {
-                                        echo htmlspecialchars($property->land);
-                                    } else {
-                                        echo '-';
-                                    }
-                                    ?>
-                                </td>
                              <td>
                             <?php if (!empty($property->main_site)): ?>
                                 <?php if (strtolower(trim($property->main_site)) == 'frontend'): ?>
@@ -246,11 +245,16 @@ $propertyAdvanceSearchVisible = !empty($_POST) ? 'block' : 'none';
                             <?php endif; ?>
                         </td>
                                 <td>
-                                    <label class="switch">
-                                        <input type="checkbox" value="deactivate" <?php if ($property->status == 'active') echo 'checked'; ?> name="status" class="status" data-id="<?php echo $property->id; ?>">
-                                        <span class="slider round"></span>
-                                    </label>
-                                </td>
+    <label class="switch">
+        <input type="checkbox" 
+               value="<?php echo $property->status == 'active' ? 'active' : 'deactivate'; ?>" 
+               <?php echo $property->status == 'active' ? 'checked' : ''; ?> 
+               name="status" 
+               class="status" 
+               data-id="<?php echo $property->id; ?>">
+        <span class="slider round"></span>
+    </label>
+</td>
                                 <td class="d-none"><?php echo $property->status; ?></td>
 
                                 <td>
@@ -309,15 +313,28 @@ $propertyAdvanceSearchVisible = !empty($_POST) ? 'block' : 'none';
 <script>
 // Custom sorting for Status column
 jQuery.extend(jQuery.fn.dataTableExt.oSort, {
-    "status-type-pre": function(data) {
-        return data.indexOf('checked') !== -1 ? 'active' : 'deactivate';
+    "status-type-pre": function (data) {
+        // Agar input checked hai to 'active', warna 'deactivate'
+        return $(data).find('input[type="checkbox"]').is(':checked') ? 'active' : 'deactivate';
     },
-    "status-type-asc": function(a, b) {
-        return a < b ? -1 : a > b ? 1 : 0;
+    "status-type-asc": function (a, b) {
+        return a < b ? -1 : (a > b ? 1 : 0);
     },
-    "status-type-desc": function(a, b) {
-        return a < b ? 1 : a > b ? -1 : 0;
+    "status-type-desc": function (a, b) {
+        return a < b ? 1 : (a > b ? -1 : 0);
     }
+});
+
+
+$(document).on('change', '.status', function () {
+    let id = $(this).data('id');
+    let status = $(this).is(':checked') ? 'active' : 'deactivate';
+
+   $.post('your_controller/update_status', { list_id: id, status: status }, function (resp) {
+    console.log(resp);
+
+
+    });
 });
 
 jQuery(document).ready(function() {
@@ -327,7 +344,7 @@ jQuery(document).ready(function() {
         "pageLength": 25,
         "columnDefs": [
             { "orderable": false, "targets": [0, 10] }, // Disable sorting on checkbox and Raw Status
-            { "type": "string", "targets": 2 },
+            { "property_type": "string", "targets": 2 },
             { "type": "status-type", "targets": 9 } // Custom sorting for Status column
         ]
     });
@@ -359,7 +376,7 @@ jQuery(document).ready(function() {
     // Toggle BHK field
     function toggleBHK() {
         const selectedType = $('#propertyType').val();
-        if (selectedType === 'Flat') {
+        if (selectedType === 'Apartment / Flat') {
             $('#bhkGroup').show();
         } else {
             $('#bhkGroup').hide();
@@ -404,7 +421,7 @@ jQuery(document).ready(function() {
         });
     });
 
-    // Status toggle
+   
     $('.status').click(function() {
         var status = $(this).is(':checked') ? 'active' : 'deactivate';
         var dat_id = $(this).data('id');

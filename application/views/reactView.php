@@ -12,7 +12,7 @@
 		<link rel="apple-touch-icon" href="/logo192.png"/>
 		<link rel="manifest" href="/manifest.json"/>
 		<title>Best Properties Mohali in Chandigarh</title>
-		<script defer="defer" src="/static/js/main.bac3d489.js"></script>
+		<script defer="defer" src="/static/js/main.0e324358.js"></script>
 		<link href="/static/css/main.dd54bdc6.css" rel="stylesheet">
 		
 		<!-- Google tag (gtag.js) --> 

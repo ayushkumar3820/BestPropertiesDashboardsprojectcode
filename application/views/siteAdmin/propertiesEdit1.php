@@ -455,55 +455,54 @@
                             >
                         </div>
 
-                        <!-- Plot Area -->
-                        <?php
-                            $plot_area = '';
-                            $plot_unit = '';
+                       <!-- Plot Area -->
+<?php
+    $plot_area = '';
+    $plot_unit = '';
 
-                            if (isset($properties[0]->land)) {
-                                $landParts = explode(' ', trim($properties[0]->land));
-                                $plot_area = $landParts[0] ?? '';
-                                $plot_unit = strtolower($landParts[1] ?? '');
-                            }
-                        ?>
+    if (!empty($properties[0]->land)) {
+        $landParts = explode(' ', trim($properties[0]->land), 2); // only 2 parts
+        $plot_area = $landParts[0] ?? '';
+        $plot_unit = strtolower($landParts[1] ?? '');
+    }
+?>
+<div class="col-md-3 form-group">
+    <label>Plot Area</label>
+    <div class="input-group">
+        <input type="text" name="kothi_plot_area" class="form-control" placeholder="Plot Area"
+               value="<?= htmlspecialchars($plot_area); ?>">
+        <select id="area_unit" name="kothi_plot_area_unit" class="form-select">
+            <option value="sq.yard" <?= ($plot_unit == 'sq.yard') ? 'selected' : '' ?>>sq.yard</option>
+            <option value="marla"   <?= ($plot_unit == 'marla')   ? 'selected' : '' ?>>marla</option>
+            <option value="kanal"   <?= ($plot_unit == 'kanal')   ? 'selected' : '' ?>>kanal</option>
+        </select>
+    </div>
+</div>
 
-                        <div class="col-md-3 form-group">
-                            <label>Plot Area</label>
-                            <div class="input-group">
-                                <input type="text" name="kothi_plot_area" class="form-control" placeholder="Plot Area"
-                                       value="<?= htmlspecialchars($plot_area); ?>">
-                                <select id="area_unit" name="kothi_plot_area_unit" class="form-select">
-                                    <option value="sq.yard" <?= ($plot_unit == 'sq.yard') ? 'selected' : '' ?>>sq.yard</option>
-                                    <option value="marla" <?= ($plot_unit == 'marla') ? 'selected' : '' ?>>marla</option>
-                                    <option value="kanal" <?= ($plot_unit == 'kanal') ? 'selected' : '' ?>>kanal</option>
-                                </select>
-                            </div>
-                        </div>
+<!-- Covered Area -->
+<?php
+    $covered_area = '';
+    $covered_unit = '';
 
-                        <!-- Covered Area -->
-                       <?php
-                        $covered_area = '';
-                        $covered_unit = '';
+    if (!empty($properties[0]->built)) {
+        $parts = explode(' ', trim($properties[0]->built), 2); // only 2 parts
+        $covered_area = $parts[0] ?? '';
+        $covered_unit = strtolower($parts[1] ?? '');
+    }
+?>
+<div class="col-md-3 form-group">
+    <label>Covered Area</label>
+    <div class="input-group">
+        <input type="text" name="kothi_covered_area" class="form-control" placeholder="Covered Area"
+               value="<?= htmlspecialchars($covered_area); ?>">
+        <select id="covered_area_unit" name="kothi_covered_area_unit" class="form-select">
+            <option value="sq.yard" <?= ($covered_unit == 'sq.yard') ? 'selected' : '' ?>>sq.yard</option>
+            <option value="marla"   <?= ($covered_unit == 'marla')   ? 'selected' : '' ?>>marla</option>
+            <option value="kanal"   <?= ($covered_unit == 'kanal')   ? 'selected' : '' ?>>kanal</option>
+        </select>
+    </div>
+</div>
 
-                        if (isset($properties[0]->built)) {
-                            $parts = explode(' ', trim($properties[0]->built));
-                            $covered_area = $parts[0] ?? '';
-                            $covered_unit = strtolower($parts[1] ?? '');
-                        }
-                        ?>
-
-                        <div class="col-md-3 form-group">
-                            <label>Covered Area</label>
-                            <div class="input-group">
-                                <input type="text" name="kothi_covered_area" class="form-control" placeholder="Covered Area"
-                                       value="<?php echo htmlspecialchars($covered_area); ?>">
-                                <select id="covered_area_unit" name="kothi_covered_area_unit" class="form-select">
-                                    <option value="sq.yard" <?php echo ($covered_unit == 'sq.yard') ? 'selected' : ''; ?>>sq.yard</option>
-                                    <option value="marla" <?php echo ($covered_unit == 'marla') ? 'selected' : ''; ?>>marla</option>
-                                    <option value="kanal" <?php echo ($covered_unit == 'kanal') ? 'selected' : ''; ?>>kanal</option>
-                                </select>
-                            </div>
-                        </div>
 
                          <!-- Kothi Type -->
                        <div class="col-md-4 form-group">
@@ -2063,8 +2062,8 @@
                 "com_plot_area": "com_plot_area_unit",
                 "plot_area": "plot_area_unit",
                 "p_plot_area": "p_plot_area_unit",
-                "kothi_covered_area": "kothi_covered_area_unit",
-                "kothi_plot_area": "kothi_plot_area_unit",
+                //"kothi_covered_area": "kothi_covered_area_unit",
+                //"kothi_plot_area": "kothi_plot_area_unit",
                 "farm_plot_area": "farm_plot_area_unit",
                 "farm_area": "farm_area_unit",
                 "budget_in_words": "price_unit",
@@ -2107,8 +2106,7 @@
                 "plot_area": "carpet",
                 "p_plot_area": "land",
                 "farm_plot_area": "land",
-                "kothi_plot_area": "land",
-                "kothi_covered_area": "built",
+               
                 "farm_area": "carpet",
                 "com_office_carpet_area": "carpet",
                 "com_office_area": "built",
