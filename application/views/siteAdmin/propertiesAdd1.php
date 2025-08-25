@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -108,7 +109,11 @@
             text-align: center;
         }
 
-        .col-md-3, .col-md-4, .col-md-6, .col-sm-6, .col-sm-12 {
+        .col-md-3,
+        .col-md-4,
+        .col-md-6,
+        .col-sm-6,
+        .col-sm-12 {
             padding: 0 10px;
         }
 
@@ -157,12 +162,12 @@
             }
         }
 
-        input.form-check-input[type=checkbox]
-         {
+        input.form-check-input[type=checkbox] {
             border-color: black;
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="row">
@@ -188,12 +193,13 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Property Description</label>
-                                <textarea class="form-control" name="description" placeholder="Property Description"></textarea>
+                                <textarea class="form-control" name="description"
+                                    placeholder="Property Description"></textarea>
                             </div>
                         </div>
                     </div>
 
-                    <div class="row" style="margin-left:6px">
+                    <div class="row">
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label>Person Name</label>
@@ -228,11 +234,15 @@
                         <div class="col-sm-6">
                             <div class="form-group">
                                 <label>Category*</label>
-                                <select id="categorySelector" name="category" class="form-control" required>
-                                    <option value="">Select Category</option>
-                                    <option value="Residential">Residential</option>
-                                    <option value="Commercial">Commercial</option>
-                                </select>
+                                <div id="categorySelector required" style="display:flex; gap:20px;">
+                                    <label>
+                                        <input type="radio" name="category" value="Residential"> Residential
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="category" value="Commercial"> Commercial
+                                    </label>
+                                </div>
+
                             </div>
                         </div>
                     </div>
@@ -276,27 +286,27 @@
                             </div>
 
                             <div class="form-group col-md-3">
-                              <label for="construction_status">Construction Status</label>
-                              <select id="bhk_construction_status" name="construction_status" class="form-control">
-                                <option value="">Select Construction Status</option>
-                                <option value="Ready To Move">Ready To Move</option>
-                                <option value="Re-Sale">Re-Sale</option>
-                                <option value="Under Construction">Under Construction</option>
-                              </select>
+                                <label for="construction_status">Construction Status</label>
+                                <select id="bhk_construction_status" name="construction_status" class="form-control">
+                                    <option value="">Select Construction Status</option>
+                                    <option value="Ready To Move">Ready To Move</option>
+                                    <option value="Re-Sale">Re-Sale</option>
+                                    <option value="Under Construction">Under Construction</option>
+                                </select>
                             </div>
 
                             <div class="form-group col-md-3" id="bhk_property_age" style="display: none;">
-                              <label for="property_age">Property Age</label>
-                              <select id="bhk1_property_age" name="property_age" class="form-control">
-                                <option value="">Select Property Age</option>
-                                <option value="0-1 year">0-1 year</option>
-                                <option value="1-5 years">1-5 years</option>
-                                <option value="5-10 years">5-10 years</option>
-                                <option value="10+ years">10+ years</option>
-                              </select>
+                                <label for="property_age">Property Age</label>
+                                <select id="bhk1_property_age" name="property_age" class="form-control">
+                                    <option value="">Select Property Age</option>
+                                    <option value="0-1 year">0-1 year</option>
+                                    <option value="1-5 years">1-5 years</option>
+                                    <option value="5-10 years">5-10 years</option>
+                                    <option value="10+ years">10+ years</option>
+                                </select>
                             </div>
 
-                             <div class="col-md-3 form-group">
+                            <div class="col-md-3 form-group">
                                 <label>Carpet Area</label>
                                 <div class="input-group">
                                     <input name="bhk_carpet_area" class="form-control" placeholder="Carpet Area">
@@ -345,37 +355,42 @@
                                 <input name="facing" class="form-control" placeholder="Facing">
                             </div>
                             <div class="form-group col-md-3">
-                              <label for="bedrooms">Bedroom Number</label>
-                              <select id="bedrooms" name="bedrooms" class="form-control">
-                                <option value="">Bedroom Number</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                              </select>
+                                <label for="bedrooms">Bedroom Number</label>
+                                <select id="bedrooms" name="bedrooms" class="form-control">
+                                    <option value="">Bedroom Number</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                </select>
                             </div>
 
                             <div class="form-group col-md-3">
-                              <label for="bathrooms">Bathroom Number</label>
-                              <select id="bathrooms" name="bathrooms" class="form-control">
-                                <option value="">Bathroom Number</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                              </select>
+                                <label for="bathrooms">Bathroom Number</label>
+                                <select id="bathrooms" name="bathrooms" class="form-control">
+                                    <option value="">Bathroom Number</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                </select>
                             </div>
                         </div>
 
                         <!-- Kothi Options -->
                         <div id="kothi-options" class="row" style="display:none;">
+                            <div class="col-md-2 form-group">
+                            <label>Number of Floors</label>
+                            <input type="text" name="total_floors" class="form-control" value="3">
+                        </div>
 
                             <div class="col-md-3 form-group">
                                 <label>Plot Area</label>
                                 <div class="input-group">
-                                    <input type="text" name="kothi_plot_area" class="form-control" placeholder="Plot Area">
+                                    <input type="text" name="kothi_plot_area" class="form-control"
+                                        placeholder="Plot Area">
                                     <select id="area_unit" name="kothi_plot_area_unit" class="form-select">
                                         <option value="sq.yard">sq.yard</option>
                                         <option value="marla">marla</option>
@@ -386,7 +401,8 @@
                             <div class="col-md-3 form-group">
                                 <label>Covered Area</label>
                                 <div class="input-group">
-                                    <input type="text" name="kothi_covered_area" class="form-control" placeholder="Covered Area">
+                                    <input type="text" name="kothi_covered_area" class="form-control"
+                                        placeholder="Covered Area">
                                     <select id="covered_area_unit" name="kothi_covered_area_unit" class="form-select">
                                         <option value="sq.yard">sq.yard</option>
                                         <option value="marla">marla</option>
@@ -426,8 +442,10 @@
                             </div>
                             <div class="col-md-3 form-group">
                                 <label>Gated Community?</label>
+                                <div style="display:flex; gap:20px;">
                                 <label><input type="radio" name="gated_community" value="1"> Yes</label>
                                 <label><input type="radio" name="gated_community" value="0"> No</label>
+                                </div>
                             </div>
                         </div>
 
@@ -521,7 +539,7 @@
                                 </div>
                             </div>
 
-                             <div class="col-md-3 form-group">
+                            <div class="col-md-3 form-group">
                                 <label>Gated Community?</label>
                                 <label><input type="radio" name="gated_community" value="1"> Yes</label>
                                 <label><input type="radio" name="gated_community" value="0"> No</label>
@@ -548,7 +566,7 @@
                                 </div>
                             </div>
 
-                             <div class="col-md-3 form-group">
+                            <div class="col-md-3 form-group">
                                 <label>Gated Community?</label>
                                 <label><input type="radio" name="gated_community" value="1"> Yes</label>
                                 <label><input type="radio" name="gated_community" value="0"> No</label>
@@ -618,12 +636,12 @@
                                 </select>
                             </div>
 
-                             <div class="form-group col-md-3">
+                            <div class="form-group col-md-3">
                                 <label>Facing</label>
                                 <input name="facing" class="form-control" placeholder="Facing">
                             </div>
 
-                             <div class="col-md-3 form-group">
+                            <div class="col-md-3 form-group">
                                 <label>Carpet Area</label>
                                 <div class="input-group">
                                     <input name="studio_carpet_area" class="form-control" placeholder="Carpet Area">
@@ -676,7 +694,8 @@
                         <div id="other-options" class="row" style="display:none;">
                             <div class="col-md-3 form-group">
                                 <label>Describe Property Type</label>
-                                <input name="other_property_type" class="form-control" placeholder="Specify Other Property Type">
+                                <input name="other_property_type" class="form-control"
+                                    placeholder="Specify Other Property Type">
                             </div>
                         </div>
                     </div>
@@ -703,7 +722,8 @@
                         <div id="com-other-options" class="row" style="display:none;">
                             <div class="col-md-3 form-group">
                                 <label>Describe Property Type</label>
-                                <input name="other_property_type" class="form-control" placeholder="Specify Other Property Type">
+                                <input name="other_property_type" class="form-control"
+                                    placeholder="Specify Other Property Type">
                             </div>
                         </div>
 
@@ -778,13 +798,15 @@
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label>Area in sq.ft</label>
-                                        <input type="text" name="retail_area_in_sqft" class="form-control" placeholder="Area in sq.ft">
+                                        <input type="text" name="retail_area_in_sqft" class="form-control"
+                                            placeholder="Area in sq.ft">
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label>Floor No</label>
-                                        <input type="text" name="floor_no" class="form-control" placeholder="Floor Number">
+                                        <input type="text" name="floor_no" class="form-control"
+                                            placeholder="Floor Number">
                                     </div>
                                 </div>
                                 <div class="col-md-4">
@@ -816,7 +838,8 @@
                             <div class="form-group col-md-3">
                                 <label for="com_plot_area">Plot Area</label>
                                 <div class="input-group">
-                                    <input type="text" id="com_plot_area" name="com_plot_area" class="form-control" placeholder="Plot Area">
+                                    <input type="text" id="com_plot_area" name="com_plot_area" class="form-control"
+                                        placeholder="Plot Area">
                                     <select name="com_plot_area_unit" class="form-control" style="max-width: 100px;">
                                         <option value="">Select</option>
                                         <option value="sq.ft">sq.ft</option>
@@ -827,7 +850,8 @@
                             </div>
                             <div class="form-group col-md-6">
                                 <label for="com_width_length">Width x Length</label>
-                                <input type="text" id="com_width_length" name="width_length" class="form-control" placeholder="e.g., 30x40">
+                                <input type="text" id="com_width_length" name="width_length" class="form-control"
+                                    placeholder="e.g., 30x40">
                             </div>
                             <div class="form-group col-md-6">
                                 <label for="com_road_width">Road Width</label>
@@ -872,7 +896,8 @@
                                 <div class="form-group col-md-6">
                                     <label for="builtArea">Built Area</label>
                                     <div class="input-group">
-                                        <input type="text" name="com_built_area" class="form-control" placeholder="Built Area">
+                                        <input type="text" name="com_built_area" class="form-control"
+                                            placeholder="Built Area">
                                         <select name="com_built_area_unit" class="form-control">
                                             <option value="">Select</option>
                                             <option value="sq.ft">sq.ft</option>
@@ -884,7 +909,8 @@
                                 <div class="form-group col-md-6">
                                     <label for="landArea">Land Area</label>
                                     <div class="input-group">
-                                        <input type="text" name="com_land_area" class="form-control" placeholder="Land Area">
+                                        <input type="text" name="com_land_area" class="form-control"
+                                            placeholder="Land Area">
                                         <select name="com_land_area_unit" class="form-control">
                                             <option value="">Select</option>
                                             <option value="sq.ft">sq.ft</option>
@@ -895,11 +921,13 @@
                                 </div>
                                 <div class="form-group col-md-6">
                                     <label for="shutters">No. of Shutters</label>
-                                    <input type="text" name="shutters_count" class="form-control" placeholder="Number of Shutters">
+                                    <input type="text" name="shutters_count" class="form-control"
+                                        placeholder="Number of Shutters">
                                 </div>
                                 <div class="form-group col-md-6">
                                     <label for="roofHeight">Height of Roof</label>
-                                    <input type="text" name="roof_height" class="form-control" placeholder="Height (ft)">
+                                    <input type="text" name="roof_height" class="form-control"
+                                        placeholder="Height (ft)">
                                 </div>
                                 <div class="form-group col-md-6">
                                     <label for="loading_bay">Loading/Unloading Bay</label><br>
@@ -913,33 +941,36 @@
                         <!-- Commercial Factory Fields -->
                         <div id="com-factory-fields" style="display:none;" class="row">
                             <div class="form-group col-md-6">
-                                    <label for="builtArea">Built Area</label>
-                                    <div class="input-group">
-                                        <input type="text" name="factory_built_area" class="form-control" placeholder="Built Area">
-                                        <select name="factory_built_area_unit" class="form-control">
-                                            <option value="">Select</option>
-                                            <option value="sq.ft">sq.ft</option>
-                                            <option value="marla">marla</option>
-                                            <option value="kanal">kanal</option>
-                                        </select>
-                                    </div>
+                                <label for="builtArea">Built Area</label>
+                                <div class="input-group">
+                                    <input type="text" name="factory_built_area" class="form-control"
+                                        placeholder="Built Area">
+                                    <select name="factory_built_area_unit" class="form-control">
+                                        <option value="">Select</option>
+                                        <option value="sq.ft">sq.ft</option>
+                                        <option value="marla">marla</option>
+                                        <option value="kanal">kanal</option>
+                                    </select>
                                 </div>
-                                <div class="form-group col-md-6">
-                                    <label for="landArea">Land Area</label>
-                                    <div class="input-group">
-                                        <input type="text" name="factory_land_area" class="form-control" placeholder="Land Area">
-                                        <select name="factory_land_area_unit" class="form-control">
-                                            <option value="">Select</option>
-                                            <option value="sq.ft">sq.ft</option>
-                                            <option value="marla">marla</option>
-                                            <option value="kanal">kanal</option>
-                                        </select>
-                                    </div>
-                                </div>
+                            </div>
                             <div class="form-group col-md-6">
-                                    <label for="shutters">No. of Shutters</label>
-                                    <input type="text" name="shutters_count" class="form-control" placeholder="Number of Shutters">
+                                <label for="landArea">Land Area</label>
+                                <div class="input-group">
+                                    <input type="text" name="factory_land_area" class="form-control"
+                                        placeholder="Land Area">
+                                    <select name="factory_land_area_unit" class="form-control">
+                                        <option value="">Select</option>
+                                        <option value="sq.ft">sq.ft</option>
+                                        <option value="marla">marla</option>
+                                        <option value="kanal">kanal</option>
+                                    </select>
                                 </div>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="shutters">No. of Shutters</label>
+                                <input type="text" name="shutters_count" class="form-control"
+                                    placeholder="Number of Shutters">
+                            </div>
                             <div class="form-group col-md-6">
                                 <label for="roofHeight">Height of Roof</label>
                                 <input type="text" name="roof_height" class="form-control" placeholder="Height (ft)">
@@ -999,79 +1030,91 @@
                             </div>
 
                             <div class="col-md-3 form-group">
-                              <label for="hospital_license" class="form-label">Hospital License Type</label>
-                              <select id="hospital_license" name="hospital_license" class="form-select">
-                                <option value="">Select Hospital License Type</option>
-                                <option value="Registered under Clinical Establishment Act">Registered under Clinical Establishment Act</option>
-                                <option value="Private Limited">Private Limited</option>
-                                <option value="Proprietorship">Proprietorship</option>
-                                <option value="Other">Other</option>
-                              </select>
+                                <label for="hospital_license" class="form-label">Hospital License Type</label>
+                                <select id="hospital_license" name="hospital_license" class="form-select">
+                                    <option value="">Select Hospital License Type</option>
+                                    <option value="Registered under Clinical Establishment Act">Registered under
+                                        Clinical Establishment Act</option>
+                                    <option value="Private Limited">Private Limited</option>
+                                    <option value="Proprietorship">Proprietorship</option>
+                                    <option value="Other">Other</option>
+                                </select>
                             </div>
 
-                           <div class="col-md-3 form-group">
-                              <label for="possession_status" class="form-label">Possession Status</label>
-                              <select id="possession_status" name="possession_status" class="form-select">
-                                <option value="">Select Possession Status</option>
-                                <option value="Operational">Operational</option>
-                                <option value="Vacant">Vacant</option>
-                                <option value="Under Renovation">Under Renovation</option>
-                                <option value="Under Construction">Under Construction</option>
-                              </select>
+                            <div class="col-md-3 form-group">
+                                <label for="possession_status" class="form-label">Possession Status</label>
+                                <select id="possession_status" name="possession_status" class="form-select">
+                                    <option value="">Select Possession Status</option>
+                                    <option value="Operational">Operational</option>
+                                    <option value="Vacant">Vacant</option>
+                                    <option value="Under Renovation">Under Renovation</option>
+                                    <option value="Under Construction">Under Construction</option>
+                                </select>
                             </div>
 
 
                             <div class="col-md-3 form-group">
-                              <label class="form-label d-block">Medical Facilities Available</label>
-                              <div class="row">
-                                <div class="col-md-6">
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="medical_facilities[]" value="ICU Room" id="icuRoom">
-                                    <label class="form-check-label" for="icuRoom">ICU Room</label>
-                                  </div>
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="medical_facilities[]" value="Operation Theatre" id="operationTheatre">
-                                    <label class="form-check-label" for="operationTheatre">Operation Theatre</label>
-                                  </div>
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="medical_facilities[]" value="Emergency Room" id="emergencyRoom">
-                                    <label class="form-check-label" for="emergencyRoom">Emergency Room</label>
-                                  </div>
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="medical_facilities[]" value="OPD Rooms" id="opdRooms">
-                                    <label class="form-check-label" for="opdRooms">OPD Rooms</label>
-                                  </div>
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="medical_facilities[]" value="Ambulance Parking" id="ambulanceParking">
-                                    <label class="form-check-label" for="ambulanceParking">Ambulance Parking</label>
-                                  </div>
+                                <label class="form-label d-block">Medical Facilities Available</label>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="medical_facilities[]"
+                                                value="ICU Room" id="icuRoom">
+                                            <label class="form-check-label" for="icuRoom">ICU Room</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="medical_facilities[]"
+                                                value="Operation Theatre" id="operationTheatre">
+                                            <label class="form-check-label" for="operationTheatre">Operation
+                                                Theatre</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="medical_facilities[]"
+                                                value="Emergency Room" id="emergencyRoom">
+                                            <label class="form-check-label" for="emergencyRoom">Emergency Room</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="medical_facilities[]"
+                                                value="OPD Rooms" id="opdRooms">
+                                            <label class="form-check-label" for="opdRooms">OPD Rooms</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="medical_facilities[]"
+                                                value="Ambulance Parking" id="ambulanceParking">
+                                            <label class="form-check-label" for="ambulanceParking">Ambulance
+                                                Parking</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="medical_facilities[]"
+                                                value="Pharmacy Setup" id="pharmacySetup">
+                                            <label class="form-check-label" for="pharmacySetup">Pharmacy Setup</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="medical_facilities[]"
+                                                value="Doctor's Cabins" id="doctorsCabins">
+                                            <label class="form-check-label" for="doctorsCabins">Doctor's Cabins</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="medical_facilities[]"
+                                                value="Pathology Lab" id="pathologyLab">
+                                            <label class="form-check-label" for="pathologyLab">Pathology Lab</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="medical_facilities[]"
+                                                value="Radiology Room" id="radiologyRoom">
+                                            <label class="form-check-label" for="radiologyRoom">Radiology Room</label>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="col-md-6">
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="medical_facilities[]" value="Pharmacy Setup" id="pharmacySetup">
-                                    <label class="form-check-label" for="pharmacySetup">Pharmacy Setup</label>
-                                  </div>
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="medical_facilities[]" value="Doctor's Cabins" id="doctorsCabins">
-                                    <label class="form-check-label" for="doctorsCabins">Doctor's Cabins</label>
-                                  </div>
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="medical_facilities[]" value="Pathology Lab" id="pathologyLab">
-                                    <label class="form-check-label" for="pathologyLab">Pathology Lab</label>
-                                  </div>
-                                  <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="medical_facilities[]" value="Radiology Room" id="radiologyRoom">
-                                    <label class="form-check-label" for="radiologyRoom">Radiology Room</label>
-                                  </div>
-                                </div>
-                              </div>
                             </div>
 
                         </div>
                     </div>
 
                     <!-- Price Section -->
-                    <div class="row" style="width:100%;margin-left:16px">
+                    <div class="row" style="width:100%;">
                         <div class="form-group col-md-6">
                             <label>Demanded Price</label>
                             <div class="input-group">
@@ -1093,24 +1136,38 @@
 
                     <div id="extra-fields" style="display:none;">
                         <div class="form-group">
-                            <label>Amenities*</label><br>
+                            <label>Amenities*</label>
                             <div class="row">
                                 <div class="col-md-6">
-                                    <label><input name="amenities[]" value="Car parking" type="checkbox"> Car parking</label><br>
-                                    <label><input name="amenities[]" value="Security services" type="checkbox"> Security services</label><br>
-                                    <label><input name="amenities[]" value="Water supply" type="checkbox"> Water supply</label><br>
-                                    <label><input name="amenities[]" value="Elevators" type="checkbox"> Elevators</label><br>
-                                    <label><input name="amenities[]" value="Power backup" type="checkbox"> Power backup</label><br>
-                                    <label><input name="amenities[]" value="Gym" type="checkbox"> Gym</label><br>
-                                    <label><input name="amenities[]" value="Play area" type="checkbox"> Play area</label><br>
+                                    <label><input name="amenities[]" value="Car parking" type="checkbox"> Car
+                                        parking</label>
+                                    <label><input name="amenities[]" value="Security services" type="checkbox"> Security
+                                        services</label>
+                                    <label><input name="amenities[]" value="Water supply" type="checkbox"> Water
+                                        supply</label>
+                                    <label><input name="amenities[]" value="Elevators" type="checkbox">
+                                        Elevators</label>
+                                    <label><input name="amenities[]" value="Power backup" type="checkbox"> Power
+                                        backup</label>
+                                    <label><input name="amenities[]" value="Gym" type="checkbox"> Gym</label>
+                                    <label><input name="amenities[]" value="Play area" type="checkbox"> Play
+                                        area</label>
                                 </div>
                                 <div class="col-md-6">
-                                    <label><input name="amenities[]" value="Swimming pool" type="checkbox"> Swimming pool</label><br>
-                                    <label><input name="amenities[]" value="Restaurants" type="checkbox"> Restaurants</label><br>
-                                    <label><input name="amenities[]" value="Party hall" type="checkbox"> Party hall</label><br>
-                                    <label><input name="amenities[]" value="Temple and religious activity place" type="checkbox"> Temple and religious activity place</label><br>
-                                    <label><input name="amenities[]" value="Cinema hall" type="checkbox"> Cinema hall</label><br>
-                                    <label><input name="amenities[]" value="Walking/Jogging track" type="checkbox"> Walking/Jogging track</label><br>
+                                    <label><input name="amenities[]" value="Swimming pool" type="checkbox"> Swimming
+                                        pool</label>
+                                    <label><input name="amenities[]" value="Restaurants" type="checkbox">
+                                        Restaurants</label>
+                                    <label><input name="amenities[]" value="Party hall" type="checkbox"> Party
+                                        hall</label>
+                                    <label><input name="amenities[]" value="Temple and religious activity place"
+                                            type="checkbox"> Temple and religious activity place</label>
+                                    <label><input name="amenities[]" value="Cinema hall" type="checkbox"> Cinema
+                                        hall</label>
+                                    <label><input name="amenities[]" value="Walking/Jogging track" type="checkbox">
+                                        Walking/Jogging track</label>
+                                    <label><input name="amenities[]" value="Facing" type="checkbox">
+                                        Facing</label>
                                 </div>
                             </div>
                         </div>
@@ -1157,7 +1214,8 @@
 
                     <div class="row">
                         <div class="col-sm-12 text-center">
-                            <input name="save" class="btn btn-primary property-submit-btn" value="Add Property" type="submit">
+                            <input name="save" class="btn btn-primary property-submit-btn" value="Add Property"
+                                type="submit">
                         </div>
                     </div>
                 </form>
@@ -1211,7 +1269,8 @@
 
             // Toggle Residential/Commercial Fields
             function toggleCategoryFields() {
-                const category = jQuery('#categorySelector').val();
+                const category = jQuery('input[name="category"]:checked').val(); // radio से value लो
+
                 if (category === 'Residential') {
                     jQuery('#residential-fields').slideDown();
                     jQuery('#commercial-fields').slideUp();
@@ -1222,6 +1281,9 @@
                     jQuery('#residential-fields, #commercial-fields').slideUp();
                 }
             }
+
+            // radio change पर call करना ज़रूरी है
+            jQuery(document).on('change', 'input[name="category"]', toggleCategoryFields);
 
             // Show Residential Sub-Type Fields
             function showResidentialSubFields() {
@@ -1455,7 +1517,7 @@
                     "factory_land_area": "land"
                 };
 
-                 for (const oldKey in renameKeys) {
+                for (const oldKey in renameKeys) {
                     if (formData.has(oldKey)) {
                         const value = formData.get(oldKey);
                         //console.log(`Before rename: ${oldKey} = ${value}`);
@@ -1464,12 +1526,12 @@
                         if (value === null || value.trim() === '') {
                             // If value is empty, just delete the old key
                             formData.delete(oldKey);
-                           // console.log(`Deleted empty key: ${oldKey}`);
+                            // console.log(`Deleted empty key: ${oldKey}`);
                         } else {
                             // Otherwise, rename it
                             formData.set(renameKeys[oldKey], value);
                             formData.delete(oldKey);
-                          //  console.log(`Renamed ${oldKey} to ${renameKeys[oldKey]}`);
+                            //  console.log(`Renamed ${oldKey} to ${renameKeys[oldKey]}`);
                         }
                     }
                 }
@@ -1531,17 +1593,18 @@
         });
     </script>
 </body>
+
 </html>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-$(document).ready(function() {
-    $('#BHK').on('change', function() {
-        var bhkValue = $(this).val();
-        if (bhkValue != '') {
-            $('#bhk_property_age').show(); // Show the Property Age dropdown
-        } else {
-            $('#bhk_property_age').hide(); // Hide if no BHK selected
-        }
+    $(document).ready(function () {
+        $('#BHK').on('change', function () {
+            var bhkValue = $(this).val();
+            if (bhkValue != '') {
+                $('#bhk_property_age').show(); // Show the Property Age dropdown
+            } else {
+                $('#bhk_property_age').hide(); // Hide if no BHK selected
+            }
+        });
     });
-});
 </script>

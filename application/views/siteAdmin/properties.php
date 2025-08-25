@@ -61,8 +61,8 @@ $propertyAdvanceSearchVisible = !empty($_POST) ? 'block' : 'none';
         </div>
     
 
-    <div class="row" style="margin:10px;">
-        <a href="javascript:void(0);" class="advance-search-toggle">Advance Search</a>
+    <div class="row">
+        <a href="javascript:void(0);" class=" btn btn-primary advance-search-toggle">Advance Search</a>
     </div></div>
 
     <form method="post" action="" class="advance-search-form mt-3" style="display: <?php echo $propertyAdvanceSearchVisible; ?>;" id="propertyFilterForm">
