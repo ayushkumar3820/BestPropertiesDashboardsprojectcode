@@ -252,14 +252,28 @@
                                 <label>Category*</label>
                                 <?php
                                     $category = isset($properties[0]->category) ? strtolower($properties[0]->category) : '';
-                                    ?>
-
-                                    <select id="categorySelector" name="category" class="form-control" required>
-                                        <option value="">Select Category</option>
-                                        <option value="Residential" <?= ($category == 'residential') ? 'selected' : ''; ?>>Residential</option>
-                                        <option value="Commercial" <?= ($category == 'commercial') ? 'selected' : ''; ?>>Commercial</option>
-                                    </select>
+                                ?>
+                                
+                                <div style="display:flex; gap:20px;">
+                                    <label>
+                                        <input type="radio" name="category_radio" value="Residential"
+                                            <?= ($category == 'residential') ? 'checked' : ''; ?>
+                                            onclick="jQuery('#categorySelector').val(this.value).trigger('change');">
+                                        Residential
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="category_radio" value="Commercial"
+                                            <?= ($category == 'commercial') ? 'checked' : ''; ?>
+                                            onclick="jQuery('#categorySelector').val(this.value).trigger('change');">
+                                        Commercial
+                                    </label>
+                                </div>
+                            
+                                <!-- hidden input to work with existing JS -->
+                                <input type="hidden" id="categorySelector" name="category"
+                                       value="<?= ucfirst($category); ?>">
                             </div>
+
                         </div>
                     </div>
 
@@ -399,15 +413,6 @@
                                         >
                                     </div>
 
-                                    <!--<div class="form-group col-md-3">-->
-                                    <!--    <label>Facing</label>-->
-                                    <!--    <input name="facing" class="form-control"-->
-                                    <!--    <?php if (isset($properties[0]->property_type) && $properties[0]->property_type == 'Apartment / Flat'): ?>-->
-                                    <!--            value="<?= htmlspecialchars($properties_meta[0]->facing ?? '') ?>"-->
-                                    <!--        <?php endif; ?>-->
-                                    <!--    >-->
-                                    <!--</div>-->
-
                                     <div class="form-group col-md-3">
                                       <label for="bedrooms">Bedroom Number</label>
                                       <select id="bedrooms" name="bedrooms" class="form-control">
@@ -444,16 +449,6 @@
                             <?php endif; ?>
                             >
                         </div>
-
-
-                        <!--<div class="col-md-3 form-group">-->
-                        <!--    <label>Facing</label>-->
-                        <!--    <input type="text" name="facing" class="form-control"-->
-                        <!--    <?php if (isset($properties[0]->property_type) && $properties[0]->property_type == 'Independent House / Kothi'): ?>-->
-                        <!--            value="<?= htmlspecialchars($properties_meta[0]->facing ?? '') ?>"-->
-                        <!--        <?php endif; ?>-->
-                        <!--    >-->
-                        <!--</div>-->
 
                        <!-- Plot Area -->
 <?php
@@ -631,32 +626,6 @@
                                 <label>Width x Length</label>
                                 <input name="width_length" class="form-control" placeholder="e.g., 30x40"
                                     <?php if ($width_length): ?> value="<?= htmlspecialchars($width_length); ?>" <?php endif; ?>
-                                >
-                            </div>
-
-                            <div class="col-md-3 form-group">
-                                <label>Direction</label>
-                                <select name="direction" class="form-control">
-                                    <option value="">Select Direction</option>
-                                    <option value="East" <?= ($direction == 'East') ? 'selected' : '' ?>>East</option>
-                                    <option value="West" <?= ($direction == 'West') ? 'selected' : '' ?>>West</option>
-                                    <option value="North" <?= ($direction == 'North') ? 'selected' : '' ?>>North</option>
-                                    <option value="South" <?= ($direction == 'South') ? 'selected' : '' ?>>South</option>
-                                    <option value="North-East" <?= ($direction == 'North-East') ? 'selected' : '' ?>>North-East</option>
-                                    <option value="North-West" <?= ($direction == 'North-West') ? 'selected' : '' ?>>North-West</option>
-                                    <option value="South-East" <?= ($direction == 'South-East') ? 'selected' : '' ?>>South-East</option>
-                                    <option value="South-West" <?= ($direction == 'South-West') ? 'selected' : '' ?>>South-West</option>
-                                    <option value="Other" <?= ($direction == 'Other') ? 'selected' : '' ?>>Other</option>
-                                </select>
-
-                            </div>
-
-                             <div class="form-group col-md-3">
-                                <label>Facing</label>
-                                <input name="facing" class="form-control"
-                                <?php if (isset($properties[0]->property_type) && $properties[0]->property_type == 'Residential Plot'): ?>
-                                        value="<?= htmlspecialchars($properties_meta[0]->facing ?? '') ?>"
-                                    <?php endif; ?>
                                 >
                             </div>
 
@@ -849,31 +818,6 @@
 
                                 }
                             ?>
-
-                             <div class="col-md-3 form-group">
-                                <label>Direction</label>
-                                <select name="direction" class="form-control">
-                                    <option value="">Select Direction</option>
-                                    <option value="East" <?= ($direction_selected == 'East') ? 'selected' : '' ?>>East</option>
-                                    <option value="West" <?= ($direction_selected == 'West') ? 'selected' : '' ?>>West</option>
-                                    <option value="North" <?= ($direction_selected == 'North') ? 'selected' : '' ?>>North</option>
-                                    <option value="South" <?= ($direction_selected == 'South') ? 'selected' : '' ?>>South</option>
-                                    <option value="North-East" <?= ($direction_selected == 'North-East') ? 'selected' : '' ?>>North-East</option>
-                                    <option value="North-West" <?= ($direction_selected == 'North-West') ? 'selected' : '' ?>>North-West</option>
-                                    <option value="South-East" <?= ($direction_selected == 'South-East') ? 'selected' : '' ?>>South-East</option>
-                                    <option value="South-West" <?= ($direction_selected == 'South-West') ? 'selected' : '' ?>>South-West</option>
-                                    <option value="Other" <?= ($direction_selected == 'Other') ? 'selected' : '' ?>>Other</option>
-                                 </select>
-                            </div>
-
-                             <div class="form-group col-md-3">
-                                <label>Facing</label>
-                                <input name="facing" class="form-control"
-                                <?php if (isset($properties[0]->property_type) && $properties[0]->property_type == 'Builder Floor'): ?>
-                                        value="<?= htmlspecialchars($properties_meta[0]->facing ?? '') ?>"
-                                    <?php endif; ?>
-                                >
-                            </div>
 
                             <div class="col-md-3 form-group">
                                 <label>Gated Community?</label><br>
@@ -1737,38 +1681,55 @@
 
                             <div class="form-group">
                                 <label>Amenities*</label>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <?php
-                                            $amenitiesList1 = [
-                                                "Car Parking",
-                                                "Security Services",
-                                                "Water Supply",
-                                                "Elevators",
-                                                "Power Backup",
-                                                "Gym",
-                                                "Play Area",
-                                              ];
-
-                                            foreach ($amenitiesList1 as $amenity) {
-                                                $checked = in_array($amenity, $selectedAmenities) ? 'checked' : '';
-                                                echo '<label><input name="amenities[]" value="' . htmlspecialchars($amenity) . '" type="checkbox" ' . $checked . '> ' . htmlspecialchars($amenity) . '</label><br>';
-                                            }
-                                        ?>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <?php
-                                        $amenitiesList2 = [
-                                            "Swimming pool", "Restaurants", "Party hall",
-                                            "Temple and religious activity place", "Cinema hall", "Walking/Jogging track", "Facing"
-                                        ];
-                                        foreach ($amenitiesList2 as $amenity) {
-                                            $checked = in_array($amenity, $selectedAmenities) ? 'checked' : '';
-                                            echo '<label><input name="amenities[]" value="' . htmlspecialchars($amenity) . '" type="checkbox" ' . $checked . '> ' . htmlspecialchars($amenity) . '</label><br>';
-                                        }
-                                        ?>
-                                    </div>
+                               <div class="row">
+                                <div class="col-md-6">
+                                    <?php
+                                    $amenitiesList1 = [
+                                        "Car parking",
+                                        "Security services",
+                                        "Water supply",
+                                        "Elevators",
+                                        "Power backup",
+                                        "Gym",
+                                        "Play area",
+                                    ];
+                            
+                                    foreach ($amenitiesList1 as $index => $amenity) {
+                                        $checked = in_array($amenity, $selectedAmenities) ? 'checked' : '';
+                                        $id = 'amenity1-' . $index;
+                                        echo '
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="' . $id . '" name="amenities[]" value="' . htmlspecialchars($amenity) . '" ' . $checked . '>
+                                            <label class="form-check-label" for="' . $id . '">' . htmlspecialchars($amenity) . '</label>
+                                        </div>';
+                                    }
+                                    ?>
                                 </div>
+                            
+                                <div class="col-md-6">
+                                    <?php
+                                    $amenitiesList2 = [
+                                        "Swimming pool",
+                                        "Restaurants",
+                                        "Party hall",
+                                        "Temple and religious activity place",
+                                        "Cinema hall",
+                                        "Walking/Jogging track"
+                                    ];
+                            
+                                    foreach ($amenitiesList2 as $index => $amenity) {
+                                        $checked = in_array($amenity, $selectedAmenities) ? 'checked' : '';
+                                        $id = 'amenity2-' . $index;
+                                        echo '
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="' . $id . '" name="amenities[]" value="' . htmlspecialchars($amenity) . '" ' . $checked . '>
+                                            <label class="form-check-label" for="' . $id . '">' . htmlspecialchars($amenity) . '</label>
+                                        </div>';
+                                    }
+                                    ?>
+                                </div>
+                            </div>
+
                             </div>
 
 
@@ -1781,6 +1742,30 @@
 
                                     </div>
                                 </div>
+                                <div class="form-group col-md-3">
+                                    <label>Facing</label>
+                                    <input name="facing" class="form-control"
+                                        value="<?= htmlspecialchars($properties_meta[0]->facing ?? '') ?>">
+                                </div>
+                            <div class="col-md-3 form-group">
+                                <label>Direction</label>
+                                <?php $directionValue = htmlspecialchars($properties_meta[0]->direction ?? ''); ?>
+                                <select name="direction" class="form-control">
+                                    <option value="">Select Direction</option>
+                                    <option value="East" <?= ($directionValue == 'East') ? 'selected' : '' ?>>East</option>
+                                    <option value="West" <?= ($directionValue == 'West') ? 'selected' : '' ?>>West</option>
+                                    <option value="North" <?= ($directionValue == 'North') ? 'selected' : '' ?>>North</option>
+                                    <option value="South" <?= ($directionValue == 'South') ? 'selected' : '' ?>>South</option>
+                                    <option value="North-East" <?= ($directionValue == 'North-East') ? 'selected' : '' ?>>North-East</option>
+                                    <option value="North-West" <?= ($directionValue == 'North-West') ? 'selected' : '' ?>>North-West</option>
+                                    <option value="South-East" <?= ($directionValue == 'South-East') ? 'selected' : '' ?>>South-East</option>
+                                    <option value="South-West" <?= ($directionValue == 'South-West') ? 'selected' : '' ?>>South-West</option>
+                                    <option value="Other" <?= ($directionValue == 'Other') ? 'selected' : '' ?>>Other</option>
+                                </select>
+                            </div>
+
+                            
+                            
                             </div>
 
                             <div class="row">

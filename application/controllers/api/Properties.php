@@ -56,7 +56,7 @@ public function addAdminProperty_post()
         'status','approvel','show_in_slider','show_in_gallery',
         'icon','bathrooms','bedrooms','sqft','measureUnit','services','verified',
         'residential','commercial','hot_deals','clone_id','main_site','lead_id',
-        'new_properties_id','construction_status'
+        'new_properties_id','construction_status','property_tags'
     ];
 
     $data = [];
@@ -106,7 +106,7 @@ public function addAdminProperty_post()
         'commercial_approval','width_length','road_width','commercial_useType',
         'shutters_count','roof_height','loading_bay','locality','landmark','direction',
         'facing','in_society','hospital_type','floor_available','medical_facilities',
-        'hospital_license','possession_status','map_link','other_property_type'
+        'hospital_license','possession_status','map_link','other_property_type','property_tags'
     ];
 
     $metaData = ['properties_id' => $property_id];
@@ -153,7 +153,7 @@ public function addAdminProperty_post()
             'image_three', 'image_four', 'status', 'approvel', 'show_in_slider', 'show_in_gallery',
             'icon', 'bathrooms', 'bedrooms', 'sqft', 'measureUnit', 'services', 'verified',
             'residential', 'commercial', 'hot_deals', 'clone_id', 'main_site', 'lead_id',
-            'new_properties_id', 'construction_status'
+            'new_properties_id', 'construction_status','property_tags'
         ];
 
         $propertyData = [];

@@ -108,7 +108,8 @@ $route["property-delete"] = 'api/Properties/deleteProperty';
 
 
 //api contact us 
-$route['api/contact']['GET'] = 'contact/contact_get';
+$route['api/contact']['GET'] = 'api/Contact/index';
+
 
 
 

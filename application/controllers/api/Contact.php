@@ -16,6 +16,7 @@ class Contact extends REST_Controller
         // $this->load->database();
         $this->load->helper('url');
         $this->load->model('Api_model');
+        $this->load->database();
         
         $checkToken = $this->checkForToken();
         if(!$checkToken) { die(); }
@@ -98,123 +99,24 @@ class Contact extends REST_Controller
 
 
 /** Get contacts **/
-public function contact_get() {
-    // Set proper JSON headers
-    $this->output->set_content_type('application/json');
-    header('Content-Type: application/json');
-    
-    // Initialize response array
-    $return = array(
-        'status' => 'error', 
-        'message' => 'No contacts found', 
-        'result' => array()
-    );
-    
-    try {
-        // Get query parameters with proper validation
-        $property_id = $this->get('property_id');
-        $type = $this->get('type');
-        $phone = $this->get('phone');
-        $limit = $this->get('limit') ? (int)$this->get('limit') : 50;
-        $offset = $this->get('offset') ? (int)$this->get('offset') : 0;
-        
-        // Validate limit (max 100)
-        if ($limit > 100) {
-            $limit = 100;
-        }
-        
-        // Build the main query
-        $this->db->select('id, fname, phone, email, message, subject, property, type, created_at');
-        $this->db->from('contact');
-        
-        // Apply filters if provided
-        if (!empty($property_id) && is_numeric($property_id)) {
-            $this->db->where('property', (int)$property_id);
-        }
-        
-        if (!empty($type)) {
-            $this->db->where('type', $type);
-        }
-        
-        if (!empty($phone)) {
-            $this->db->where('phone', $phone);
-        }
-        
-        // Count total records (before limit/offset)
-        $total_query = clone $this->db;
-        $total_count = $total_query->count_all_results('', FALSE);
-        
-        // Add pagination and ordering to main query
-        $this->db->limit($limit, $offset);
-        $this->db->order_by('id', 'DESC');
-        
-        // Execute the query
-        $query = $this->db->get();
-        
-        // Check if we have results
-        if ($query && $query->num_rows() > 0) {
-            $contacts = $query->result_array();
-            
-            // Format the response data
-            $formatted_contacts = [];
-            foreach ($contacts as $contact) {
-                $formatted_contacts[] = array(
-                    'id' => (int)$contact['id'],
-                    'name' => $contact['fname'],
-                    'phone' => $contact['phone'],
-                    'email' => $contact['email'],
-                    'message' => $contact['message'],
-                    'subject' => $contact['subject'],
-                    'property_id' => $contact['property'] ? (int)$contact['property'] : null,
-                    'type' => $contact['type'],
-                    'created_at' => $contact['created_at'] ?? null
-                );
-            }
-            
-            $return = array(
+
+public function index_get() {
+           $query = $this->db->order_by('id', 'DESC')->get('contact');
+
+
+        $result = $query->result_array();
+
+        if (!empty($result)) {
+            $this->response([
                 'status' => 'success',
-                'message' => 'Contacts retrieved successfully',
-                'result' => array(
-                    'contacts' => $formatted_contacts,
-                    'pagination' => array(
-                        'total_count' => (int)$total_count,
-                        'current_page' => (int)($offset / $limit) + 1,
-                        'per_page' => (int)$limit,
-                        'total_pages' => (int)ceil($total_count / $limit),
-                        'has_next' => ($offset + $limit) < $total_count,
-                        'has_previous' => $offset > 0
-                    )
-                )
-            );
+                'data' => $result
+            ], REST_Controller::HTTP_OK);
         } else {
-            // No records found
-            $return = array(
-                'status' => 'success',
-                'message' => 'No contacts found',
-                'result' => array(
-                    'contacts' => [],
-                    'pagination' => array(
-                        'total_count' => 0,
-                        'current_page' => 1,
-                        'per_page' => (int)$limit,
-                        'total_pages' => 0,
-                        'has_next' => false,
-                        'has_previous' => false
-                    )
-                )
-            );
+            $this->response([
+                'status' => 'error',
+                'message' => 'No contacts found'
+            ], REST_Controller::HTTP_NOT_FOUND);
         }
-        
-    } catch (Exception $e) {
-        // Handle any database or other errors
-        $return = array(
-            'status' => 'error',
-            'message' => 'An error occurred while fetching contacts: ' . $e->getMessage(),
-            'result' => array()
-        );
     }
-    
-    // Ensure we return proper JSON response
-    $this->response($return, REST_Controller::HTTP_OK);
-}
+
 }

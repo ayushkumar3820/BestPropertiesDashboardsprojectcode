@@ -1,4 +1,4 @@
- <?php
+<?php
 defined('BASEPATH') or exit('No direct script access allowed');
 ?>
 
@@ -95,7 +95,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
 			}
 		});    
      });
-     jQuery('#datatable1').DataTable();
+     jQuery('#datatable1').DataTable({
+"dom": '<"row"<"col-sm-6"f><"col-sm-6"l>>rt<"row"<"col-sm-5"i><"col-sm-7"p>>'
+
+});
  	});
  </script>
   

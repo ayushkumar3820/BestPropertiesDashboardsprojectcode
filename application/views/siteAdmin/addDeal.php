@@ -35,7 +35,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
         <div class="row">
            <div class="col-sm-3">
                     <div class="form-group">
-                        <label>Add property</label>
+                        <label>Add property test </label>
                         <input type="number" name="addProperty" value="" class="form-control" placeholder="Add Property">
                     </div>
             </div>

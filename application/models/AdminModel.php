@@ -174,6 +174,8 @@ public function updatePropertyStatusBulk($ids = array(), $status = '') {
 		return $query->result(); 
 	}
 
+    
+
  public function getDataByMultipleColumns($where, $table, $columns = '*', $orderBy = '', $orderByValue = '', $limit = '') {
 	    $this->db->select($columns);
 		$this->db->from($table);
@@ -204,7 +206,8 @@ public function updatePropertyStatusBulk($ids = array(), $status = '') {
         $this->db->update($table, $data);
         return true;
 	}
-	
+
+    
 	
 	public function addDataInTable($data,$table) {
       $this->db->insert($table, $data);
@@ -408,6 +411,13 @@ public function getCloneData($clone_id) {
 
 public function get_all() {
     return $this->db->get('properties')->result();
+}
+public function get_all_users() {
+    $this->db->select('properties.*, users.username as user_name');
+    $this->db->from('properties');
+    $this->db->join('users', 'users.id = properties.user_id', 'left');
+    $query = $this->db->get();
+    return $query->result();
 }
 
 public function insert($data) {

@@ -154,6 +154,8 @@ $propertyAdvanceSearchVisible = !empty($_POST) ? 'block' : 'none';
                             <th>Property Address</th>
                             <th>Property For/ ID</th>
                             <th>Phone</th>
+                                                       <th>User Name</th>
+
                             <th>Budget</th>
                             
                             <th>Data Source</th>
@@ -179,6 +181,10 @@ $propertyAdvanceSearchVisible = !empty($_POST) ? 'block' : 'none';
                                     <small>ID: <?php echo htmlspecialchars($property->id); ?></small>
                                 </td>
                                 <td><?php echo $property->phone; ?></td>
+
+<td>
+  <?php echo !empty($property->admin_name) ? htmlspecialchars($property->admin_name) : 'N/A'; ?>
+</td>
 <td>
     <?php
         $value = '-';

@@ -111,10 +111,20 @@ if (!empty($post['bhk']) && !empty($post['property_type']) && $post['property_ty
     }
 
     // Build full query manually to allow LEFT JOIN
-    $this->db->select('properties.*, properties_clone.main_site as clone_site, properties_clone.property_url, users.name AS user_name');
-    $this->db->from('properties');
-    $this->db->join('properties_clone', 'properties.clone_id = properties_clone.id', 'left');
-    $this->db->join('users', 'properties.userid = users.id', 'left'); // FIXED JOIN
+   $this->db->select('
+    properties.*, 
+    properties_clone.main_site as clone_site, 
+    properties_clone.property_url, 
+    users.name AS user_name, 
+    adminLogin.fullname AS admin_name, 
+    adminLogin.email AS admin_email, 
+    adminLogin.phone AS admin_phone
+');
+$this->db->from('properties');
+$this->db->join('properties_clone', 'properties.clone_id = properties_clone.id', 'left');
+$this->db->join('users', 'properties.userid = users.id', 'left');
+$this->db->join('adminLogin', 'properties.userid = adminLogin.id', 'left'); // ✅ NEW JOIN
+
    
    
    $role    = $this->session->userdata('role');

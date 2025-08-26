@@ -350,10 +350,10 @@
                                 <label>Floor No</label>
                                 <input name="floor_no" class="form-control" placeholder="Floor Number">
                             </div>
-                            <div class="form-group col-md-3">
-                                <label>Facing</label>
-                                <input name="facing" class="form-control" placeholder="Facing">
-                            </div>
+                            <!--<div class="form-group col-md-3">-->
+                            <!--    <label>Facing</label>-->
+                            <!--    <input name="facing" class="form-control" placeholder="Facing">-->
+                            <!--</div>-->
                             <div class="form-group col-md-3">
                                 <label for="bedrooms">Bedroom Number</label>
                                 <select id="bedrooms" name="bedrooms" class="form-control">
@@ -463,28 +463,9 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="form-group col-md-3">
-                                <label>Facing</label>
-                                <input name="facing" class="form-control" placeholder="Facing">
-                            </div>
                             <div class="col-md-3 form-group">
                                 <label>Width x Length</label>
                                 <input name="width_length" class="form-control" placeholder="e.g., 30x40">
-                            </div>
-                            <div class="col-md-3 form-group">
-                                <label>Direction</label>
-                                <select name="direction" class="form-control">
-                                    <option value="">Select Direction</option>
-                                    <option value="East">East</option>
-                                    <option value="West">West</option>
-                                    <option value="North">North</option>
-                                    <option value="South">South</option>
-                                    <option value="North-East">North-East</option>
-                                    <option value="North-West">North-West</option>
-                                    <option value="South-East">South-East</option>
-                                    <option value="South-West">South-West</option>
-                                    <option value="Other">Other</option>
-                                </select>
                             </div>
                         </div>
 
@@ -571,27 +552,6 @@
                                 <label><input type="radio" name="gated_community" value="1"> Yes</label>
                                 <label><input type="radio" name="gated_community" value="0"> No</label>
                             </div>
-
-                            <div class="form-group col-md-3">
-                                <label>Facing</label>
-                                <input name="facing" class="form-control" placeholder="Facing">
-                            </div>
-
-                            <div class="col-md-3 form-group">
-                                <label>Direction</label>
-                                <select name="direction" class="form-control">
-                                    <option value="">Select Direction</option>
-                                    <option value="East">East</option>
-                                    <option value="West">West</option>
-                                    <option value="North">North</option>
-                                    <option value="South">South</option>
-                                    <option value="North-East">North-East</option>
-                                    <option value="North-West">North-West</option>
-                                    <option value="South-East">South-East</option>
-                                    <option value="South-West">South-West</option>
-                                    <option value="Other">Other</option>
-                                </select>
-                            </div>
                         </div>
 
                         <!-- Studio Options -->
@@ -617,28 +577,6 @@
                             <div class="col-md-3 form-group">
                                 <label>Floor No</label>
                                 <input name="floor_no" class="form-control" placeholder="Floor Number">
-                            </div>
-
-
-                            <div class="col-md-3 form-group">
-                                <label>Direction</label>
-                                <select name="direction" class="form-control">
-                                    <option value="">Select Direction</option>
-                                    <option value="East">East</option>
-                                    <option value="West">West</option>
-                                    <option value="North">North</option>
-                                    <option value="South">South</option>
-                                    <option value="North-East">North-East</option>
-                                    <option value="North-West">North-West</option>
-                                    <option value="South-East">South-East</option>
-                                    <option value="South-West">South-West</option>
-                                    <option value="Other">Other</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group col-md-3">
-                                <label>Facing</label>
-                                <input name="facing" class="form-control" placeholder="Facing">
                             </div>
 
                             <div class="col-md-3 form-group">
@@ -1137,46 +1075,110 @@
                     <div id="extra-fields" style="display:none;">
                         <div class="form-group">
                             <label>Amenities*</label>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <label><input name="amenities[]" value="Car parking" type="checkbox"> Car
-                                        parking</label>
-                                    <label><input name="amenities[]" value="Security services" type="checkbox"> Security
-                                        services</label>
-                                    <label><input name="amenities[]" value="Water supply" type="checkbox"> Water
-                                        supply</label>
-                                    <label><input name="amenities[]" value="Elevators" type="checkbox">
-                                        Elevators</label>
-                                    <label><input name="amenities[]" value="Power backup" type="checkbox"> Power
-                                        backup</label>
-                                    <label><input name="amenities[]" value="Gym" type="checkbox"> Gym</label>
-                                    <label><input name="amenities[]" value="Play area" type="checkbox"> Play
-                                        area</label>
-                                </div>
-                                <div class="col-md-6">
-                                    <label><input name="amenities[]" value="Swimming pool" type="checkbox"> Swimming
-                                        pool</label>
-                                    <label><input name="amenities[]" value="Restaurants" type="checkbox">
-                                        Restaurants</label>
-                                    <label><input name="amenities[]" value="Party hall" type="checkbox"> Party
-                                        hall</label>
-                                    <label><input name="amenities[]" value="Temple and religious activity place"
-                                            type="checkbox"> Temple and religious activity place</label>
-                                    <label><input name="amenities[]" value="Cinema hall" type="checkbox"> Cinema
-                                        hall</label>
-                                    <label><input name="amenities[]" value="Walking/Jogging track" type="checkbox">
-                                        Walking/Jogging track</label>
-                                    <label><input name="amenities[]" value="Facing" type="checkbox">
-                                        Facing</label>
-                                </div>
+                           <div class="row">
+                          <!-- Left Column -->
+                          <div class="col-md-6">
+                            <div class="form-check">
+                              <input class="form-check-input" type="checkbox" id="car-parking" name="amenities[]" value="Car parking">
+                              <label class="form-check-label" for="car-parking">Car parking</label>
                             </div>
+                            <div class="form-check">
+                              <input class="form-check-input" type="checkbox" id="security-services" name="amenities[]" value="Security services">
+                              <label class="form-check-label" for="security-services">Security services</label>
+                            </div>
+                            <div class="form-check">
+                              <input class="form-check-input" type="checkbox" id="water-supply" name="amenities[]" value="Water supply">
+                              <label class="form-check-label" for="water-supply">Water supply</label>
+                            </div>
+                            <div class="form-check">
+                              <input class="form-check-input" type="checkbox" id="elevators" name="amenities[]" value="Elevators">
+                              <label class="form-check-label" for="elevators">Elevators</label>
+                            </div>
+                            <div class="form-check">
+                              <input class="form-check-input" type="checkbox" id="power-backup" name="amenities[]" value="Power backup">
+                              <label class="form-check-label" for="power-backup">Power backup</label>
+                            </div>
+                            <div class="form-check">
+                              <input class="form-check-input" type="checkbox" id="gym" name="amenities[]" value="Gym">
+                              <label class="form-check-label" for="gym">Gym</label>
+                            </div>
+                            <div class="form-check">
+                              <input class="form-check-input" type="checkbox" id="play-area" name="amenities[]" value="Play area">
+                              <label class="form-check-label" for="play-area">Play area</label>
+                            </div>
+                          </div>
+                        
+                          <!-- Right Column -->
+                          <div class="col-md-6">
+                            <div class="form-check">
+                              <input class="form-check-input" type="checkbox" id="swimming-pool" name="amenities[]" value="Swimming pool">
+                              <label class="form-check-label" for="swimming-pool">Swimming pool</label>
+                            </div>
+                            <div class="form-check">
+                              <input class="form-check-input" type="checkbox" id="restaurants" name="amenities[]" value="Restaurants">
+                              <label class="form-check-label" for="restaurants">Restaurants</label>
+                            </div>
+                            <div class="form-check">
+                              <input class="form-check-input" type="checkbox" id="party-hall" name="amenities[]" value="Party hall">
+                              <label class="form-check-label" for="party-hall">Party hall</label>
+                            </div>
+                            <div class="form-check">
+                              <input class="form-check-input" type="checkbox" id="temple" name="amenities[]" value="Temple and religious activity place">
+                              <label class="form-check-label" for="temple">Temple and religious activity place</label>
+                            </div>
+                            <div class="form-check">
+                              <input class="form-check-input" type="checkbox" id="cinema-hall" name="amenities[]" value="Cinema hall">
+                              <label class="form-check-label" for="cinema-hall">Cinema hall</label>
+                            </div>
+                            <div class="form-check">
+                              <input class="form-check-input" type="checkbox" id="walking-track" name="amenities[]" value="Walking/Jogging track">
+                              <label class="form-check-label" for="walking-track">Walking/Jogging track</label>
+                            </div>
+                            <div class="form-check">
+                              <input class="form-check-input" type="checkbox" id="facing" name="amenities[]" value="Facing">
+                              <label class="form-check-label" for="facing">Facing</label>
+                            </div>
+                          </div>
+                        </div>
+
                         </div>
                         <div class="row">
+  
+                            <div class="form-group">
+                                <label>Tags*</label>
+                                <div id="tag-container" class="d-flex flex-wrap">
+                                    <!-- Tags will be added here -->
+                                    <input type="text" id="tag-input" class="form-control me-2" placeholder="Add tag" style="width:auto;" />
+                                    <button type="button" id="add-tag-btn" class="btn btn-success">Add</button>
+                                </div>
+                                <input type="hidden" name="property_tags" id="property_tags">
+                            </div>
+
+
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label>City*</label>
                                     <input name="city" class="form-control" placeholder="Mohali">
                                 </div>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label>Facing</label>
+                                <input name="facing" class="form-control" placeholder="Facing">
+                            </div>
+                             <div class="col-md-3 form-group">
+                                <label>Direction</label>
+                                <select name="direction" class="form-control">
+                                    <option value="">Select Direction</option>
+                                    <option value="East">East</option>
+                                    <option value="West">West</option>
+                                    <option value="North">North</option>
+                                    <option value="South">South</option>
+                                    <option value="North-East">North-East</option>
+                                    <option value="North-West">North-West</option>
+                                    <option value="South-East">South-East</option>
+                                    <option value="South-West">South-West</option>
+                                    <option value="Other">Other</option>
+                                </select>
                             </div>
 
                         </div>
@@ -1240,6 +1242,67 @@
                     }
                 });
             }
+            
+            // Add Propety Tabs
+                let tags = [];
+                
+                function renderTags() {
+                    $("#tag-container .tag").remove(); // remove old tags
+                    tags.forEach((tag, index) => {
+                        $("#tag-input").before(`
+                            <span class="tag badge bg-primary me-1 mb-1">
+                                ${tag} <span class="remove-tag" data-index="${index}" style="cursor:pointer;">&times;</span>
+                            </span>
+                        `);
+                    });
+                    $("#property_tags").val(tags.join("~-~")); // hidden input store
+                }
+                
+                // Button click se tag add
+                $("#add-tag-btn").on("click", function () {
+                    const tagVal = $("#tag-input").val().trim();
+                    if (tagVal !== "" && !tags.includes(tagVal)) {
+                        tags.push(tagVal);
+                        $("#tag-input").val("");
+                        renderTags();
+                    }
+                });
+                
+                // Enter key se bhi add karna ho to:
+                $("#tag-input").on("keypress", function (e) {
+                    if (e.which === 13) {
+                        e.preventDefault();
+                        $("#add-tag-btn").click();
+                    }
+                });
+                
+                // Tag remove
+                $(document).on("click", ".remove-tag", function () {
+                    const index = $(this).data("index");
+                    tags.splice(index, 1);
+                    renderTags();
+                });
+
+                // Add tag on Enter
+                $("#tag-input").on("keypress", function (e) {
+                    if (e.which === 13) {
+                        e.preventDefault();
+                        let val = $(this).val().trim();
+                        if (val && !tags.includes(val)) {
+                            tags.push(val);
+                            $(this).val("");
+                            renderTags();
+                        }
+                    }
+                });
+            
+                // Remove tag on click
+                $(document).on("click", ".remove-tag", function () {
+                    const index = $(this).data("index");
+                    tags.splice(index, 1);
+                    renderTags();
+                });
+            // End Property Tag Code
 
             // Show/hide property age based on construction status
             jQuery('#bhk_construction_status').on('change', function () {
@@ -1459,7 +1522,8 @@
                     "budget_in_words": "price_unit",
                     "carpet": "carpet_area_unit",
                     "factory_land_area": "factory_land_area_unit",
-                    "factory_built_area": "factory_built_area_unit"
+                    "factory_built_area": "factory_built_area_unit",
+                    "property_tags": "property_tags"
                 };
 
                 for (const key in unitFields) {
