@@ -1733,7 +1733,21 @@
                             </div>
 
 
+      
                             <div class="row">
+                                <div class="form-group">
+                                    <label>Tags*</label>
+                                    <div id="tag-container" class="d-flex flex-wrap">
+                                        <!-- Tags will be shown here -->
+                                        <input type="text" id="tag-input" class="form-control me-2" placeholder="Add tag" style="width:auto;" />
+                                        <button type="button" id="add-tag-btn" class="btn btn-success">Add</button>
+                                    </div>
+                                    <!-- Important: DB value ko default me set karo -->
+                                    <input type="hidden" name="property_tags" id="property_tags"
+                                           value="<?php echo isset($properties[0]->property_tags) ? $properties[0]->property_tags : ''; ?>">
+                                </div>
+
+
                                 <div class="col-md-3">
                                     <div class="form-group">
                                         <label>City*</label>
@@ -1823,6 +1837,61 @@
                 }
             });
         }
+// Property Tags Code
+let tags = [];
+
+// Render tags function
+function renderTags() {
+    $("#tag-container .tag").remove(); // old tags remove
+    tags.forEach((tag, index) => {
+        $("#tag-input").before(`
+            <span class="tag badge bg-primary me-1 mb-1" 
+                  style="display: flex;justify-content: center;align-items: center;background: #007485 !important;font-size: 14px;font-weight: normal;text-transform: capitalize;gap: 5px;">
+                ${tag} 
+                <span class="remove-tag" data-index="${index}" 
+                      style="cursor:pointer;background: red;border-radius: 100px;display: flex;justify-content: center;align-items: flex-start;padding: 2px;font-size: 15px;height: 20px;width: 20px;">
+                    &times;
+                </span>
+            </span>
+        `);
+    });
+    $("#property_tags").val(tags.join("~-~")); // hidden input update
+}
+
+// ========== Load old tags in EDIT MODE ==========
+$(document).ready(function () {
+    let existingTags = $("#property_tags").val();
+    if (existingTags) {
+        tags = existingTags.split("~-~").map(t => t.trim()).filter(t => t !== "");
+        renderTags();
+    }
+});
+
+// Button click se add
+$("#add-tag-btn").on("click", function () {
+    const tagVal = $("#tag-input").val().trim();
+    if (tagVal !== "" && !tags.includes(tagVal)) {
+        tags.push(tagVal);
+        $("#tag-input").val("");
+        renderTags();
+    }
+});
+
+// Enter key se add
+$("#tag-input").on("keypress", function (e) {
+    if (e.which === 13) {
+        e.preventDefault();
+        $("#add-tag-btn").click();
+    }
+});
+
+// Remove tag
+$(document).on("click", ".remove-tag", function () {
+    const index = $(this).data("index");
+    tags.splice(index, 1);
+    renderTags();
+});
+
 
         // Show/hide property age based on construction status
             jQuery('#bhk_construction_status').on('change', function () {

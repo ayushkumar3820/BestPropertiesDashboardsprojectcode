@@ -97,7 +97,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
      });
      jQuery('#datatable1').DataTable({
 "dom": '<"row"<"col-sm-6"f><"col-sm-6"l>>rt<"row"<"col-sm-5"i><"col-sm-7"p>>'
-
 });
  	});
  </script>
@@ -175,4 +174,18 @@ background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBo
     color: #fff;
     font-size: 14px;
 }
+/* Row ko flex mat banao, bootstrap ke grid ke andar hi fix karo */
+.dataTables_wrapper .dataTables_filter {
+    float: left !important;   /* search forcefully left */
+    text-align: left !important;
+    margin-left: 0 !important;
+}
+
+.dataTables_wrapper .dataTables_length {
+    float: right !important;  /* show entries forcefully right */
+    text-align: right !important;
+    margin-right: 0 !important;
+}
+
+
 </style>

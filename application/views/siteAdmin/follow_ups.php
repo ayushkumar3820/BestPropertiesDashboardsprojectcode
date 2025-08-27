@@ -77,6 +77,19 @@
         </div>
     </div>
 </div>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+<!-- DataTable Initialization -->
+<script>
+jQuery(document).ready(function($){
+    $('#datatable1').DataTable({
+        "dom": '<"row"<"col-sm-6"f><"col-sm-6"l>>rt<"row"<"col-sm-5"i><"col-sm-7"p>>',
+        "pageLength": 10
+    });
+});
+</script>
 
 <!-- Add custom CSS -->
 <style>

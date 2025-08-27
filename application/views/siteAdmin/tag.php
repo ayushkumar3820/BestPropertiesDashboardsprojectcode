@@ -16,7 +16,7 @@
             <div class="row">
                 <div class="col-sm-12">
                     <div class="table-responsive">
-		              <table class="table table-striped">
+		              <table id="datatableTags" class="table table-striped table-bordered table-sm display" cellspacing="0" width="100%">
                          <thead>
 						    <tr>
 							   <th>Sr. No.</th>
@@ -157,4 +157,44 @@ background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBo
     color: #fff;
     font-size: 14px;
 }
+</style>
+<!-- JS and DataTables -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+
+<script>
+jQuery(document).ready(function() {
+    // Initialize DataTable for tags
+    jQuery('#datatableTags').DataTable({
+        "dom": '<"row"<"col-sm-6"f><"col-sm-6"l>>rt<"row"<"col-sm-5"i><"col-sm-7"p>>'
+    });
+});
+</script>
+
+<style>
+/* Search & Pagination fixes like user page */
+.dataTables_wrapper .dataTables_filter {
+    float: left !important;
+    text-align: left !important;
+    margin-left: 0 !important;
+}
+
+.dataTables_wrapper .dataTables_length {
+    float: right !important;
+    text-align: right !important;
+    margin-right: 0 !important;
+}
+
+/* Existing slider and button CSS */
+.switch { position: relative; display: inline-block; width: 72px; height: 20px; }
+.switch input {display:none;}
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #888888; transition: .4s; }
+.slider:before { position: absolute; content: ""; height: 20px; width: 20px; background-color: white; transition: .4s; }
+input:checked + .slider { background-color: #0ba038; }
+input:focus + .slider { box-shadow: 0 0 1px #0ba038; }
+input:checked + .slider:before { transform: translateX(52px); background-color: #ffffff; }
+.slider.round { border-radius: 68px; }
+.slider.round:before { border-radius: 50%; }
+.search_btn { background: #2ed8b6; border-color: #2ed8b6; padding: 2px 15px; transition: all 0.5s ease; color: #fff; font-size: 14px; }
 </style>

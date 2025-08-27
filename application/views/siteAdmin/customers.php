@@ -19,7 +19,8 @@
 	<div class="row">
 		<div class="col-sm-12">
 			<div class="table-responsive">
-				<table class="table table-striped">
+				<!-- <table class="table table-striped"> -->
+					<table id="datatable3" class="table table-striped table-bordered table-sm display" cellspacing="0" width="100%">
 					<thead>
 						<tr>
 							<th>Sr. No.</th>
@@ -191,3 +192,50 @@
         $(".alert-success").fadeOut("slow");
     }, 3000); // 4 seconds
 </script>
+<!-- ✅ Scripts -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+
+<script>
+    jQuery(document).ready(function () {
+        jQuery('.status').click(function () {
+            var dat_id = jQuery(this).data('id');
+            var listId = jQuery('.listId' + dat_id).val(dat_id);
+            var list_id = jQuery('.listId' + dat_id).val();
+
+            var status = (jQuery(this).is(':checked')) ? 'Yes' : 'No';
+
+            $.ajax({
+                type: "POST",
+                url: "<?php echo base_url('Siteadmin/Customers/updateCustomerStatus'); ?>",
+                data: { status: status, list_id: list_id },
+                success: function (data) { }
+            });
+        });
+
+        // ✅ DataTable initialization (search + show entries + pagination)
+        jQuery('#datatable3').DataTable({
+            "dom": '<"row"<"col-sm-6"f><"col-sm-6"l>>rt<"row"<"col-sm-5"i><"col-sm-7"p>>'
+        });
+    });
+
+    // ✅ Flash message hide after 3s
+    setTimeout(function(){
+        $(".alert-success").fadeOut("slow");
+    }, 3000);
+</script>
+
+<style>
+    /* Search bar left, show entries right */
+    .dataTables_wrapper .dataTables_filter {
+        float: left !important;
+        text-align: left !important;
+        margin-left: 0 !important;
+    }
+    .dataTables_wrapper .dataTables_length {
+        float: right !important;
+        text-align: right !important;
+        margin-right: 0 !important;
+    }
+</style>

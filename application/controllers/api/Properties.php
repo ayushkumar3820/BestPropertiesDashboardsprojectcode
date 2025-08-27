@@ -19,7 +19,6 @@ public function addAdminProperty_post()
 {
     $return = ['status' => 'error', 'message' => 'Missing required fields', 'result' => ''];
 
-    // Ensure session is loaded in REST controller
     if (!isset($this->session)) {
         $this->load->library('session');
     }
@@ -47,7 +46,7 @@ public function addAdminProperty_post()
         }
     }
 
-    // ---- Collect Property Fields (excluding userid; set separately) ----
+    // ---- Collect Property Fields ----
     $propertyFields = [
         'name','property_builder','description','property_for','project_n',
         'built','land','carpet','additional','additional_value','address','person',
@@ -61,13 +60,12 @@ public function addAdminProperty_post()
 
     $data = [];
 
-    // Always set userid (POST -> Session -> Header fallback)
+    // ---- User ID ----
     $userid = $this->input->post('userid', true);
     if (empty($userid) && isset($this->session) && method_exists($this->session, 'userdata')) {
         $userid = $this->session->userdata('id');
     }
     if (empty($userid)) {
-        // optional header fallback if you pass user id via header
         $headerUserId = $this->input->get_request_header('X-User-Id', true);
         if (!empty($headerUserId)) {
             $userid = $headerUserId;
@@ -77,7 +75,7 @@ public function addAdminProperty_post()
         $data['userid'] = $userid;
     }
 
-    // Copy posted fields (ignore null/empty strings)
+    // ---- Copy property fields ----
     foreach ($propertyFields as $field) {
         $val = $this->input->post($field);
         if ($val !== null && $val !== '') {
@@ -85,7 +83,7 @@ public function addAdminProperty_post()
         }
     }
 
-    // Merge uploaded images
+    // ---- Merge uploaded images ----
     foreach ($uploadedImages as $field => $filename) {
         $data[$field] = $filename;
     }
@@ -106,7 +104,7 @@ public function addAdminProperty_post()
         'commercial_approval','width_length','road_width','commercial_useType',
         'shutters_count','roof_height','loading_bay','locality','landmark','direction',
         'facing','in_society','hospital_type','floor_available','medical_facilities',
-        'hospital_license','possession_status','map_link','other_property_type','property_tags'
+        'hospital_license','possession_status','map_link','other_property_type'
     ];
 
     $metaData = ['properties_id' => $property_id];
@@ -119,10 +117,27 @@ public function addAdminProperty_post()
 
     $this->db->insert('properties_meta', $metaData);
 
+    // ---- Insert into property_tags_tb ----
+    $propertyTags = $this->input->post('property_tags');
+    if (!empty($propertyTags) && !empty($userid)) {
+        // agar multiple tags comma separated aaye hain to split kar lo
+        $tagsArray = explode(',', $propertyTags);
+        foreach ($tagsArray as $tag) {
+            $tag = trim($tag);
+            if ($tag !== '') {
+                $this->db->insert('property_tags_tb', [
+                    'userid'        => $userid,
+                    'property_tags' => $tag
+                ]);
+            }
+        }
+    }
+
     $return['status']  = 'done';
     $return['message'] = 'Property added successfully';
     return $this->response($return, REST_Controller::HTTP_OK);
 }
+
 
 
 
@@ -153,7 +168,7 @@ public function addAdminProperty_post()
             'image_three', 'image_four', 'status', 'approvel', 'show_in_slider', 'show_in_gallery',
             'icon', 'bathrooms', 'bedrooms', 'sqft', 'measureUnit', 'services', 'verified',
             'residential', 'commercial', 'hot_deals', 'clone_id', 'main_site', 'lead_id',
-            'new_properties_id', 'construction_status','property_tags'
+            'new_properties_id', 'construction_status'
         ];
 
         $propertyData = [];
@@ -253,7 +268,7 @@ public function addAdminProperty_post()
         'status', 'approvel', 'show_in_slider', 'show_in_gallery',
         'icon', 'bathrooms', 'bedrooms', 'sqft', 'measureUnit', 'services', 'verified',
         'residential', 'commercial', 'hot_deals', 'clone_id', 'main_site', 'lead_id',
-        'new_properties_id', 'construction_status'
+        'new_properties_id', 'construction_status','property_tags'
     ];
 
     foreach ($propertyFields as $field) {

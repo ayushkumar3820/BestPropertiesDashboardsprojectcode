@@ -180,7 +180,7 @@
                     <div class="row">
                         <div class="col-md-3">
                             <div class="form-group">
-                                <label>Property Name</label>
+                                <label>Property Name*</label>
                                 <input name="name" class="form-control" placeholder="Property Name" required>
                             </div>
                         </div>
@@ -1250,8 +1250,9 @@
                     $("#tag-container .tag").remove(); // remove old tags
                     tags.forEach((tag, index) => {
                         $("#tag-input").before(`
-                            <span class="tag badge bg-primary me-1 mb-1">
-                                ${tag} <span class="remove-tag" data-index="${index}" style="cursor:pointer;">&times;</span>
+                            <span class="tag badge bg-primary me-1 mb-1" style="display: flex;justify-content: center;align-items: center;background: #007485 !important;font-size: 14px;font-weight: normal;text-transform: capitalize;gap: 5px;">
+                                ${tag} <span class="remove-tag" data-index="${index}" style="cursor:pointer;
+                                background: red;border-radius: 100px;display: flex;justify-content: center;align-items: flex-start; padding: 2px;font-size: 15px;height: 20px; width: 20px;">&times;</span>
                             </span>
                         `);
                     });
@@ -1522,8 +1523,7 @@
                     "budget_in_words": "price_unit",
                     "carpet": "carpet_area_unit",
                     "factory_land_area": "factory_land_area_unit",
-                    "factory_built_area": "factory_built_area_unit",
-                    "property_tags": "property_tags"
+                    "factory_built_area": "factory_built_area_unit"
                 };
 
                 for (const key in unitFields) {
@@ -1604,6 +1604,7 @@
                 // Clean FormData (remove blanks except valid files)
                 const cleanedFormData = new FormData();
                 for (let [key, value] of formData.entries()) {
+                     console.log(key, ":", value);
                     if (value instanceof File && value.name !== "") {
                         cleanedFormData.append(key, value);
                     } else if (typeof value === 'string' && value.trim() !== "") {

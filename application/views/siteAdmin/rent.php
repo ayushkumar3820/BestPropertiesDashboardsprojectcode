@@ -18,7 +18,7 @@
             <div class="row">
                 <div class="col-sm-12">
                     <div class="table-responsive">
-		              <table class="table table-striped">
+		              <table id="rentTable" class="table table-striped table-sm display" cellspacing="0" width="100%">
                          <thead>
 						    <tr>
 							   <th>Sr. No.</th>
@@ -164,5 +164,49 @@ background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBo
     transition: all 0.5s ease;
     color: #fff;
     font-size: 14px;
+}
+</style>
+<!-- ✅ Scripts -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+
+<script>
+jQuery(document).ready(function() {
+    // ✅ DataTable initialize (search + show entries + pagination)
+    jQuery('#rentTable').DataTable({
+        "dom": '<"row"<"col-sm-6"f><"col-sm-6"l>>rt<"row"<"col-sm-5"i><"col-sm-7"p>>'
+    });
+
+    // ✅ Status toggle ajax
+    jQuery('.status').click(function(){
+        var dat_id = jQuery(this).data('id');
+        var listId = jQuery('.listId'+dat_id).val(dat_id);
+        var list_id = jQuery('.listId'+dat_id).val();
+
+        var status = jQuery(this).is(':checked') ? 'active' : 'deactivate';
+
+        $.ajax({
+            type: "POST",
+            url: "<?php echo base_url('Siteadmin/Rent/updateRentStatus');?>",
+            data: {status: status, list_id:list_id},
+            success: function(data){
+                console.log("Status Updated: " + status);
+            }
+        });    
+    });
+});
+</script>
+
+<style>
+/* ✅ Search bar left, Show entries right */
+.dataTables_wrapper .dataTables_filter {
+    float: left !important;
+    text-align: left !important;
+    margin-left: 0 !important;
+}
+.dataTables_wrapper .dataTables_length {
+    float: right !important;
+    text-align: right !important;
+    margin-right: 0 !important;
 }
 </style>
