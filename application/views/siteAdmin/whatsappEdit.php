@@ -70,7 +70,7 @@ foreach($messages as $msg){
 .chat-header {
     display: block;
     align-items: center;
-    padding: 10px 15px;
+    padding: 21px 19px;
     background: #f1f1f1;
     border-bottom: 1px solid #ccc;
 }

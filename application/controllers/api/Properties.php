@@ -278,36 +278,64 @@ public function addAdminProperty_post()
         }
     }
 
-// ✅ Custom handling for land (plot area)
-$plot_area = trim($this->input->post('kothi_plot_area'));
-$plot_unit = strtolower(trim($this->input->post('kothi_plot_area_unit')));
-
-if ($plot_area !== '' && $plot_unit !== '') {
-    $allowed_units = ['sq.yard','marla','kanal'];
-    if (!in_array($plot_unit, $allowed_units)) {
-        $plot_unit = 'sq.yard'; // fallback
+    // ✅ Custom handling for land (plot area)
+    $plot_area = trim($this->input->post('kothi_plot_area'));
+    $plot_unit = strtolower(trim($this->input->post('kothi_plot_area_unit')));
+    
+    if ($plot_area !== '' && $plot_unit !== '') {
+        $allowed_units = ['sq.yard','marla','kanal'];
+        if (!in_array($plot_unit, $allowed_units)) {
+            $plot_unit = 'sq.yard'; // fallback
+        }
+        // अब दोनों को जोड़कर एक ही field में save करो
+        $this->db->set('land', $plot_area . ' ' . $plot_unit);
     }
-    // अब दोनों को जोड़कर एक ही field में save करो
-    $this->db->set('land', $plot_area . ' ' . $plot_unit);
-}
-
-// ✅ Custom handling for built (covered area)
-$covered_area = trim($this->input->post('kothi_covered_area'));
-$covered_unit = strtolower(trim($this->input->post('kothi_covered_area_unit')));
-
-if ($covered_area !== '' && $covered_unit !== '') {
-    $allowed_units = ['sq.yard','marla','kanal'];
-    if (!in_array($covered_unit, $allowed_units)) {
-        $covered_unit = 'sq.yard';
+    
+    // ✅ Custom handling for built (covered area)
+    $covered_area = trim($this->input->post('kothi_covered_area'));
+    $covered_unit = strtolower(trim($this->input->post('kothi_covered_area_unit')));
+    
+    if ($covered_area !== '' && $covered_unit !== '') {
+        $allowed_units = ['sq.yard','marla','kanal'];
+        if (!in_array($covered_unit, $allowed_units)) {
+            $covered_unit = 'sq.yard';
+        }
+        $this->db->set('built', $covered_area . ' ' . $covered_unit);
     }
-    $this->db->set('built', $covered_area . ' ' . $covered_unit);
-}
-
-
-
     // Update the `properties` table
     $this->db->where('id', $property_id);
     $this->db->update('properties');
+    
+    // ✅ Update property_tags_tb also
+        // ✅ Update property_tags_tb also
+        $property_tags = $this->input->post('property_tags');
+        // get userid directly from properties table using property_id
+        $userid = $this->db->select('userid')
+                           ->where('id', $property_id)
+                           ->get('properties')
+                           ->row()
+                           ->userid;
+        
+        if (!empty($property_tags) && !empty($userid)) {
+            // check if record already exists for this user
+            $exists = $this->db->get_where('property_tags_tb', ['userid' => $userid])->row();
+        
+            if ($exists) {
+                // update existing
+                $this->db->where('userid', $userid);
+                $this->db->update('property_tags_tb', [
+                    'property_tags' => $property_tags
+                ]);
+            } else {
+                // insert new
+                $this->db->insert('property_tags_tb', [
+                    'userid' => $userid,
+                    'property_tags' => $property_tags
+                ]);
+            }
+}
+
+
 
     // Property meta fields
     $metaFields = [
@@ -368,7 +396,6 @@ public function deleteProperty_post()
     $return['message'] = 'Property deleted successfully';
     return $this->response($return, REST_Controller::HTTP_OK);
 }
-
 
 
 }

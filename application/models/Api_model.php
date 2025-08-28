@@ -172,10 +172,12 @@ public function get_meeting_list() {
 }
 
 
-    
  public function insertData($table, $data){
     return $this->db->insert($table, $data);
 }
+
+
+
 
 
 }

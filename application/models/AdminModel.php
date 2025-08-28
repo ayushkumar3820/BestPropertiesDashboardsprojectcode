@@ -496,5 +496,69 @@ public function get_meeting_list() {
     return $this->db->get('meetings')->result_array();
 }
 
+
+public function getMatchingProperties($lead) {
+    $this->db->select('p.*, pc.property_url');
+    $this->db->from('properties p');
+    $this->db->join('properties_clone pc', 'p.clone_id = pc.id', 'left');
+    $this->db->where('p.status', 'active');
+
+    // Start a group for all conditions
+    $this->db->group_start();
+
+    // Property type condition
+    if (!empty($lead->propertyType_sub)) {
+        $this->db->where('p.category', $lead->propertyType_sub);
+    }
+
+    // Budget condition
+    if (isset($lead->max_budget) && $lead->max_budget > 0) {
+        $budgetInWords = $this->convertNumberToWords($lead->max_budget);
+        $this->db->group_start(); // Start a group for OR conditions within budget
+        $this->db->where('p.budget', $lead->max_budget);
+        $this->db->or_where('p.budget_in_words', $budgetInWords);
+        $minBudget = $lead->max_budget - ($lead->max_budget * 0.15);
+        $maxBudget = $lead->max_budget + ($lead->max_budget * 0.15);
+        $this->db->or_where("p.budget BETWEEN {$minBudget} AND {$maxBudget}");
+        $this->db->group_end(); // End the OR group for budget
+    }
+
+    // End the main group
+    $this->db->group_end();
+
+    // Order by
+    $this->db->order_by('p.id', 'DESC');
+    $query = $this->db->get();
+    return $query->result();
+}
+
+// Convert number to words (unchanged)
+private function convertNumberToWords($number) {
+    $words = "";
+    if ($number >= 10000000) {
+        $crore = floor($number / 10000000);
+        $words .= $crore . " Crore";
+        $number %= 10000000;
+    }
+    if ($number >= 100000) {
+        $lakh = floor($number / 100000);
+        $words .= ($words ? " " : "") . $lakh . " Lakh";
+        $number %= 100000;
+    }
+    if ($number >= 1000) {
+        $thousand = floor($number / 1000);
+        $words .= ($words ? " " : "") . $thousand . " Thousand";
+        $number %= 1000;
+    }
+    if ($number > 0) {
+        $words .= ($words ? " " : "") . $number;
+    }
+    return $words;
+}
+
+
+
+
+
 }
 ?>

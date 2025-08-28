@@ -166,7 +166,9 @@ $propertyAdvanceSearchVisible = !empty($_POST) ? 'block' : 'none';
                     </thead>
                     <tbody>
                         <?php if (!empty($properties)): $i = 1; foreach ($properties as $property): ?>
+                            
                             <tr>
+                                
                                 
                                 <td><input type="checkbox" class="property_checkbox" value="<?php echo $property->id; ?>"></td>
                                 <td><?php echo $i++; ?></td>

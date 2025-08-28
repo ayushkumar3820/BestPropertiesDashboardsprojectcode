@@ -117,6 +117,10 @@ class Reactjs extends REST_Controller
         $this->db->join('properties_clone pc', 'p.clone_id = pc.id', 'left');  // ✅ Correct join
         $this->db->where('p.name !=', '');
         $this->db->where('p.status', 'active');
+
+          // ✅ Only include properties created in last 6 months
+        $this->db->where('p.created_at >=', date('Y-m-d H:i:s', strtotime('-6 months')));
+
         $this->db->order_by('p.id', 'DESC');
 
         $query = $this->db->get();

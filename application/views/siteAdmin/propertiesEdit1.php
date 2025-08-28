@@ -441,14 +441,14 @@
 
                     <!--kothi option start-->
                     <div id="kothi-options" class="row" style="display:none;">
-                        <div class="col-md-2 form-group">
-                            <label>Number of Floors</label>
-                            <input type="text" name="total_floors" class="form-control"
-                            <?php if (isset($properties[0]->property_type) && $properties[0]->property_type == 'Independent House / Kothi'): ?>
-                                value="<?= htmlspecialchars($properties_meta[0]->total_floors ?? '') ?>"
-                            <?php endif; ?>
-                            >
-                        </div>
+                        <!--<div class="col-md-2 form-group">-->
+                        <!--    <label>Number of Floors</label>-->
+                        <!--    <input type="text" name="total_floors" class="form-control"-->
+                        <!--    <?php if (isset($properties[0]->property_type) && $properties[0]->property_type == 'Independent House / Kothi'): ?>-->
+                        <!--        value="<?= htmlspecialchars($properties_meta[0]->total_floors ?? '') ?>"-->
+                        <!--    <?php endif; ?>-->
+                        <!--    >-->
+                        <!--</div>-->
 
                        <!-- Plot Area -->
 <?php
@@ -500,7 +500,7 @@
 
 
                          <!-- Kothi Type -->
-                       <div class="col-md-4 form-group">
+                       <div class="col-md-3 form-group">
                             <label>Independent House / Kothi Type</label>
                             <select id="kothi_story_type" name="kothi_story_type" class="form-control">
                                 <option value="">Select</option>
@@ -1736,7 +1736,7 @@
       
                             <div class="row">
                                 <div class="form-group">
-                                    <label>Tags*</label>
+                                    <label>Tags</label>
                                     <div id="tag-container" class="d-flex flex-wrap">
                                         <!-- Tags will be shown here -->
                                         <input type="text" id="tag-input" class="form-control me-2" placeholder="Add tag" style="width:auto;" />

@@ -994,79 +994,37 @@ public function meeting()
 
     /*Deal function start*/
 
-   public function addDeal()
-{
+
+public function addDeal() {
     $leadId = $this->uri->segment("4");
-    
     // Get lead data for matching
     $leadData = $this->AdminModel->getDataFromTableByField($leadId, "buyers", "id");
     if (empty($leadData)) {
         redirect(base_url("admin/leads"));
     }
-    
     $lead = $leadData[0];
-    
+
     if ($this->input->post("save")) {
         $this->form_validation->set_rules("phone", "phone", "trim");
-        $this->form_validation->set_error_delimiters(
-            '<div class="alert alert-danger">',
-            "</div>"
-        );
+        $this->form_validation->set_error_delimiters('<div class="alert alert-danger">', "</div>");
         if ($this->form_validation->run() != false) {
             $propertyId = $this->input->post("addProperty");
             $idWhere = ["id" => $propertyId, "status" => "active"];
-            $checkpropertyID = $this->AdminModel->getDataByMultipleColumns(
-                $idWhere,
-                "properties",
-                "id,status"
-            );
-
+            $checkpropertyID = $this->AdminModel->getDataByMultipleColumns($idWhere, "properties", "id,status");
             if ($checkpropertyID) {
                 $where = ["id" => $leadId];
-                $current_deal = $this->AdminModel->getDataByMultipleColumns(
-                    $where,
-                    "buyers",
-                    "deal"
-                );
+                $current_deal = $this->AdminModel->getDataByMultipleColumns($where, "buyers", "deal");
                 $currentPropertyId = $current_deal[0]->deal;
-
-                // Convert the current deal to an array if it's a comma-separated string
-                $current_deal_array =
-                    $currentPropertyId != ""
-                        ? explode(",", $currentPropertyId)
-                        : [];
-
-                // Check if property is already added
+                $current_deal_array = ($currentPropertyId != "") ? explode(",", $currentPropertyId) : [];
                 if (in_array($propertyId, $current_deal_array)) {
-                    $this->session->set_flashdata(
-                        "error",
-                        "Error: Property is already added."
-                    );
+                    $this->session->set_flashdata("error", "Error: Property is already added.");
                 } else {
-                    $updated_deal =
-                        $currentPropertyId != ""
-                            ? $currentPropertyId . "," . $propertyId
-                            : $propertyId;
-                    $updateData = [
-                        "deal" => $updated_deal,
-                    ];
-                    $result = $this->AdminModel->updateTable(
-                        $leadId,
-                        "id",
-                        "buyers",
-                        $updateData
-                    );
-                    $this->session->set_flashdata(
-                        "message1",
-                        "Property added successfully."
-                    );
-
+                    $updated_deal = ($currentPropertyId != "") ? $currentPropertyId . "," . $propertyId : $propertyId;
+                    $updateData = ["deal" => $updated_deal];
+                    $result = $this->AdminModel->updateTable($leadId, "id", "buyers", $updateData);
+                    $this->session->set_flashdata("message1", "Property added successfully.");
                     // Insert into leadDeal table
-                    $propertyData = $this->AdminModel->getDataByMultipleColumns(
-                        $idWhere,
-                        "properties",
-                        "name"
-                    );
+                    $propertyData = $this->AdminModel->getDataByMultipleColumns($idWhere, "properties", "name");
                     $dataToInsert = [
                         "name" => $propertyData[0]->name,
                         "lead_id" => $leadId,
@@ -1077,35 +1035,25 @@ public function meeting()
                     $this->AdminModel->insertLeadDeal($dataToInsert);
                 }
             } else {
-                $this->session->set_flashdata(
-                    "error",
-                    "Sorry! This property does not exist."
-                );
+                $this->session->set_flashdata("error", "Sorry! This property does not exist.");
             }
         }
     }
 
     $where1 = ["id" => $leadId];
-    $allDeals = $this->AdminModel->getDataByMultipleColumns(
-        $where1,
-        "buyers",
-        "deal"
-    );
+    $allDeals = $this->AdminModel->getDataByMultipleColumns($where1, "buyers", "deal");
     if ($allDeals) {
         if ($allDeals[0]->deal != "") {
             $dealString = $allDeals[0]->deal;
             $dealArray = explode(",", $dealString);
             $whereLead = ["p.id" => $dealArray, "l.lead_id" => $leadId];
-            $data["propertyDeal"] = $this->AdminModel->getDealProperties(
-                $whereLead
-            );
+            $data["propertyDeal"] = $this->AdminModel->getDealProperties($whereLead);
         }
     }
-    
+
     // Get matching properties based on lead criteria
     $data["matchingProperties"] = $this->AdminModel->getMatchingProperties($lead);
     $data["leadData"] = $lead;
-    
     $data["mainContent"] = "siteAdmin/addDeal";
     $this->load->view("includes/admin/template", $data);
 }

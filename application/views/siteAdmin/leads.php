@@ -162,7 +162,23 @@ if ($agents && in_array('Admin', $roles)) {
                                     <td><a href="<?php echo base_url().'admin/leads/view/'.$lead->id;?>"><?php echo $lead->uName;?></a></td>
                                     <td><?php echo $lead->mobile;?></td>
                                     <td><?php echo $lead->preferred_location;?></td>
-                                    <td><?php echo $lead->budget;?></td>
+                                   <td>
+<?php
+$budget = $lead->budget;
+
+if ($budget >= 10000000) {
+    // If 1 crore or more
+    echo ($budget / 10000000) . ' Cr';
+} elseif ($budget >= 100000) {
+    // If 1 lakh or more
+    echo ($budget / 100000) . ' Lakh';
+} else {
+    // Less than 1 lakh, show as is
+    echo $budget;
+}
+?>
+</td>
+
                                     <td>
                                        <?php
                                        $requirementDisplay = '';
