@@ -187,7 +187,20 @@ if ( ! function_exists('getProperties')){
         return false;
     }
 	}
-
+	
+if ( ! function_exists('propertyCityAutosuggest')){
+    function propertyCityAutosuggest() {
+        return array(
+            'Chandigarh',
+            'Mohali',
+            'Zirakpur',
+            'Kharar',
+            'Kurali',
+            'Panchkula'
+            
+        );
+    }	
+}
 
 if (!function_exists('getroll')) {
     function getroll() {

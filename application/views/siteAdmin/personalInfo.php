@@ -9,6 +9,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         <!--- <a href='<?= base_url('admin/leadtask/') . $this->uri->segment('4'); ?>'>Meeting and Task </a>-->
         <a href="<?= base_url('admin/leads/personal/' . $this->uri->segment('4')); ?>" id="personalInfoLink">Personal Information</a>
         <a href="<?= base_url('admin/leads/deal/' . $this->uri->segment('4')); ?>" id="personalInfoLink">Deal</a>
+         <a href="<?= base_url('admin/leads/meetings/' . $this->uri->segment('4')); ?>" id="personalInfoLink">Meetings</a>
     
 
      

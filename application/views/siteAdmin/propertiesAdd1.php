@@ -1,11 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Property Form</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+      <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
+
+      
     <style>
         .main {
             padding: 20px;
@@ -1224,85 +1221,57 @@
             </div>
         </div>
     </div>
-
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"></script>
 
     <script>
         jQuery(document).ready(function () {
-            var i = 1;
-
-            function clearFields(selector) {
-                const container = jQuery(selector);
-                container.find('input, select, textarea').each(function () {
-                    if (this.type === 'checkbox' || this.type === 'radio') {
-                        this.checked = false;
-                    } else {
-                        jQuery(this).val('');
-                    }
+           
+            // Add Propety Tabs
+            // Store selected tags
+            let tags = [];
+            
+            // Function to render tag chips
+            function renderTags() {
+                $("#tag-container .tag").remove(); // remove old tags
+                tags.forEach((tag, index) => {
+                    $("#tag-input").before(`
+                        <span class="tag badge bg-primary me-1 mb-1" style="display: flex;justify-content: center;align-items: center;background: #007485 !important;font-size: 14px;font-weight: normal;text-transform: capitalize;gap: 5px;">
+                            ${tag} 
+                            <span class="remove-tag" data-index="${index}" style="cursor:pointer;background: red;border-radius: 100px;display: flex;justify-content: center;align-items: flex-start; padding: 2px;font-size: 15px;height: 20px; width: 20px;">&times;</span>
+                        </span>
+                    `);
                 });
+                $("#property_tags").val(tags.join("~-~")); // hidden input store
             }
             
-            // Add Propety Tabs
-                let tags = [];
-                
-                function renderTags() {
-                    $("#tag-container .tag").remove(); // remove old tags
-                    tags.forEach((tag, index) => {
-                        $("#tag-input").before(`
-                            <span class="tag badge bg-primary me-1 mb-1" style="display: flex;justify-content: center;align-items: center;background: #007485 !important;font-size: 14px;font-weight: normal;text-transform: capitalize;gap: 5px;">
-                                ${tag} <span class="remove-tag" data-index="${index}" style="cursor:pointer;
-                                background: red;border-radius: 100px;display: flex;justify-content: center;align-items: flex-start; padding: 2px;font-size: 15px;height: 20px; width: 20px;">&times;</span>
-                            </span>
-                        `);
-                    });
-                    $("#property_tags").val(tags.join("~-~")); // hidden input store
+            // Add tag manually on button click
+            $("#add-tag-btn").on("click", function () {
+                const tagVal = $("#tag-input").val().trim();
+                if (tagVal !== "" && !tags.includes(tagVal)) {
+                    tags.push(tagVal);
+                    $("#tag-input").val("");
+                    renderTags();
                 }
-                
-                // Button click se tag add
-                $("#add-tag-btn").on("click", function () {
-                    const tagVal = $("#tag-input").val().trim();
-                    if (tagVal !== "" && !tags.includes(tagVal)) {
-                        tags.push(tagVal);
-                        $("#tag-input").val("");
-                        renderTags();
-                    }
-                });
-                
-                // Enter key se bhi add karna ho to:
-                $("#tag-input").on("keypress", function (e) {
-                    if (e.which === 13) {
-                        e.preventDefault();
-                        $("#add-tag-btn").click();
-                    }
-                });
-                
-                // Tag remove
-                $(document).on("click", ".remove-tag", function () {
-                    const index = $(this).data("index");
-                    tags.splice(index, 1);
-                    renderTags();
-                });
-
-                // Add tag on Enter
-                $("#tag-input").on("keypress", function (e) {
-                    if (e.which === 13) {
-                        e.preventDefault();
-                        let val = $(this).val().trim();
-                        if (val && !tags.includes(val)) {
-                            tags.push(val);
-                            $(this).val("");
-                            renderTags();
-                        }
-                    }
-                });
+            });
             
-                // Remove tag on click
-                $(document).on("click", ".remove-tag", function () {
-                    const index = $(this).data("index");
-                    tags.splice(index, 1);
-                    renderTags();
-                });
+            // Enter key add support
+            $("#tag-input").on("keypress", function (e) {
+                if (e.which === 13) {
+                    e.preventDefault();
+                    $("#add-tag-btn").click();
+                }
+            });
+            
+            // Remove tag
+            $(document).on("click", ".remove-tag", function () {
+                const index = $(this).data("index");
+                tags.splice(index, 1);
+                renderTags();
+            });
+
             // End Property Tag Code
 
             // Show/hide property age based on construction status
@@ -1431,6 +1400,9 @@
                 const button_id = jQuery(this).attr("id");
                 jQuery('#custom' + button_id).remove();
             });
+            function clearFields(selector) {
+        jQuery(selector).find("input, select, textarea").val(""); 
+    }
 
             // Event Bindings
             jQuery('#categorySelector').change(toggleCategoryFields);
@@ -1484,6 +1456,49 @@
 
                 toggleCommercialSubFields(jQuery(this).val());
             });
+            
+            jQuery("#tag-input").autocomplete({
+                source: function (request, response) {
+                    jQuery.ajax({
+                        url: "https://bestpropertiesmohali.com/Siteadmin/Properties/getTags",
+                        type: "POST",
+                        dataType: "json",
+                        data: { term: request.term },
+                        headers: {
+                        'Authorization': 'Bearer 9j1h8hgjO0KUin2bhj58d97jiOh67f5h48hj78hg8vg5j63fo0h930'
+                        },
+                        success: function (data) {
+                            console.log("API Response:", data);
+                            let finalList = [];
+                            if (Array.isArray(data)) {
+                                data.forEach(function (item) {
+                                    if (typeof item === "string") {
+                                        finalList = finalList.concat(item.split("~~"));
+                                    }
+                                });
+                            }
+            
+                            console.log("Processed List:", finalList);
+                            response(finalList);
+                        }
+                    });
+                },
+                minLength: 1,
+                select: function (event, ui) {
+                    const tagVal = ui.item.value;
+                    if (tagVal && !tags.includes(tagVal)) {
+                        tags.push(tagVal);
+                        renderTags();
+                    }
+                    jQuery(this).val(""); // clear input
+                    return false;
+                }
+            });
+
+
+
+
+            
         });
 
         $(document).ready(function () {
@@ -1655,12 +1670,20 @@
                     }
                 });
             });
+			
+		$('#BHK').on('change', function () {
+            var bhkValue = $(this).val();
+            if (bhkValue != '') {
+                $('#bhk_property_age').show(); // Show the Property Age dropdown
+            } else {
+                $('#bhk_property_age').hide(); // Hide if no BHK selected
+            }
+        });
+		
         });
     </script>
-</body>
 
-</html>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!--script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function () {
         $('#BHK').on('change', function () {
@@ -1672,4 +1695,4 @@
             }
         });
     });
-</script>
+</script-->

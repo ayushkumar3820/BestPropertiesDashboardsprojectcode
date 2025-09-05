@@ -50,6 +50,8 @@ public function updatePropertyStatusBulk($ids = array(), $status = '') {
 		return $query->result(); 
 	}
 	
+	
+	
 	public function getMeals(){
         $this->db->select('m.*,c.name as c_name,t.name as t_name');
         $this->db->from('meals as m');
@@ -501,36 +503,41 @@ public function getMatchingProperties($lead) {
     $this->db->select('p.*, pc.property_url');
     $this->db->from('properties p');
     $this->db->join('properties_clone pc', 'p.clone_id = pc.id', 'left');
-    $this->db->where('p.status', 'active');
+    // $this->db->where('p.status', 'active');
 
-    // Start a group for all conditions
-    $this->db->group_start();
+    $hasConditions = false;
 
     // Property type condition
     if (!empty($lead->propertyType_sub)) {
-        $this->db->where('p.category', $lead->propertyType_sub);
+        $this->db->where('p.category', $lead->propertyType);
+        $hasConditions = true;
     }
 
     // Budget condition
     if (isset($lead->max_budget) && $lead->max_budget > 0) {
         $budgetInWords = $this->convertNumberToWords($lead->max_budget);
-        $this->db->group_start(); // Start a group for OR conditions within budget
-        $this->db->where('p.budget', $lead->max_budget);
-        $this->db->or_where('p.budget_in_words', $budgetInWords);
         $minBudget = $lead->max_budget - ($lead->max_budget * 0.15);
         $maxBudget = $lead->max_budget + ($lead->max_budget * 0.15);
+
+        $this->db->group_start(); 
+        $this->db->where('p.budget', $lead->max_budget);
+        $this->db->or_where('p.budget_in_words', $budgetInWords);
         $this->db->or_where("p.budget BETWEEN {$minBudget} AND {$maxBudget}");
-        $this->db->group_end(); // End the OR group for budget
+        $this->db->group_end();
+
+        $hasConditions = true;
     }
 
-    // End the main group
-    $this->db->group_end();
+    // Only wrap conditions in group if any exist
+    if ($hasConditions) {
+        // Already added above with group_start where needed
+    }
 
-    // Order by
     $this->db->order_by('p.id', 'DESC');
     $query = $this->db->get();
     return $query->result();
 }
+
 
 // Convert number to words (unchanged)
 private function convertNumberToWords($number) {
@@ -556,6 +563,35 @@ private function convertNumberToWords($number) {
     return $words;
 }
 
+public function getTags($term)
+{
+    $this->db->like('tags', $term);
+    $query = $this->db->get('property_tags_tb');
+    return $query->result();
+}
+
+
+
+public function saveTags($tagsInput)
+{
+    if (!empty($tagsInput)) {
+        $tagsArray = explode("~-~", $tagsInput); // frontend se joined tags
+        foreach ($tagsArray as $tag) {
+            $tag = trim($tag);
+            if ($tag !== "") {
+                $exists = $this->db->get_where("property_tags_tb", ["tags" => $tag])->row();
+                if (!$exists) {
+                    $this->db->insert("property_tags_tb", ["tags" => $tag]);
+                }
+            }
+        }
+    }
+}
+
+ public function getSingleRow($table, $where) {
+        $query = $this->db->get_where($table, $where);
+        return $query->row();   // single row return karega
+    }
 
 
 

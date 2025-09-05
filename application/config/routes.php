@@ -93,6 +93,10 @@ $route['add-user-leads'] = 'api/Leads/addLeadsData';
 $route['delete-user-leads/(:num)'] = 'api/Leads/deleteLeadsData/$1';
 $route['update-user-leads/(:num)'] = 'api/Leads/updateLeadsData/$1';
 
+//meeting new api 
+$route['get-user-meetings'] = 'api/AppApiMeeting/getMeetingsData';
+$route['add-user-meeting'] = 'api/AppApiMeeting/addMeeting';
+$route['edit-user-meeting'] = 'api/AppApiMeeting/editMeeting';
 
 
 
@@ -104,6 +108,7 @@ $route['delete-meeting'] = 'api/AppApiMeeting/deleteAllMeetings';
 
 
 //property api delete
+$route["property-get"]='api/Properties/getProperty';
 $route["property-delete"] = 'api/Properties/deleteProperty';
 
 
@@ -225,7 +230,7 @@ $route['admin/project/edit/(:num)'] = 'Siteadmin/Project/editProject/$1';
 $route['admin/project/delete/(:num)'] = 'Siteadmin/Project/deleteProject/$1';
 
 /*Meetings*/
-$route['admin/meetings/(:num)'] = 'Siteadmin/Meetings/index/$1';
+$route['admin/leads/meetings/(:num)'] = 'Siteadmin/Meetings/index/$1';
 $route['admin/meeting/add/(:num)'] = 'Siteadmin/Meetings/addMeeting/$1';
 $route['admin/meeting/edit/(:num)'] = 'Siteadmin/Meetings/editMeeting/$1';
 $route['admin/meeting/delete/(:num)'] = 'Siteadmin/Meetings/deleteMeeting/$1';

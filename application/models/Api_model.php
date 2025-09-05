@@ -167,6 +167,7 @@ public function getAdditionalPropertiesByType($propertyType, $currentId, $limit 
         $query = $this->db->get();
         return $query->result_array();
     }
+    
 public function get_meeting_list() {
     return $this->db->get('meetings')->result_array();
 }
@@ -176,15 +177,93 @@ public function get_meeting_list() {
     return $this->db->insert($table, $data);
 }
 
+public function searchTags($term)
+{
+    $this->db->select('property_tags');
+    $this->db->from('property_tags_tb');
+    $this->db->like('property_tags', $term);
+    $query = $this->db->get();
 
+    $result = $query->result_array();
+    $finalTags = [];
 
+    foreach ($result as $row) {
+        $tags = explode("~-~", $row['property_tags']);
+        foreach ($tags as $t) {
+            $t = trim($t);
+            if (stripos($t, $term) !== false) {
+                $finalTags[] = $t;
+            }
+        }
+    }
 
-
+    return $finalTags;
 }
 
-		
-	 
+public function getAllMeetingsWithProperties($userId = null)
+{
     
-    
+    if ($userId) {
+        $this->db->where('user_id', $userId);
+    }
 
-?>
+    $meetings = $this->db->get('meetings')->result();
+
+    foreach ($meetings as &$meeting) {
+        // 🔹 Properties fetch
+        if (!empty($meeting->property_id)) {
+            $decoded = json_decode($meeting->property_id, true);
+            $props = [];
+
+            if (is_array($decoded)) {
+                foreach ($decoded as $p) {
+                    $propId = isset($p['id']) ? $p['id'] : null;
+                    if ($propId) {
+                        $propQuery = $this->db->select('id, name, phone, person_address, person, image_one')
+                                              ->from('properties')
+                                              ->where('id', $propId)
+                                              ->get()
+                                              ->row_array();
+                        if ($propQuery) {
+                            $props[] = $propQuery;
+                        }
+                    }
+                }
+            }
+            $meeting->properties_detail = $props;
+        } else {
+            $meeting->properties_detail = [];
+        }
+
+        // 🔹 Buyer fetch
+        if (!empty($meeting->lead_id)) {
+            $buyer = $this->db->select('id, budget, preferred_location, uName, mobile')
+                              ->from('buyers')
+                              ->where('id', $meeting->lead_id)
+                              ->get()
+                              ->row_array();
+            $meeting->buyer_detail = $buyer ? $buyer : new stdClass();
+        } else {
+            $meeting->buyer_detail = new stdClass();
+        }
+    }
+
+    return $meetings;
+}
+
+
+
+
+private function isJson($string)
+{
+    json_decode($string);
+    return (json_last_error() == JSON_ERROR_NONE);
+}
+
+public function addDataInTable($data, $table)
+{
+    $this->db->insert($table, $data);
+    return $this->db->insert_id();
+}
+
+}

@@ -119,7 +119,17 @@ $propertyAdvanceSearchVisible = !empty($_POST) ? 'block' : 'none';
             <div class="form-group col-sm-2">
                 <label>Address:</label>
                 <input type="text" name="address" class="form-control" placeholder="Enter address" value="<?php echo isset($_POST['address']) ? htmlspecialchars($_POST['address']) : ''; ?>">
+            </div> 
+            <div class="form-group col-sm-12 ">
+                <label>Tags:</label>
+                <div id="tag-container" class="d-flex flex-wrap gap-2">
+                    <!-- Tags chips yaha render honge -->
+                    <input type="text" id="tag-input" class="form-control me-2" placeholder="Add tag" style="width:auto;" />
+                    <button type="button" id="add-tag-btn" class="btn btn-success">Add</button>
+                </div>
+                <input type="hidden" name="property_tags" id="property_tags" value="<?php echo isset($_POST['property_tags']) ? htmlspecialchars($_POST['property_tags']) : ''; ?>">
             </div>
+
             <div class="form-group col-sm-12 mt-2">
                 <button type="submit" class="btn btn-primary">Search</button>
                 <a href="<?php echo base_url('admin/properties'); ?>" class="btn btn-secondary btn-sm ml-2">Reset</a>
@@ -316,6 +326,9 @@ $propertyAdvanceSearchVisible = !empty($_POST) ? 'block' : 'none';
 <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
 <script type="text/javascript" src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
+
 
 
 <script>
@@ -334,7 +347,77 @@ jQuery.extend(jQuery.fn.dataTableExt.oSort, {
 });
 
 
-$(document).on('change', '.status', function () {
+jQuery(document).ready(function() {
+    
+    let tags = [];
+
+    // agar already search hua hai to hidden field se tags load karo
+    let oldTags = $("#property_tags").val();
+    if (oldTags) {
+        tags = oldTags.split("~-~");
+        renderTags();
+    }
+
+    // Autocomplete for tag search
+    $("#tag-input").autocomplete({
+        source: function(request, response) {
+            $.ajax({
+                url: "/Siteadmin/Properties/getTags",  
+                type: "POST",
+                data: { term: request.term },
+                success: function(data) {
+                    var parsedData = typeof data === "string" ? JSON.parse(data) : data;
+                    response(parsedData);
+                }
+            });
+        },
+        minLength: 1,
+        select: function(event, ui) {
+            $("#tag-input").val(ui.item.value);
+            return false;
+        }
+    });
+
+    // Render tags
+    function renderTags() {
+        $("#tag-container .tag").remove();
+        tags.forEach((tag, index) => {
+            $("#tag-input").before(`
+                <span class="tag badge bg-primary me-1 mb-1" style="display: flex;justify-content: center;align-items: center;background: #007485 !important;font-size: 14px;font-weight: normal;text-transform: capitalize;gap: 5px; color:white !important;">
+                    ${tag}
+                    <span class="remove-tag" data-index="${index}" style="cursor:pointer;background: red;border-radius: 100px;display: flex;justify-content: center;align-items: flex-start; padding: 2px;font-size: 15px;height: 20px; width: 20px;">&times;</span>
+                </span>
+            `);
+        });
+        $("#property_tags").val(tags.join("~-~"));
+    }
+
+    // Add tag
+    $("#add-tag-btn").on("click", function () {
+        const tagVal = $("#tag-input").val().trim();
+        if (tagVal !== "" && !tags.includes(tagVal)) {
+            tags.push(tagVal);
+            $("#tag-input").val("");
+            renderTags();
+        }
+    });
+
+    // Enter key support
+    $("#tag-input").on("keypress", function (e) {
+        if (e.which === 13) {
+            e.preventDefault();
+            $("#add-tag-btn").click();
+        }
+    });
+
+    // Remove tag
+    $(document).on("click", ".remove-tag", function () {
+        const index = $(this).data("index");
+        tags.splice(index, 1);
+        renderTags();
+    });
+    $(document).on('change', '.status', function () {
+    
     let id = $(this).data('id');
     let status = $(this).is(':checked') ? 'active' : 'deactivate';
 
@@ -344,8 +427,6 @@ $(document).on('change', '.status', function () {
 
     });
 });
-
-jQuery(document).ready(function() {
     // Initialize DataTables
     var table = $('#propertiesTable').DataTable({
         "dom": '<"top"lf>rt<"bottom"ip><"clear">',
@@ -359,9 +440,9 @@ jQuery(document).ready(function() {
 
     function filterProperties(status) {
         if (status === 'all') {
-            table.column(10).search('').draw(); // Clear filter for "All Properties"
+            table.column(10).search('').draw();
         } else {
-            table.column(10).search('^' + status + '$', true, false).draw(); // Exact match for status
+            table.column(10).search('^' + status + '$', true, false).draw(); 
         }
     }
 
@@ -495,6 +576,7 @@ function export_properties() {
 //     });
 //}
 </script>
+
 
 <style>
 /* DataTables styling */

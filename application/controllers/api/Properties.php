@@ -117,21 +117,35 @@ public function addAdminProperty_post()
 
     $this->db->insert('properties_meta', $metaData);
 
-    // ---- Insert into property_tags_tb ----
-    $propertyTags = $this->input->post('property_tags');
-    if (!empty($propertyTags) && !empty($userid)) {
-        // agar multiple tags comma separated aaye hain to split kar lo
+   // ---- Insert into property_tags_tb ----
+$propertyTags = $this->input->post('property_tags');
+if (!empty($propertyTags) && !empty($userid)) {
+    // agar tags "~-~" ke sath aaye hain to uske hisab se split karlo
+    if (strpos($propertyTags, '~-~') !== false) {
+        $tagsArray = explode('~-~', $propertyTags);
+    } else {
         $tagsArray = explode(',', $propertyTags);
-        foreach ($tagsArray as $tag) {
-            $tag = trim($tag);
-            if ($tag !== '') {
+    }
+
+    foreach ($tagsArray as $tag) {
+        $tag = trim($tag);
+        if ($tag !== '') {
+            // check karo tag already exist karta hai ya nahi
+            $this->db->where('tags', $tag);
+            $query = $this->db->get('property_tags_tb');
+
+            if ($query->num_rows() == 0) {
+                // agar exist nahi karta tabhi insert
                 $this->db->insert('property_tags_tb', [
-                    'userid'        => $userid,
-                    'property_tags' => $tag
+                    
+                    'tags'   => $tag
                 ]);
             }
         }
     }
+}
+
+
 
     $return['status']  = 'done';
     $return['message'] = 'Property added successfully';
@@ -278,16 +292,15 @@ public function addAdminProperty_post()
         }
     }
 
-    // ✅ Custom handling for land (plot area)
+
     $plot_area = trim($this->input->post('kothi_plot_area'));
     $plot_unit = strtolower(trim($this->input->post('kothi_plot_area_unit')));
     
     if ($plot_area !== '' && $plot_unit !== '') {
         $allowed_units = ['sq.yard','marla','kanal'];
         if (!in_array($plot_unit, $allowed_units)) {
-            $plot_unit = 'sq.yard'; // fallback
+            $plot_unit = 'sq.yard';
         }
-        // अब दोनों को जोड़कर एक ही field में save करो
         $this->db->set('land', $plot_area . ' ' . $plot_unit);
     }
     
@@ -307,33 +320,33 @@ public function addAdminProperty_post()
     $this->db->update('properties');
     
     // ✅ Update property_tags_tb also
-        // ✅ Update property_tags_tb also
-        $property_tags = $this->input->post('property_tags');
-        // get userid directly from properties table using property_id
-        $userid = $this->db->select('userid')
-                           ->where('id', $property_id)
-                           ->get('properties')
-                           ->row()
-                           ->userid;
-        
-        if (!empty($property_tags) && !empty($userid)) {
-            // check if record already exists for this user
-            $exists = $this->db->get_where('property_tags_tb', ['userid' => $userid])->row();
-        
-            if ($exists) {
-                // update existing
-                $this->db->where('userid', $userid);
-                $this->db->update('property_tags_tb', [
-                    'property_tags' => $property_tags
-                ]);
-            } else {
-                // insert new
+ $propertyTags = $this->input->post('property_tags');
+
+if (!empty($propertyTags)) {
+    if (strpos($propertyTags, '~-~') !== false) {
+        $tagsArray = explode('~-~', $propertyTags);
+    } else {
+        $tagsArray = explode(',', $propertyTags);
+    }
+
+    foreach ($tagsArray as $tag) {
+        $tag = trim($tag); // white space hatao
+        $tag = ucwords(strtolower($tag)); // normalize: 1bhk -> 1Bhk
+
+        if ($tag !== '') {
+            // check karo normalized tag already exist karta hai ya nahi
+            $this->db->where('tags', $tag);
+            $query = $this->db->get('property_tags_tb');
+
+            if ($query->num_rows() == 0) {
                 $this->db->insert('property_tags_tb', [
-                    'userid' => $userid,
-                    'property_tags' => $property_tags
+                    'tags' => $tag
                 ]);
             }
+        }
+    }
 }
+
 
 
 
@@ -364,6 +377,25 @@ public function addAdminProperty_post()
     $return['message'] = 'Property updated successfully';
     return $this->response($return, REST_Controller::HTTP_OK);
 }
+
+// Controller: Properties.php
+
+public function getTags()
+{
+    $term = $this->input->get('term'); // user jo type karega
+    $this->db->like('tags', $term);
+    $query = $this->db->get('property_tags_tb');
+    $result = $query->result();
+
+    $tags = [];
+    foreach ($result as $row) {
+        $tags[] = $row->tags;
+    }
+
+    echo json_encode($tags); // frontend ko array bhej do
+}
+
+
 
 
 
@@ -396,6 +428,19 @@ public function deleteProperty_post()
     $return['message'] = 'Property deleted successfully';
     return $this->response($return, REST_Controller::HTTP_OK);
 }
+
+public function fetchTags_post()
+{
+    $term = $this->input->post('term');
+
+    $this->load->model('Api_model');
+    $tags = $this->Api_model->searchTags($term);
+
+    echo json_encode($tags);
+}
+
+
+
 
 
 }

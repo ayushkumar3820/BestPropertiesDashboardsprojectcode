@@ -2,13 +2,14 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 ?>
 <div class= "row" style="width:100%;">
-<div class="col main pt-5 mt-3">
-    <div class="button-container">
+<div class="col main pt-5 mt-3"   style="margin-left:20px;">
+    <div class="button-container" style="margin-left: 56px !important;">
         <a href="<?= base_url('admin/leads/view/' . $this->uri->segment('4')); ?>" id="leadView">Follow Ups</a>
         <a href="<?= base_url('admin/leads/edit/' . $this->uri->segment('4')); ?>">Requirement</a>
         <!--- <a href='<?= base_url('admin/leadtask/') . $this->uri->segment('4'); ?>'>Meeting and Task </a>-->
         <a href="<?= base_url('admin/leads/personal/' . $this->uri->segment('4')); ?>" id="personalInfoLink">Personal Information</a>
         <a href="<?= base_url('admin/leads/deal/' . $this->uri->segment('4')); ?>" id="personalInfoLink">Deal</a>
+        <a href="<?= base_url('admin/leads/meetings/' . $this->uri->segment('4')); ?>" id="personalInfoLink">Meetings</a>
     </div>
     <a href="<?= base_url('admin/leads/'); ?>" style="float: right; margin: 14px 2px;" class="btn btn-sm btn-info back-btn">Back</a>
 
@@ -123,7 +124,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             </h1> 
             </div>
 
-            <div class="col-sm-4">
+            <div class="col-sm-4" style="margin-top:10px;">
                   <h1 class="heading status text-right">
                Status :- <?php echo ($status); ?>
                 </h1>
@@ -137,7 +138,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             <div class="form-group">
                 <div style="display: flex; gap: 10px;">
                     <label><input type="radio" id="choice-followup" name="choice" value="Followup" <?php echo set_value('choice', 'Followup') == 'Followup' ? 'checked' : ''; ?> /> Followup</label>
-                    <label><input type="radio" id="choice-meeting" name="choice" value="Meeting" <?php echo set_value('choice') == 'Meeting' ? 'checked' : ''; ?> /> Meeting</label>
+                    <!--<label><input type="radio" id="choice-meeting" name="choice" value="Meeting" <?php echo set_value('choice') == 'Meeting' ? 'checked' : ''; ?> /> Meeting</label>-->
                     <label><input type="radio" id="choice-message" name="choice" value="Message" <?php echo set_value('choice') == 'Message' ? 'checked' : ''; ?> /> Message</label>
                 </div>
             </div>

@@ -111,7 +111,17 @@ if ($agents && in_array('Admin', $roles)) {
             </div>
 <?php } ?>
 
-            <div class="form-group align-self-end">
+        <div class="form-group col-sm-12">
+            <label>Tags:</label>
+            <div id="tag-container" class="d-flex flex-wrap">
+                <!-- Tags chips yaha render honge -->
+                <input type="text" id="tag-input" class="form-control me-2" placeholder="Add tag" style="width:auto;" />
+                <button type="button" id="add-tag-btn" class="btn btn-success">Add</button>
+            </div>
+            <input type="hidden" name="leads_tags" id="leads_tags" value="<?php echo isset($_POST['leads_tags']) ? htmlspecialchars($_POST['leads_tags']) : ''; ?>">
+        </div>
+
+            <div class="form-group col-sm-12 align-self-end ">
                 <button type="submit" class="btn btn-primary btn-sm">Search</button>
                 <a href="<?php echo base_url('admin/leads'); ?>" class="btn btn-secondary btn-sm ml-2">Reset</a>
                 <button type="button" onclick="export_data()" class="btn btn-primary btn-sm" style="margin:2px;">Export</button>
@@ -144,7 +154,7 @@ if ($agents && in_array('Admin', $roles)) {
                             <th>Pref. Location</th>
                             <th>Budget</th>
                             <th>Requirement</th>
-                             <th>Type</th>
+                           
                             <th>Status</th>
                             <th>Action</th>
                         </tr>
@@ -159,46 +169,36 @@ if ($agents && in_array('Admin', $roles)) {
                                 ?>
                                 <tr>
                                     <td><?php echo $i;?></td>
-                                    <td><a href="<?php echo base_url().'admin/leads/view/'.$lead->id;?>"><?php echo $lead->uName;?></a></td>
+<td>
+  <a href="<?php echo base_url().'admin/leads/view/'.$lead->id;?>">
+    <?php echo  $lead->uName; ?>
+     
+  </a><br>
+  <!--<small><?php echo strtoupper(substr($lead->leads_type, 0, 1))?></small>-->
+  <small><?php echo $lead->leads_type; ?></small?
+</td>
                                     <td><?php echo $lead->mobile;?></td>
                                     <td><?php echo $lead->preferred_location;?></td>
-                                   <td>
+<td>
 <?php
-$budget = $lead->budget;
+$budget = (float) $lead->budget; 
 
 if ($budget >= 10000000) {
     // If 1 crore or more
-    echo ($budget / 10000000) . ' Cr';
+    echo number_format($budget / 10000000, 2) . ' Cr';
 } elseif ($budget >= 100000) {
     // If 1 lakh or more
-    echo ($budget / 100000) . ' Lakh';
+    echo number_format($budget / 100000, 2) . ' Lakh';
 } else {
     // Less than 1 lakh, show as is
-    echo $budget;
+    echo number_format($budget, 2);
 }
 ?>
 </td>
 
-                                    <td>
-                                       <?php
-                                       $requirementDisplay = '';
 
-                                       if (!empty($lead->propertyType_sub)) {
 
-                                           $type = strtolower($lead->propertyType_sub);
-
-                                           if ($type == 'Residential') {
-                                       $requirementDisplay .= 'R: ' . $lead->propertyType_sub;
-                                            } elseif ($type == 'Commercial') {
-                                     $requirementDisplay .= 'C: ' . $lead->propertyType_sub;
-                                            } else {
-                                      $requirementDisplay .= $lead->propertyType_sub; // fallback
-                                           }
-                                          }
-
-                                       echo $requirementDisplay;
-                                       ?>
-                                    </td>
+                                   
 
                                     <td><?php echo $lead->leads_type;?></td>
 
@@ -272,8 +272,10 @@ if ($budget >= 10000000) {
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
 <script type="text/javascript" src="https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script> 
-<!-- Make sure this is in your <head> tag of the main layout -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
+
 <script>
     document.getElementById('date_filter').addEventListener('change', function () {
         const filter = this.value;
@@ -319,6 +321,73 @@ if ($budget >= 10000000) {
 </script>
 <script>
     jQuery(document).ready(function() {
+            let tags = [];
+
+    // agar already search hua hai to hidden field se tags load karo
+    let oldTags = $("#leads_tags").val();
+    if (oldTags) {
+        tags = oldTags.split("~-~");
+        renderTags();
+    }
+
+    // Autocomplete for tag search
+    $("#tag-input").autocomplete({
+        source: function(request, response) {
+            $.ajax({
+                url: "/Siteadmin/Properties/getTags",  
+                type: "POST",
+                data: { term: request.term },
+                success: function(data) {
+                    var parsedData = typeof data === "string" ? JSON.parse(data) : data;
+                    response(parsedData);
+                }
+            });
+        },
+        minLength: 1,
+        select: function(event, ui) {
+            $("#tag-input").val(ui.item.value);
+            return false;
+        }
+    });
+
+    // Render tags
+    function renderTags() {
+        $("#tag-container .tag").remove();
+        tags.forEach((tag, index) => {
+            $("#tag-input").before(`
+                <span class="tag badge bg-primary me-1 mb-1" style="display: flex;justify-content: center;align-items: center;background: #007485 !important;font-size: 14px;font-weight: normal;text-transform: capitalize;gap: 5px; color:white !important;">
+                    ${tag}
+                    <span class="remove-tag" data-index="${index}" style="cursor:pointer;background: red;border-radius: 100px;display: flex;justify-content: center;align-items: flex-start; padding: 2px;font-size: 15px;height: 20px; width: 20px;">&times;</span>
+                </span>
+            `);
+        });
+        $("#leads_tags").val(tags.join("~-~"));
+    }
+
+    // Add tag
+    $("#add-tag-btn").on("click", function () {
+        const tagVal = $("#tag-input").val().trim();
+        if (tagVal !== "" && !tags.includes(tagVal)) {
+            tags.push(tagVal);
+            $("#tag-input").val("");
+            renderTags();
+        }
+    });
+
+    // Enter key support
+    $("#tag-input").on("keypress", function (e) {
+        if (e.which === 13) {
+            e.preventDefault();
+            $("#add-tag-btn").click();
+        }
+    });
+
+    // Remove tag
+    $(document).on("click", ".remove-tag", function () {
+        const index = $(this).data("index");
+        tags.splice(index, 1);
+        renderTags();
+    });
         jQuery('#datatable1').DataTable({
             "dom": '<"top"lf>rt<"bottom"ip><"clear">'
         });

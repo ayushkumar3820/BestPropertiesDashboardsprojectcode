@@ -9,6 +9,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         <!--- <a href='<?= base_url('admin/leadtask/') . $this->uri->segment('4'); ?>'>Meeting and Task </a>-->
         <a href="<?= base_url('admin/leads/personal/' . $this->uri->segment('4')); ?>" id="personalInfoLink">Personal Information</a>
         <a href="<?= base_url('admin/leads/deal/' . $this->uri->segment('4')); ?>" id="personalInfoLink">Deal</a>
+        <a href="<?= base_url('admin/leads/meetings/' . $this->uri->segment('4')); ?>" id="personalInfoLink">Meetings</a>
         
         
  <?php if (isset($property) && !empty($property) && $property->lead_id > 0): ?>
@@ -92,58 +93,16 @@ echo validation_errors();
             </div>
         </div>
         
-        <div class="col-sm-3">
-                <div class="form-group">
-                    <label>City</label>
-                    <input type="text" name="city" value="<?php echo $info->city; ?>" class="form-control" placeholder="City">
-                </div>
-        </div>
-        <div class="col-sm-3">
-            <div class="form-group">
-                <label>Property Type</label>
-                <select id="propertyType" name="propertyType" class="form-control">
-
-                    <option value="Residential" <?php if ($info->propertyType == 'Residential') echo 'selected'; ?>>Residential</option>
-                    <option value="Commercial" <?php if ($info->propertyType == 'Commercial') echo 'selected'; ?>>Commercial</option>
-
-                </select>
-            </div>
-        </div>
-
-<div class="col-sm-3" id="residentialDiv" style="display:<?php if ($info->propertyType=='Residential') { echo 'block'; } else { echo 'none'; } ?>;">
+     <div class="col-sm-3">
     <div class="form-group">
-        <label>Residential</label>
-        <select id="residentialOptions" class="form-control">
-            <option value="">Select</option>
-            <option <?php if($info->propertyType_sub=='Flat/Apartment'){ echo 'selected'; }?> value="Flat/Apartment">Flat/Apartment</option>
-            <option <?php if($info->propertyType_sub=='Independent House/Villa'){ echo 'selected'; }?> value="Independent House/Villa">Independent House/Villa</option>
-            <option <?php if($info->propertyType_sub=='Independent/Builder Floor'){ echo 'selected'; }?> value="Independent/Builder Floor">Independent/Builder Floor</option>
-            <option <?php if($info->propertyType_sub=='Plot'){ echo 'selected'; }?> value="Plot">Plot</option>
-            <option <?php if($info->propertyType_sub=='1RK/Studio Apartment'){ echo 'selected'; }?> value="1RK/Studio Apartment">1RK/Studio Apartment</option>
-            <option <?php if($info->propertyType_sub=='Serviced Apartment'){ echo 'selected'; }?> value="Serviced Apartment">Serviced Apartment</option>
-            <option <?php if($info->propertyType_sub=='Farmhouse'){ echo 'selected'; }?> value="Farmhouse">Farmhouse</option>
-            <option <?php if($info->propertyType_sub=='Other'){ echo 'selected'; }?> value="Other">Other</option>
-        </select>
+        <label>City</label>
+        <input type="text" id="cityInput" name="city" 
+               value="<?php echo $info->city; ?>" 
+               class="form-control" placeholder="City" autocomplete="off">
+        <div id="citySuggestions" class="list-group" 
+             style="position:absolute; z-index:1000; width:100%; display:none;"></div>
     </div>
 </div>
-
-<div class="col-sm-3" id="commercialDiv" style="display:none<?php if ($info->propertyType=='Commercial;') { echo 'block'; } else { echo 'none'; } ?>;">
-    <div class="form-group">
-        <label>Commercial</label>
-        <select id="commercialOptions" class="form-control">
-            <option value="">Select</option>
-            <option <?php if($info->propertyType_sub=='Office'){ echo 'selected'; }?> value="Office">Office</option>
-            <option <?php if($info->propertyType_sub=='Retail'){ echo 'selected'; }?> value="Retail">Retail</option>
-            <option <?php if($info->propertyType_sub=='Plot/Land'){ echo 'selected'; }?> value="Plot/Land">Plot/Land</option>
-            <option <?php if($info->propertyType_sub=='Storage'){ echo 'selected'; }?> value="Storage">Storage</option>
-            <option <?php if($info->propertyType_sub=='Industry'){ echo 'selected'; }?> value="Industry">Industry</option>
-            <option <?php if($info->propertyType_sub=='Hospitality'){ echo 'selected'; }?> value="Hospitality">Hospitality</option>
-            <option <?php if($info->propertyType_sub=='Other'){ echo 'selected'; }?> value="Other">Other</option>
-        </select>
-    </div>
-</div>
-
-<input type="hidden" name="propertyType_sub" id="propertyType_sub">
 
      
             <div class="col-sm-3">
@@ -160,6 +119,52 @@ echo validation_errors();
                 </select> 				
             </div>
         </div>
+        
+        <div class="col-sm-3">
+    <div class="form-group">
+        <label>Property Type</label>
+        <select id="propertyType" name="propertyType" required class="form-control">
+            <option value="">Select</option>
+            <option value="Residential" <?= isset($info->propertyType) && $info->propertyType=='Residential'?'selected':''; ?>>Residential</option>
+            <option value="Commercial"  <?= isset($info->propertyType) && $info->propertyType=='Commercial'?'selected':''; ?>>Commercial</option>
+        </select>
+    </div>
+</div>
+
+<div class="col-sm-3" id="residentialDiv" style="display:none;">
+    <div class="form-group">
+        <label>Residential</label>
+        <select id="residentialOptions" class="form-control">
+            <option value="">Select</option>
+            <option value="Flat/Apartment"            <?= isset($info->propertyType_sub) && $info->propertyType_sub=='Flat/Apartment'?'selected':''; ?>>Flat/Apartment</option>
+            <option value="Independent House/Villa"   <?= isset($info->propertyType_sub) && $info->propertyType_sub=='Independent House/Villa'?'selected':''; ?>>Independent House/Villa</option>
+            <option value="Independent/Builder Floor" <?= isset($info->propertyType_sub) && $info->propertyType_sub=='Independent/Builder Floor'?'selected':''; ?>>Independent/Builder Floor</option>
+            <option value="Plot"                      <?= isset($info->propertyType_sub) && $info->propertyType_sub=='Plot'?'selected':''; ?>>Plot</option>
+            <option value="1RK/Studio Apartment"      <?= isset($info->propertyType_sub) && $info->propertyType_sub=='1RK/Studio Apartment'?'selected':''; ?>>1RK/Studio Apartment</option>
+            <option value="Serviced Apartment"        <?= isset($info->propertyType_sub) && $info->propertyType_sub=='Serviced Apartment'?'selected':''; ?>>Serviced Apartment</option>
+            <option value="Farmhouse"                 <?= isset($info->propertyType_sub) && $info->propertyType_sub=='Farmhouse'?'selected':''; ?>>Farmhouse</option>
+            <option value="Other"                     <?= isset($info->propertyType_sub) && $info->propertyType_sub=='Other'?'selected':''; ?>>Other</option>
+        </select>
+    </div>
+</div>
+
+<div class="col-sm-3" id="commercialDiv" style="display:none;">
+    <div class="form-group">
+        <label>Commercial</label>
+        <select id="commercialOptions" class="form-control">
+            <option value="">Select</option>
+            <option value="Office"      <?= isset($info->propertyType_sub) && $info->propertyType_sub=='Office'?'selected':''; ?>>Office</option>
+            <option value="Retail"      <?= isset($info->propertyType_sub) && $info->propertyType_sub=='Retail'?'selected':''; ?>>Retail</option>
+            <option value="Plot/Land"   <?= isset($info->propertyType_sub) && $info->propertyType_sub=='Plot/Land'?'selected':''; ?>>Plot/Land</option>
+            <option value="Storage"     <?= isset($info->propertyType_sub) && $info->propertyType_sub=='Storage'?'selected':''; ?>>Storage</option>
+            <option value="Industry"    <?= isset($info->propertyType_sub) && $info->propertyType_sub=='Industry'?'selected':''; ?>>Industry</option>
+            <option value="Hospitality" <?= isset($info->propertyType_sub) && $info->propertyType_sub=='Hospitality'?'selected':''; ?>>Hospitality</option>
+            <option value="Other"       <?= isset($info->propertyType_sub) && $info->propertyType_sub=='Other'?'selected':''; ?>>Other</option>
+        </select>
+    </div>
+</div>
+
+<input type="hidden" name="propertyType_sub" id="propertyType_sub" value="<?= isset($info->propertyType_sub)?$info->propertyType_sub:''; ?>">
 
 <div class="col-sm-3">
             <div class="form-group">
@@ -177,12 +182,7 @@ echo validation_errors();
         </div>
 
    
-        <div class="col-sm-3">
-            <div class="form-group">
-                <label>Maximum Budget</label>
-                <input type="number" name="budgetmax" value="<?php echo $info->max_budget;?>" class="form-control" placeholder="Maximum Budget"> 				
-            </div>
-        </div>
+      
         
         
         
@@ -207,6 +207,7 @@ echo validation_errors();
                     <option value="">Select</option>
                     <option <?php if($info->priority=='Hot'){ echo 'selected'; }?> value="Hot">Hot***</option>
                     <option <?php if($info->priority=='Cold'){ echo 'selected'; }?> value="Cold">Cold</option>
+                     <option <?php if($info->priority=='Normal'){ echo 'selected'; }?> value="Normal">Normal</option>
  
                 </select> 				
             </div>
@@ -242,6 +243,27 @@ echo validation_errors();
                 </select>
             </div>
         </div>
+        
+<?php
+$tags = '';
+if (!empty($info)) {
+    if (is_array($info) && isset($info[0]->leads_tags)) {
+        $tags = $info[0]->leads_tags;
+    } elseif (is_object($info) && isset($info->leads_tags)) {
+        $tags = $info->leads_tags;
+    }
+}
+?>
+
+<div class="form-group">
+    <label>Tags</label>
+    <div id="tag-container" class="d-flex flex-wrap">
+        <input type="text" id="tag-input" class="form-control me-2" placeholder="Add tag" style="width:auto;" />
+        <button type="button" id="add-tag-btn" class="btn btn-success">Add</button>
+    </div>
+   
+    <input type="hidden" name="leads_tags" id="leads_tags" value="<?php echo htmlspecialchars($tags); ?>">
+</div>
 
             <?php if (!empty($info->additional_info)): ?>
                 <div class="col-sm-12">
@@ -272,203 +294,6 @@ echo validation_errors();
 		</div>	
 	
 	</form>
-
-        
-   
-
-
-        <!-- New fields added here -->
-       
-        
-    
-<!--<div class="col-sm-12">
-    <fieldset id="more-information" class="hide-div">
-        <legend>Personnel Information</legend>
-<button id="toggleMoreInfo" type="button">Show</button>
-        <div class="row">
-            <div class="col-sm-4">
-                <div class="form-group">
-                    <label>City</label>
-                    <input type="text" name="city" value="<?php echo $info->city; ?>" class="form-control" placeholder="City">
-                </div>
-            </div>
-
-            <div class="col-sm-4">
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" name="email" value="<?php echo $info->email; ?>" class="form-control" placeholder="Email">
-                </div>
-            </div>
-
-            <div class="col-sm-4">
-                <div class="form-group">
-                    <label>Address</label>
-                    <input type="text" name="address" value="<?php echo $info->address; ?>" class="form-control" placeholder="Address">
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-      
-            <div class="col-sm-4">
-            <div class="form-group">
-                <label>Profession</label>
-                <input type="text" name="profession" value="<?php echo $info->profession; ?>" class="form-control" placeholder="Profession">
-            </div>
-        </div>
-     <div class="col-sm-4">
-    <div class="form-group">
-        <label>Payment Method</label>
-        <div class="d-flex">
-            <div class="form-check mr-3">
-                <input type="checkbox" id="cash_payment" name="payment_method[]" value="cash"  class="form-check-input">
-                <label for="cash_payment" class="form-check-label">Cash Payment</label>
-            </div>
-            <div class="form-check">
-                <input type="checkbox" id="online_payment" name="payment_method[]" value="online" class="form-check-input">
-                <label for="online_payment" class="form-check-label">Online Payment</label>
-            </div>
-        </div>
-    </div>
-</div>
-        </div>
-    </fieldset>
-
-    
-</div>
-
-<script>
-    $(document).ready(function() {
-        $("#toggleMoreInfo").click(function() {
-            var moreInfoSection = $("#more-information");
-            var button = $(this);
-            
-            // Toggle visibility based on current state
-            if ($("#more-information > div").is(":hidden")) {
-                moreInfoSection.removeClass('hide-div');
-                button.text("Hide");
-            } else {
-                moreInfoSection.addClass('hide-div');
-                button.text("Show");
-            }
-        });
-    });
-</script>-->
-
-
-
-            
-	
-
-	  
-	  
-	  <!---leads Comment--->
-	  <?php /*
-	  $message = $this->session->flashdata('message2');
-	  if($message != ''){
-	      echo '<div class="alert alert-success">'.$message.'</div>';
-	      $this->session->set_flashdata('message2','');
-	  }
-	  ?>
-	  
-	  <form class="form" method="post" action="<?php echo base_url('admin/leads/edit/').$this->uri->segment('4');?>">
-	  
-	  <h1 class="d-sm-block heading">Follow Up</h1>
-	  <div class="row">
-	      <div class="col-sm-12">
-             <div class="form-group">
-				 <label>Comment</label>
-                 <textarea  name="comment" value=""  class="form-control" placeholder="Comment"></textarea>  				
-			 </div>
-         </div>    </div>
-	      
-	     	  <div class="row">
-         <div class="col-sm-5">
-    <div class="form-group">
-        <label>Date & Time</label>
-        <input type="datetime-local" id="nextdt" name="nextdt" required class="form-control" placeholder="Next Follow Up Date & Time">               
-    </div>
-</div>
-                     <div class="col-sm-4">
-           <div class="form-group">
-    <label>Type</label>
-    <div style="display: flex; gap: 10px;">
-        <input type="radio" name="choice" value="Followup" <?php echo set_value('choice', 'Followup') == 'Followup' ? 'checked' : ''; ?> /> Followup
-        <input type="radio" name="choice" value="Meeting" <?php echo set_value('choice') == 'Meeting' ? 'checked' : ''; ?> /> Meeting
-    </div>
-     </div>
-        </div>
-<div class="col-sm-3 mt-4 text-center">
-    <input type="submit" value="Submit" name="submit" class="btn btn-primary">
-</div></div> 
-       
-
-<script>
-    document.addEventListener('DOMContentLoaded', (event) => {
-        const date = new Date();
-        let day = date.getDate();
-        let month = date.getMonth() + 1; // January is 0!
-        const year = date.getFullYear();
-        let hours = date.getHours();
-        let minutes = date.getMinutes();
-
-        // Add leading zero to single digit day, month, hours, and minutes
-        if (day < 10) day = '0' + day;
-        if (month < 10) month = '0' + month;
-        if (hours < 10) hours = '0' + hours;
-        if (minutes < 10) minutes = '0' + minutes;
-
-        const today = `${year}-${month}-${day}T${hours}:${minutes}`;
-        document.getElementById('nextdt').value = today;
-    });
-</script>
-<h1 class="d-sm-block heading">Follow Data</h1>
-<div class="row">
-    <div class="col-sm-12">
-        <div class="table-responsive">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Leads Id</th>
-                        <th>Comment</th>
-                        <th>Next Follow Up Date & Time</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php 
-                    if (!empty($leadscomment)) { 
-                        $leadscomment = array_reverse($leadscomment); // Array ko reverse karke descending order mein karna
-                        $i = 1;
-                        foreach ($leadscomment as $leadsc) { ?>
-                            <tr>
-                                <td><?php echo $i;?></td>
-                                <td><?php echo htmlspecialchars($leadsc->comment);?></td>
-                             <td><?php echo date('d M Y h:iA', strtotime($leadsc->nextdt)); ?></td>
-
-                                 
-                               <!--td><a href="<?php // echo base_url().'admin/leads/delete-comment/'.$leadsc->id .'/'.$leadsc->leadId;?>" class="btn btn-danger btn-sm">Delete</a></td-->
-                                <td>
-                                <?php if ($leadsc->status == 'Completed') { ?>
-                                    <span>Completed</span>
-                                <?php } else { ?>
-                                    <select name="FollowUpStatus" data-id="<?php echo $leadsc->id; ?>">
-                                        <option value="Active" <?php if($leadsc->status == 'Active'){echo 'selected';}?>>Active</option>
-                                        <option value="Completed" <?php if($leadsc->status == 'Completed'){echo 'selected';}?>>Completed</option>
-                                    </select>
-                                <?php } ?>
-                                </td>
-                            </tr>
-                    <?php
-                        $i++;
-                        } 
-                    }?>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-*/?>
 
 <?php if ($logs): ?>
     <h2 class="d-sm-block mb-5">Logs</h2>
@@ -516,7 +341,129 @@ echo validation_errors();
     display:none;
 }
 </style>
+
+
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"></script>
+    
+
+
 <script>
+document.addEventListener("DOMContentLoaded", function() {
+    const propertyType = document.getElementById("propertyType");
+    const residentialDiv = document.getElementById("residentialDiv");
+    const commercialDiv = document.getElementById("commercialDiv");
+    const residentialOptions = document.getElementById("residentialOptions");
+    const commercialOptions = document.getElementById("commercialOptions");
+    const finalInput = document.getElementById("propertyType_sub");
+
+    function toggleDivs(selectedType) {
+        residentialDiv.style.display = "none";
+        commercialDiv.style.display = "none";
+
+        if (selectedType === "Residential") {
+            residentialDiv.style.display = "block";
+        } else if (selectedType === "Commercial") {
+            commercialDiv.style.display = "block";
+        }
+    }
+
+    // Page load ke time jo DB se selected hai wahi dikhana
+    toggleDivs(propertyType.value);
+
+    // Type change hone par toggle
+    propertyType.addEventListener("change", function() {
+        toggleDivs(this.value);
+        finalInput.value = "";
+    });
+
+    // Subtype select hone par hidden input update karna
+    residentialOptions.addEventListener("change", function() {
+        finalInput.value = this.value;
+    });
+    commercialOptions.addEventListener("change", function() {
+        finalInput.value = this.value;
+    });
+});
+</script>
+
+
+
+
+<script>
+      jQuery(document).ready(function () {
+          
+          
+            jQuery("#tag-input").autocomplete({
+        source: function(request, response) {
+            jQuery.ajax({
+                url: "/Siteadmin/Properties/getTags",  
+                type: "POST",
+                data: { term: request.term },
+                success: function(data) {
+                    var parsedData = typeof data === "string" ? JSON.parse(data) : data;
+                    response(parsedData);
+                }
+            });
+        },
+        minLength: 1,
+        select: function(event, ui) {
+            jQuery("#tag-input").val(ui.item.value);
+            return false;
+        }
+    });
+    // Store selected tags
+          // Store selected tags (load from hidden input)
+let tags = [];
+if ($("#leads_tags").val() !== "") {
+    tags = $("#leads_tags").val().split("~-~");
+}
+renderTags();
+
+// Function to render tag chips
+function renderTags() {
+    $("#tag-container .tag").remove(); // remove old tags
+    tags.forEach((tag, index) => {
+        $("#tag-input").before(`
+            <span class="tag badge bg-primary me-1 mb-1" style="color:white; margin-right:3px;display: flex;justify-content: center;align-items: center;background: #007485 !important;font-size: 14px;font-weight: normal;text-transform: capitalize;gap: 5px;">
+                ${tag} 
+                <span class="remove-tag" data-index="${index}" style="cursor:pointer;background: red;border-radius: 100px;display: flex;justify-content: center;align-items: flex-start; padding: 2px;font-size: 15px;height: 20px; width: 20px;">&times;</span>
+            </span>
+        `);
+    });
+    $("#leads_tags").val(tags.join("~-~")); // hidden input store
+}
+
+            
+            // Add tag manually on button click
+            $("#add-tag-btn").on("click", function () {
+                const tagVal = $("#tag-input").val().trim();
+                if (tagVal !== "" && !tags.includes(tagVal)) {
+                    tags.push(tagVal);
+                    $("#tag-input").val("");
+                    renderTags();
+                }
+            });
+            
+            // Enter key add support
+            $("#tag-input").on("keypress", function (e) {
+                if (e.which === 13) {
+                    e.preventDefault();
+                    $("#add-tag-btn").click();
+                }
+            });
+            
+            // Remove tag
+            $(document).on("click", ".remove-tag", function () {
+                const index = $(this).data("index");
+                tags.splice(index, 1);
+                renderTags();
+            });
+})
+            // End Property Tag Code
+
     // Function to set the active link based on the current URL
     function setActiveLink() {
         const currentUrl = window.location.href;
@@ -540,7 +487,7 @@ echo validation_errors();
     // Call the function on page load
     window.onload = setActiveLink;
 </script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
 <script>
 jQuery(document).ready(function(){
     jQuery('select[name="FollowUpStatus"]').change(function(){
@@ -607,6 +554,50 @@ jQuery(document).ready(function(){
         }
     });
 </script>
+<script>
+    // PHP array ko JS me bhej diya
+    var cities = <?php echo json_encode(propertyCityAutosuggest()); ?>;
+
+    const input = document.getElementById("cityInput");
+    const suggestionBox = document.getElementById("citySuggestions");
+
+    input.addEventListener("keyup", function() {
+        const query = this.value.toLowerCase();
+        suggestionBox.innerHTML = "";
+        
+        if (query.length === 0) {
+            suggestionBox.style.display = "none";
+            return;
+        }
+
+        let matches = cities.filter(c => c.toLowerCase().startsWith(query));
+
+        if (matches.length > 0) {
+            matches.forEach(city => {
+                let div = document.createElement("div");
+                div.classList.add("list-group-item");
+                div.style.cursor = "pointer";
+                div.textContent = city;
+                div.onclick = function() {
+                    input.value = city;
+                    suggestionBox.style.display = "none";
+                };
+                suggestionBox.appendChild(div);
+            });
+            suggestionBox.style.display = "block";
+        } else {
+            suggestionBox.style.display = "none";
+        }
+    });
+
+    // Input se bahar click hote hi suggestion hide ho jaye
+    document.addEventListener("click", function(e) {
+        if (!input.contains(e.target) && !suggestionBox.contains(e.target)) {
+            suggestionBox.style.display = "none";
+        }
+    });
+</script>
+
 
 
 

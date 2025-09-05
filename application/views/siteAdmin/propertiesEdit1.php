@@ -1,10 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Property Form - Fixed CSS <?php echo $properties[0]->property_type; ?></title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <style>
         .main {
@@ -164,8 +158,7 @@
             }
         }
     </style>
-</head>
-<body>
+
     <div class="container">
     <div class="row">
             <div class="col main mt-3 pt-5">
@@ -1660,7 +1653,23 @@
                                 </select>
                             </div>
                         </div>
-                    </div>
+                   
+                    
+  <?php 
+$hot_deals = isset($properties[0]->hot_deals) ? $properties[0]->hot_deals : 'No';
+?>
+<div class="form-group col-md-6">
+<label>Hot Deals</label>
+
+<label>
+    <input type="radio" name="hot_deals" value="Yes" <?= ($hot_deals == 'Yes') ? 'checked' : '' ?>> Yes
+</label>
+
+<label>
+    <input type="radio" name="hot_deals" value="No" <?= ($hot_deals == 'No') ? 'checked' : '' ?>> No
+</label>
+ </div>
+</div>
 
                     <!-- Extra Fields Toggle -->
                     <div class="form-group">
@@ -1819,12 +1828,33 @@
         </div> <!--row end -->
     </div> <!--container end -->
 
-
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"></script>
+  <script>
 
-<script>
     jQuery(document).ready(function () {
+	
+	jQuery("#tag-input").autocomplete({
+        source: function(request, response) {
+            jQuery.ajax({
+                url: "/Siteadmin/Properties/getTags",  // route/controller ka URL
+                type: "POST",
+                data: { term: request.term },
+                success: function(data) {
+                    var parsedData = typeof data === "string" ? JSON.parse(data) : data;
+                    response(parsedData);
+                }
+            });
+        },
+        minLength: 1,
+        select: function(event, ui) {
+            jQuery("#tag-input").val(ui.item.value);
+            return false;
+        }
+    });
+	
         var i = 1;
 
         function clearFields(selector) {
@@ -2253,5 +2283,3 @@ $(document).on("click", ".remove-tag", function () {
 
 </script>
 
-</body>
-</html>

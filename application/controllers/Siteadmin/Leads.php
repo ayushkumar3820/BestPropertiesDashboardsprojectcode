@@ -10,6 +10,7 @@ class Leads extends CI_Controller
         $this->load->helper("access_helper");
         $this->load->library("session");
         $this->load->model("AdminModel");
+        $this->load->helper('headerdata');
         $sessionLogin = $this->session->userdata("adminLogged");
         if (!$sessionLogin) {
             redirect(base_url("site-admin"));
@@ -72,6 +73,14 @@ class Leads extends CI_Controller
                     $agent = $post["agent"];
                     $filters["userid"] = $agent;
                 }
+                        if (!empty($post['leads_tags'])) {
+    $tags = explode("~-~", $post['leads_tags']);
+    $this->db->group_start();
+    foreach ($tags as $tag) {
+        $this->db->or_like('buyers.leads_tags', $tag);
+    }
+    $this->db->group_end();
+}
             }
 
             $data["leads"] = $this->AdminModel->getFilteredLeads(
@@ -232,6 +241,7 @@ public function meeting()
                                 "propertyType_sub"
                             ),
                             "propertyType" => $this->input->post("propertyType"),
+                             "leads_tags" => $this->input->post("leads_tags"),
                             "max_budget" => $this->input->post("max_budget"),
                             "Project_Builder" => $this->input->post("Project_Builder"),
                             "Profession" => $this->input->post("Profession"),
@@ -250,6 +260,7 @@ public function meeting()
                     $insertData,
                     "buyers"
                 );
+                $this->AdminModel->saveTags($this->input->post("leads_tags"));
                 if ($result == true) {
                     $leadId = $this->db->insert_id();
                     $userId = $this->session->userdata("id");
@@ -353,6 +364,7 @@ public function meeting()
                     "preferred_location" => $this->input->post("preferred_location"),
                     "Project_Builder"    => $this->input->post("Project_Builder"),
                     "propertyType_sub"   => $this->input->post("propertyType_sub"),
+                     "leads_tags" => $this->input->post("leads_tags"),
                     "propertyType"       => $this->input->post("propertyType"),
                     "requirement"        => $this->input->post("requirement"),
                     "Profession"         => $this->input->post("Profession"),
@@ -365,6 +377,7 @@ public function meeting()
                     "leads_type"         => $this->input->post("leads_type"),
                     "additional_info"    => $encodedAdditionalInfo
                 ];
+               
                 $currentData = $data["leads"][0];
                 $logContent = [];
 
@@ -406,6 +419,7 @@ public function meeting()
                     "buyers",
                     $updateData
                 );
+                $this->AdminModel->saveTags($this->input->post("leads_tags"));    
 
                 //  Notification
                 $assignedUsers = $this->AdminModel->getDataFromTableByField(
@@ -996,8 +1010,10 @@ public function meeting()
 
 
 public function addDeal() {
+    $this->load->library('pagination'); 
     $leadId = $this->uri->segment("4");
-    // Get lead data for matching
+
+    // Get lead data
     $leadData = $this->AdminModel->getDataFromTableByField($leadId, "buyers", "id");
     if (empty($leadData)) {
         redirect(base_url("admin/leads"));
@@ -1011,18 +1027,21 @@ public function addDeal() {
             $propertyId = $this->input->post("addProperty");
             $idWhere = ["id" => $propertyId, "status" => "active"];
             $checkpropertyID = $this->AdminModel->getDataByMultipleColumns($idWhere, "properties", "id,status");
+
             if ($checkpropertyID) {
                 $where = ["id" => $leadId];
                 $current_deal = $this->AdminModel->getDataByMultipleColumns($where, "buyers", "deal");
                 $currentPropertyId = $current_deal[0]->deal;
                 $current_deal_array = ($currentPropertyId != "") ? explode(",", $currentPropertyId) : [];
+
                 if (in_array($propertyId, $current_deal_array)) {
                     $this->session->set_flashdata("error", "Error: Property is already added.");
                 } else {
                     $updated_deal = ($currentPropertyId != "") ? $currentPropertyId . "," . $propertyId : $propertyId;
                     $updateData = ["deal" => $updated_deal];
-                    $result = $this->AdminModel->updateTable($leadId, "id", "buyers", $updateData);
+                    $this->AdminModel->updateTable($leadId, "id", "buyers", $updateData);
                     $this->session->set_flashdata("message1", "Property added successfully.");
+
                     // Insert into leadDeal table
                     $propertyData = $this->AdminModel->getDataByMultipleColumns($idWhere, "properties", "name");
                     $dataToInsert = [
@@ -1040,23 +1059,96 @@ public function addDeal() {
         }
     }
 
-    $where1 = ["id" => $leadId];
-    $allDeals = $this->AdminModel->getDataByMultipleColumns($where1, "buyers", "deal");
-    if ($allDeals) {
-        if ($allDeals[0]->deal != "") {
-            $dealString = $allDeals[0]->deal;
-            $dealArray = explode(",", $dealString);
-            $whereLead = ["p.id" => $dealArray, "l.lead_id" => $leadId];
-            $data["propertyDeal"] = $this->AdminModel->getDealProperties($whereLead);
-        }
+    $perPage = 10; 
+    $dealPage = $this->input->get('deal_page') ? $this->input->get('deal_page') : 1;
+    $matchingPage = $this->input->get('matching_page') ? $this->input->get('matching_page') : 1;
+
+    // Get current deals
+    $data["propertyDeal"] = [];
+    $allDeals = $this->AdminModel->getDataByMultipleColumns(["id" => $leadId], "buyers", "deal");
+    if ($allDeals && $allDeals[0]->deal != "") {
+        $dealArray = explode(",", $allDeals[0]->deal);
+        $whereLead = ["p.id" => $dealArray, "l.lead_id" => $leadId];
+        
+        // Get total rows for deal properties
+        $totalDealRows = count($dealArray);
+        
+        // Paginate deal properties
+        $this->db->select('p.*, l.status, l.properties_id');
+        $this->db->from('leadDeal l');
+        $this->db->join('properties p', 'p.id = l.properties_id');
+        $this->db->where_in('p.id', $dealArray);
+        $this->db->where('l.lead_id', $leadId);
+        $this->db->limit($perPage, ($dealPage - 1) * $perPage);
+        $query = $this->db->get();
+        $data["propertyDeal"] = $query->result();
+
+        // Deal pagination config
+        $dealConfig = [
+            'base_url' => base_url('admin/leads/deal/' . $leadId),
+            'total_rows' => $totalDealRows,
+            'per_page' => $perPage,
+            'use_page_numbers' => TRUE,
+            'page_query_string' => TRUE,
+            'query_string_segment' => 'deal_page',
+            'full_tag_open' => '<div class="pagination">',
+            'full_tag_close' => '</div>',
+            'first_link' => 'First',
+            'last_link' => 'Last',
+            'next_link' => '&raquo;',
+            'prev_link' => '&laquo;',
+            'cur_tag_open' => '<a class="active">',
+            'cur_tag_close' => '</a>',
+        ];
+        $this->pagination->initialize($dealConfig);
+        $data['deal_pagination'] = $this->pagination->create_links();
     }
 
-    // Get matching properties based on lead criteria
-    $data["matchingProperties"] = $this->AdminModel->getMatchingProperties($lead);
+    // Get matching properties excluding already in deal
+    $matching = $this->AdminModel->getMatchingProperties($lead);
+    $addedIds = [];
+    if (!empty($data["propertyDeal"])) {
+        foreach ($data["propertyDeal"] as $pd) {
+            $addedIds[] = $pd->properties_id; 
+        }
+    }
+    $filtered = array_filter($matching, function ($p) use ($addedIds) {
+        return !in_array($p->id, $addedIds);
+    });
+
+    // Paginate matching properties
+    $totalMatchingRows = count($filtered);
+    $filtered = array_slice($filtered, ($matchingPage - 1) * $perPage, $perPage);
+    $data["matchingProperties"] = $filtered;
+
+    // Matching properties pagination config
+    $matchingConfig = [
+        'base_url' => base_url('admin/leads/deal/' . $leadId),
+        'total_rows' => $totalMatchingRows,
+        'per_page' => $perPage,
+        'use_page_numbers' => TRUE,
+        'page_query_string' => TRUE,
+        'query_string_segment' => 'matching_page',
+        'full_tag_open' => '<div class="pagination">',
+        'full_tag_close' => '</div>',
+        'first_link' => 'First',
+        'last_link' => 'Last',
+        'next_link' => '&raquo;',
+        'prev_link' => '&laquo;',
+        'cur_tag_open' => '<a class="active">',
+        'cur_tag_close' => '</a>',
+    ];
+    $this->pagination->initialize($matchingConfig);
+    $data['matching_pagination'] = $this->pagination->create_links();
+
     $data["leadData"] = $lead;
     $data["mainContent"] = "siteAdmin/addDeal";
     $this->load->view("includes/admin/template", $data);
 }
+
+
+
+
 
 
 

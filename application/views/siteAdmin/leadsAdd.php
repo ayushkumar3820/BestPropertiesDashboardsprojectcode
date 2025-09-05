@@ -96,12 +96,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     <input type="number" name="budget" value="" class="form-control">
                 </div>
             </div>
-            <div class="col-sm-3">
-                <div class="form-group">
-                    <label>Maximum Budget</label>
-                    <input type="number" name="max_budget" value="" class="form-control">
-                </div>
-            </div>
+
              <div class="col-sm-3">
                 <div class="form-group">
                     <label>Project Builder</label>
@@ -129,10 +124,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             <option value="Invalid Lead">Invalid Lead</option>
                         </select>
                     </div>
-                </div> </div>
-                
-                 <div class="row">
-                <div class="col-sm-3">
+                </div>    <div class="col-sm-3">
                     <div class="form-group">
                         <label for="source">Source</label>
                         <select id="source" name="source" class="form-control">
@@ -143,7 +135,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             <option value="Manually">Manually</option>
                            
                         </select>
-                    </div></div>
+                    </div></div> </div>
+                
+                 <div class="row">
+            
                      <div class="col-sm-3">
                     <div class="form-group">
                         <label for="priority">Priority</label>
@@ -151,6 +146,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                              <option value="">Select</option>
                             <option value="Hot">Hot***</option>
                             <option value="Cold">Cold</option>
+                            <option value="Normal">Normal</option>
                         </select>
                     </div></div>
                     
@@ -167,11 +163,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             <option value="6+ Months">6+ Months</option>
                         </select>
                     </div>
-                </div></div>
-     
-      
-        <div class="row">
-                <div class="col-sm-2">
+                </div>     <div class="col-sm-3">
                     <div class="form-group">
                         <label for="status">Leads Type</label>
                         <select id="leads_type" name="leads_type" class="form-control">
@@ -184,19 +176,36 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             
                         </select>
                     </div>
-                </div>
-            <div class="col-sm-5">
+                </div></div>
+     
+      
+        <div class="row">
+           
+            <div class="col-sm-6">
                 <div class="form-group">
                     <label>Requirement</label>
                     <textarea name="requirement" class="form-control" placeholder="Requirement" value= "requirement"></textarea>
                 </div>
             </div>
-            <div class="col-sm-5">
+            <div class="col-sm-6">
                 <div class="form-group">
                     <label>Description</label>
                     <textarea name="description" class="form-control" placeholder="Description"></textarea>
                 </div>
             </div>
+            
+            <div class="col-12">
+                <div class="form-group">
+                   <label>Tags</label>
+                    <div id="tag-container" class="d-flex flex-wrap">
+                     <input type="text" id="tag-input" class="form-control me-2" placeholder="Add tag" style="width:auto; margin-right:5px;" />
+                     <button type="button" id="add-tag-btn" class="btn btn-success">Add</button>
+                     </div>
+                     <input type="hidden" name="leads_tags" id="leads_tags">
+              </div>
+            </div>
+            
+                            
         </div>
 
         <div class="personal-main-div">
@@ -232,25 +241,16 @@ defined('BASEPATH') or exit('No direct script access allowed');
                   
                 </div>
             </div>
-            <div class="row">
-                <div class="col-4">
-                    <label>City</label>
-                    <select name="city" class="form-control">
-                        <option value="">City</option>
-                        <option value="Zirakpur">Zirakpur</option>
-                        <option value="Mohali">Mohali</option>
-                        <option value="Chandigarh">Chandigarh</option>
-                        <option value="Kharar">Kharar</option>
-                        <option value="Panchkula">Panchkula</option>
-                    </select>
-                </div>
-                    <div class="col-4">
-                        <label>Email</label>
-                <input type="email" name="email" value="" class="form-control" placeholder="Email" pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$" title="Please enter a valid email address">
-
-                </div>
-                  
-            </div>
+         <div class="col-sm-3">
+    <div class="form-group">
+        <label>City</label>
+        <input type="text" id="cityInput" name="city" 
+               value="<?php echo $info->city; ?>" 
+               class="form-control" placeholder="City" autocomplete="off">
+        <div id="citySuggestions" class="list-group" 
+             style="position:absolute; z-index:1000; width:100%; display:none;"></div>
+    </div>
+</div>
              <div class="row">
             <div class="col-sm-12">
                 
@@ -289,7 +289,12 @@ defined('BASEPATH') or exit('No direct script access allowed');
     </form>
 </div>
 
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
+     
+        <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const toggleButton = document.getElementById('toggleButton');
@@ -350,6 +355,117 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
     commercialOptions.addEventListener("change", function() {
         finalInput.value = this.value;
+    });
+</script>
+
+<script>
+      jQuery(document).ready(function () {
+          
+          
+            jQuery("#tag-input").autocomplete({
+        source: function(request, response) {
+            jQuery.ajax({
+                url: "/Siteadmin/Properties/getTags",  
+                type: "POST",
+                data: { term: request.term },
+                success: function(data) {
+                    var parsedData = typeof data === "string" ? JSON.parse(data) : data;
+                    response(parsedData);
+                }
+            });
+        },
+        minLength: 1,
+        select: function(event, ui) {
+            jQuery("#tag-input").val(ui.item.value);
+            return false;
+        }
+    });
+    // Store selected tags
+            let tags = [];
+            
+            // Function to render tag chips
+            function renderTags() {
+                $("#tag-container .tag").remove(); // remove old tags
+                tags.forEach((tag, index) => {
+                    $("#tag-input").before(`
+                        <span class="tag badge bg-primary me-1 mb-1" style="color:white; margin-right:3px;display: flex;justify-content: center;align-items: center;background: #007485 !important;font-size: 14px;font-weight: normal;text-transform: capitalize;gap: 5px;">
+                            ${tag} 
+                            <span class="remove-tag" data-index="${index}" style="cursor:pointer;background: red;border-radius: 100px;display: flex;justify-content: center;align-items: flex-start; padding: 2px;font-size: 15px;height: 20px; width: 20px;">&times;</span>
+                        </span>
+                    `);
+                });
+                $("#leads_tags").val(tags.join("~-~")); // hidden input store
+            }
+            
+            // Add tag manually on button click
+            $("#add-tag-btn").on("click", function () {
+                const tagVal = $("#tag-input").val().trim();
+                if (tagVal !== "" && !tags.includes(tagVal)) {
+                    tags.push(tagVal);
+                    $("#tag-input").val("");
+                    renderTags();
+                }
+            });
+            
+            // Enter key add support
+            $("#tag-input").on("keypress", function (e) {
+                if (e.which === 13) {
+                    e.preventDefault();
+                    $("#add-tag-btn").click();
+                }
+            });
+            
+            // Remove tag
+            $(document).on("click", ".remove-tag", function () {
+                const index = $(this).data("index");
+                tags.splice(index, 1);
+                renderTags();
+            });
+})
+            // End Property Tag Code
+</script>
+
+<script>
+    // PHP array ko JS me bhej diya
+    var cities = <?php echo json_encode(propertyCityAutosuggest()); ?>;
+
+    const input = document.getElementById("cityInput");
+    const suggestionBox = document.getElementById("citySuggestions");
+
+    input.addEventListener("keyup", function() {
+        const query = this.value.toLowerCase();
+        suggestionBox.innerHTML = "";
+        
+        if (query.length === 0) {
+            suggestionBox.style.display = "none";
+            return;
+        }
+
+        let matches = cities.filter(c => c.toLowerCase().startsWith(query));
+
+        if (matches.length > 0) {
+            matches.forEach(city => {
+                let div = document.createElement("div");
+                div.classList.add("list-group-item");
+                div.style.cursor = "pointer";
+                div.textContent = city;
+                div.onclick = function() {
+                    input.value = city;
+                    suggestionBox.style.display = "none";
+                };
+                suggestionBox.appendChild(div);
+            });
+            suggestionBox.style.display = "block";
+        } else {
+            suggestionBox.style.display = "none";
+        }
+    });
+
+    // Input se bahar click hote hi suggestion hide ho jaye
+    document.addEventListener("click", function(e) {
+        if (!input.contains(e.target) && !suggestionBox.contains(e.target)) {
+            suggestionBox.style.display = "none";
+        }
     });
 </script>
 

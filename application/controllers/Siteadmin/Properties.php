@@ -108,6 +108,15 @@ if (!empty($post['bhk']) && !empty($post['property_type']) && $post['property_ty
         if (!empty($post['max_budget'])) {
             $filters['properties.budget <='] = (int)$post['max_budget'];
         }
+        if (!empty($post['property_tags'])) {
+    $tags = explode("~-~", $post['property_tags']);
+    $this->db->group_start();
+    foreach ($tags as $tag) {
+        $this->db->or_like('properties.property_tags', $tag);
+    }
+    $this->db->group_end();
+}
+
     }
 
     // Build full query manually to allow LEFT JOIN
@@ -554,6 +563,21 @@ public function editProperties1() {
     $data['mainContent'] = 'siteAdmin/propertiesEdit1';
     $this->load->view('includes/admin/template', $data);
 }
+
+public function getTags()
+{
+    $term = $this->input->post('term');
+    $result = $this->AdminModel->getTags($term);
+
+    $tags = [];
+    foreach ($result as $row) {
+        $tags[] = $row->tags;
+    }
+   
+
+    echo json_encode($tags);
+}
+
 
 
 public function editProperties() {

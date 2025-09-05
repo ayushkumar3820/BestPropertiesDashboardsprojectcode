@@ -20,7 +20,216 @@ class AppApiMeeting extends REST_Controller
         }
     }
 
- 
+public function getMeetingsData_post()
+{
+    $return = array('status' => 'error', 'message' => 'Please send all required parameters', 'result' => '');
+
+    $json = file_get_contents('php://input');
+    $data = json_decode($json, true);
+
+    $token  = removeAllSpecialCharcter($data['token'] ?? '');
+    $userId = removeAllSpecialCharcter($data['user_id'] ?? '');
+
+    if ($token == '') {
+        $return['message'] = 'Please pass the valid token.';
+    } elseif (!$userId || !is_numeric($userId)) {
+        $return['message'] = 'Please pass a valid user id.';
+    } else {
+
+        $checkToken = $this->Api_model->getRecordByColumn('token', $token, 'adminLogin');
+
+        if ($checkToken) {
+            $loginUser = $checkToken[0]; 
+            $dbUserId  = $loginUser['id']; 
+            $role      = strtolower($loginUser['role'] ?? '');
+
+            if ($dbUserId != $userId) {
+                $return['message'] = 'Invalid user id.';
+                $this->response($return, REST_Controller::HTTP_UNAUTHORIZED);
+                return;
+            }
+
+         
+            if ($role === 'admin') {
+                $meetingsData = $this->Api_model->getAllMeetingsWithProperties();
+            } else {
+                $meetingsData = $this->Api_model->getAllMeetingsWithProperties($dbUserId); 
+            }
+
+            if (!empty($meetingsData)) {
+                $return['status']  = 'done';
+                $return['message'] = 'Meetings fetched successfully.';
+                $return['result']  = $meetingsData;
+            } else {
+                $return['status']  = 'Fail';
+                $return['message'] = 'No records found.';
+            }
+        } else {
+            $return['message'] = 'Invalid token.';
+        }
+    }
+
+    $this->response($return, REST_Controller::HTTP_OK);
+}
+
+
+private function isJson($string) {
+    json_decode($string);
+    return (json_last_error() == JSON_ERROR_NONE);
+}
+
+public function addMeeting_post()
+{
+    $return = array('status' => 'error', 'message' => 'Please send all required parameters', 'result' => '');
+
+    $json = file_get_contents('php://input');
+    $data = json_decode($json, true);
+
+    $token   = removeAllSpecialCharcter($data['token'] ?? '');
+    $userId  = removeAllSpecialCharcter($data['user_id'] ?? '');
+    $leadId  = removeAllSpecialCharcter($data['lead_id'] ?? '');
+
+    if ($token == '') {
+        $return['message'] = 'Please pass the valid token.';
+    } elseif (!$userId || !is_numeric($userId)) {
+        $return['message'] = 'Please pass a valid user id.';
+    } elseif (!$leadId || !is_numeric($leadId)) {
+        $return['message'] = 'Please pass a valid lead id.';
+    } else {
+      
+        $checkToken = $this->Api_model->getRecordByColumn('token', $token, 'adminLogin');
+
+        if ($checkToken) {
+            $loginUser = $checkToken[0];
+
+            if (strtolower($loginUser['role']) === 'admin' && $loginUser['id'] == $userId) {
+           
+                $propertyData = $data['property_id'] ?? [];
+                $propertyJson = json_encode($propertyData);
+                
+                if (!isset($data['meeting_date']) || !$this->validate_meeting_time_api($data['meeting_date'])) {
+    $return['message'] = 'Invalid meeting time. Please select between 7 AM to 7 PM.';
+    $this->response($return, REST_Controller::HTTP_OK);
+    return;
+}
+$this->db->where('lead_id', $leadId);
+$this->db->order_by('id', 'DESC');
+$this->db->limit(1);
+$lastMeeting = $this->db->get('meetings')->row();
+
+if($lastMeeting && $lastMeeting->status != 'Complete') {
+    $return['message'] = 'You cannot add a new meeting until the previous meeting is complete.';
+    $this->response($return, REST_Controller::HTTP_OK);
+    return; // exit function
+}
+
+                $insertData = array(
+                    'user_id'      => $userId,
+                    'lead_id'      => $leadId,
+                    'meeting_date' => $data['meeting_date'] ?? '',
+                    'status'       => $data['status'] ?? '',
+                    'purpose'      => $data['purpose'] ?? '',
+                    'comment'      => $data['comment'] ?? '',
+                    'next_step'    => $data['next_step'] ?? '',
+                    'location'     => $data['location'] ?? '',
+                    'property_id'  => $propertyJson,
+                    'outcome'      => $data['outcome'] ?? '',
+                    'offer'        => $data['offer'] ?? ''
+                );
+
+                $result = $this->Api_model->addDataInTable($insertData, 'meetings');
+
+                if ($result) {
+                    $return['status']  = 'done';
+                    $return['message'] = 'Meeting added successfully.';
+                } else {
+                    $return['message'] = 'Failed to add meeting.';
+                }
+            } else {
+                $return['message'] = 'Invalid role or user id.';
+            }
+        } else {
+            $return['message'] = 'Token expired or invalid.';
+        }
+    }
+
+    $this->response($return, REST_Controller::HTTP_OK);
+}
+
+public function editMeeting_post()
+{
+    $return = array('status' => 'error', 'message' => 'Something went wrong.', 'result' => '');
+
+    $json = file_get_contents('php://input');
+    $data = json_decode($json, true);
+
+    $token   = removeAllSpecialCharcter($data['token'] ?? '');
+    $userId  = removeAllSpecialCharcter($data['user_id'] ?? '');
+    $id      = removeAllSpecialCharcter($data['meeting_id'] ?? ''); // DB id
+
+    if ($token == '' || !$userId || !$id) {
+        $return['message'] = 'Missing required parameters.';
+    } else {
+        $checkToken = $this->Api_model->getRecordByColumn('token', $token, 'adminLogin');
+
+        if ($checkToken) {
+            $loginUser = $checkToken[0];
+
+            if (strtolower($loginUser['role']) === 'admin' && $loginUser['id'] == $userId) {
+
+                // ✅ property_id handling same as add
+                $propertyData = $data['property_id'] ?? [];
+                $propertyJson = json_encode($propertyData);
+                
+                if (!isset($data['meeting_date']) || !$this->validate_meeting_time_api($data['meeting_date'])) {
+    $return['message'] = 'Invalid meeting time. Please select between 7 AM to 7 PM.';
+    $this->response($return, REST_Controller::HTTP_OK);
+    return;
+}
+
+                $updateData = array(
+                    'meeting_date' => $data['meeting_date'] ?? '',
+                    'status'       => $data['status'] ?? '',
+                    'outcome'      => $data['outcome'] ?? '',
+                    'offer'        => $data['offer'] ?? '',
+                    'purpose'      => $data['purpose'] ?? '',
+                     'comment'      => $data['comment'] ?? '',
+                    'location'     => $data['location'] ?? '',
+                    'next_step'    => $data['next_step'] ?? '',
+                    'property_id'  => $propertyJson
+                );
+
+                $this->db->where('id', $id);
+                $this->db->update('meetings', $updateData);
+
+                if ($this->db->affected_rows() > 0) {
+                    $return['status']  = 'done';
+                    $return['message'] = 'Meeting updated successfully.';
+                } else {
+                    $return['message'] = 'No changes or meeting not found.';
+                }
+            } else {
+                $return['message'] = 'Invalid role or user id.';
+            }
+        } else {
+            $return['message'] = 'Token expired or invalid.';
+        }
+    }
+
+    $this->response($return, REST_Controller::HTTP_OK);
+}
+
+private function validate_meeting_time_api($meeting_date) {
+    if (empty($meeting_date)) return false;
+
+    $timestamp = strtotime($meeting_date);
+    $hour = (int) date('H', $timestamp); // 24-hour format
+
+    return ($hour >= 7 && $hour <= 19); // 7 AM – 7 PM
+}
+
+
+
 
 public function getAllMeetings_get()
 {
@@ -157,7 +366,6 @@ public function postAllMeetings_post()
         $this->response($return, REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
     }
 }
-
 
 
 public function deleteMeeting_delete()

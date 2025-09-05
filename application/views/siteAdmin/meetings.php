@@ -1,6 +1,13 @@
 <div class="col main pt-5 mt-3">
+     <div class="button-container">
+        <a href="<?= base_url('admin/leads/view/' . $this->uri->segment('4')); ?>" id="leadView">Follow Ups</a>
+        <a href="<?= base_url('admin/leads/edit/' . $this->uri->segment('4')); ?>">Requirement</a>
+        <a href="<?= base_url('admin/leads/personal/' . $this->uri->segment('4')); ?>" id="personalInfoLink">Personal Information</a>
+        <a href="<?= base_url('admin/leads/deal/' . $this->uri->segment('4')); ?>" id="personalInfoLink">Deal</a>
+         <a href="<?= base_url('admin/leads/meetings/' . $this->uri->segment('4')); ?>" class="active">Meetings</a>
+    </div>
              <a href="<?php echo base_url('admin/leads');?>" style="float: right;margin: 14px 2px;" class="btn btn-sm btn-info back-btn">Back</a>
-            <a href="<?php echo base_url('admin/meeting/add/').$this->uri->segment('3');?>" style="float: right;margin: 14px 2px;" class="btn btn-sm btn-info back-btn">Add New</a>
+            <a href="<?php echo base_url('admin/meeting/add/').$this->uri->segment('4');?>" style="float: right;margin: 14px 2px;" class="btn btn-sm btn-info back-btn">Add New</a>
             <h1 class="d-sm-block heading"><?php echo $title; ?></h1>
             <div class="clearfix"></div>
             <?php $message = $this->session->flashdata('message');
@@ -18,7 +25,7 @@
 						    <tr>
 							   <th>Sr. No.</th>
 							   <th>Meeting Date & Time</th>
-							   <th>Description</th>
+							   <th>Purpose</th>
 							   <th>Status</th>
 							   <th>Action</th>
 							</tr>
@@ -30,17 +37,32 @@
 						          foreach($meeting as $meeting){?>
 						          <tr>
 						                <td><?php echo $i; ?> </td>
-						                <td><?php echo $meeting->meeting_date;?></td>
-						                <td><?php echo $meeting->description;?></td>
-						                <td><select id="status" name="status">
-                                        <option value="active" <?php if($meeting->status == "active"){ echo "selected"; } ?>>Active</option>
-                                        <option value="deactive" <?php if($meeting->status == "deactive"){ echo "selected"; } ?>>Deactive</option>
-                                        <option value="pending" <?php if($meeting->status == "pending"){ echo "selected"; } ?>>Pending</option>
-                                        <option value="completed" <?php if($meeting->status == "completed"){ echo "selected"; } ?>>Completed</option>
-                                        </select>
-                                        </td>
+						               <td>
+<?php
+$dateTime = new DateTime($meeting->meeting_date);
+
+// Indian format
+$formatted = $dateTime->format('d M Y h:i A');
+
+// Time check (7 AM to 7 PM)
+$hour = (int)$dateTime->format('H');
+if ($hour >= 0 && $hour <= 24) {
+    echo $formatted;
+} else {
+    echo "Outside Business Hours";
+}
+?>
+</td>
+
+						                 <td><?php echo $meeting->purpose;?></td>
+						                
+						                <td><?php echo $meeting->status;?></td>
+                                      
+                                        
+                                        
 						                <td><a href="<?php echo base_url().'admin/meeting/edit/'.$meeting->id;?>" class="btn btn-success btn-sm">Edit</a>
-						                <a href="<?php echo base_url().'admin/meeting/delete/'.$meeting->id;?>" class="btn btn-danger btn-sm" onclick="return confirm(\'Are you sure?\')">Delete</a>
+						               
+						                 <a href="<?php echo base_url().'admin/meeting/delete/'.$meeting->id;?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this project?')">Delete</a>
 						                </td>
 						              </tr>
 						              <?php 
