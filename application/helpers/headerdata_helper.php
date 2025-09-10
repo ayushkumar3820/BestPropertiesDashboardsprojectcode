@@ -201,6 +201,26 @@ if ( ! function_exists('propertyCityAutosuggest')){
         );
     }	
 }
+	if ( ! function_exists('meetingPurpose')){
+		function meetingPurpose() {
+        $meetingPurpose = array(
+             "Office Meeting",
+            "Site Visit Meeting",
+            "Builder Office Meeting",
+            "Token Meeting",
+            "Documentation Meeting",
+            "Negotiation Meeting",
+            "Stamp Duty Meeting",
+            "GAMADA Meeting",
+            "Agreement Meeting",
+            "Registration Meeting",
+            "Hand Over Meeting",
+             "Others Meeting"
+        );
+
+        return $meetingPurpose;
+		}	
+	}
 
 if (!function_exists('getroll')) {
     function getroll() {

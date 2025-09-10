@@ -23,8 +23,7 @@ class Leads extends REST_Controller
     
     // Get Leads Data
 
-
- public function getLeadsData_post()
+public function getLeadsData_post()
 {
     $return = array('status' => 'error', 'message' => 'Please send all required parameters', 'result' => '');
 
@@ -48,18 +47,10 @@ class Leads extends REST_Controller
                 // 🔥 Admin gets ALL buyers (no filter)
                 $this->db->select('*');
                 $this->db->from('buyers');
-                 $this->db->order_by('id', 'DESC');   // ✅ latest first
-                 $query = $this->db->get();
+                $this->db->order_by('id', 'DESC');   // ✅ latest first
+                $query = $this->db->get();
                 $leadsData = $query->num_rows() > 0 ? $query->result_array() : [];
 
-                if ($leadsData) {
-                    $return['status'] = 'done';
-                    $return['message'] = 'All leads fetched (Admin).';
-                    $return['result'] = $leadsData;
-                } else {
-                    $return['status'] = 'Fail';
-                    $return['message'] = 'No records found in buyers.';
-                }
             } else {
                 // 🔥 Non-admin = only assigned leads
                 $assignedLeads = $this->Api_model->getRecordByColumn('userid', $userId, 'assigned_leads', 'leadid');
@@ -67,18 +58,66 @@ class Leads extends REST_Controller
                 if ($assignedLeads) {
                     $leadIds = array_column($assignedLeads, 'leadid');
                     $leadsData = $this->Api_model->getRecordsByWhereIn('id', $leadIds, 'buyers');
-
-                    if ($leadsData) {
-                        $return['status'] = 'done';
-                        $return['message'] = 'Done.';
-                        $return['result'] = $leadsData;
-                    } else {
-                        $return['status'] = 'Fail';
-                        $return['message'] = 'No records found.';
-                    }
                 } else {
-                    $return['message'] = 'No leads assigned to this user.';
+                    $leadsData = [];
                 }
+            }
+
+            // ✅ Attach meetings + property info
+            if (!empty($leadsData)) {
+                $leadIds = array_column($leadsData, 'id');
+                $meetingsByLead = $this->Api_model->getMeetingsByLeadIds($leadIds);
+
+                foreach ($leadsData as &$lead) {
+                    $leadId = $lead['id'];
+                    $lead['meetings'] = isset($meetingsByLead[$leadId]) ? $meetingsByLead[$leadId] : [];
+
+                    // Attach property details for each meeting
+                   foreach ($lead['meetings'] as &$meeting) {
+    $meeting['property'] = [];
+
+    if (!empty($meeting['property_id'])) {
+        $ids = [];
+
+        // Normalize JSON or string
+        $decoded = json_decode($meeting['property_id'], true);
+        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+            // JSON array [{"id":"1923"},{"id":"1924"}]
+            foreach ($decoded as $item) {
+                if (isset($item['id'])) $ids[] = intval($item['id']);
+            }
+        } else {
+            // Comma-separated "1923,1924" or other string
+            $parts = preg_split('/[\s,]+/', $meeting['property_id']);
+            foreach ($parts as $p) {
+                $id = intval(trim($p));
+                if ($id > 0) $ids[] = $id;
+            }
+        }
+
+        $ids = array_unique($ids); // remove duplicates
+
+        if (!empty($ids)) {
+            // fetch only the properties that exist in the properties table
+            $properties = $this->Api_model->getPropertiesByIds($ids);
+
+            // 🔹 Keep only existing properties, ignore missing IDs
+            $meeting['property'] = $properties ?: [];
+        }
+    }
+}
+unset($meeting);
+
+                }
+                unset($lead); // break reference
+                unset($meeting);
+
+                $return['status'] = 'done';
+                $return['message'] = 'Leads fetched successfully.';
+                $return['result'] = $leadsData;
+            } else {
+                $return['status'] = 'Fail';
+                $return['message'] = 'No records found.';
             }
         } else {
             $return['message'] = 'This token has been expired.';
@@ -87,7 +126,7 @@ class Leads extends REST_Controller
 
     $this->response($return, REST_Controller::HTTP_OK);
 }
-       
+
     
     public function statusGetLeadsData_post()
     {

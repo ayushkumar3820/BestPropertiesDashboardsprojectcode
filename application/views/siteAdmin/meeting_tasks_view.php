@@ -96,10 +96,10 @@ if ($view === 'monthly') {
 
             foreach ($calendar_events[$formattedDate] as $meeting) {
               
-                $lead_id = isset($meeting['leadId']) ? $meeting['leadId'] : 0;
-                $desc = $meeting['comment'];
+                $lead_id = isset($meeting['id']) ? $meeting['id'] : 0;
+                $desc = $meeting['purpose'];
 
-                $url = base_url("admin/leads/view/{$lead_id}");
+                $url = base_url("admin/meeting/edit/{$lead_id}");
                 echo "<li><a href='$url'>• $desc</a></li>";
             }
 
@@ -122,69 +122,9 @@ if ($view === 'monthly') {
 </table>
 
 
-</body>
-</html>
 
-                <h6 class="section-title">Meetings</h6>
-                <?php if (!empty($meeting_tasks)): ?>
-                <div class="table-main-div">
-                    <table id="datatable1" class="table table-striped table-bordered table-sm display">
-                        <thead>
-                            <tr>
-                                <th>Sr. No.</th>
-                                <th>Task Name</th>
-                                <th>Name</th>
-                                <th>Pref. Location</th>
-                                <th>Budget</th>
-                                <th>Requirement</th>
-                                <th>Date /Time</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php 
-                            $task_limit = min(100, count($meeting_tasks)); // Limit tasks to 100
-                            if (!empty($meeting_tasks)) {
-                                for ($i = 0; $i < $task_limit; $i++) {
-                                    $task = $meeting_tasks[$i]; ?>
-                                    <tr>
-                                        <td><?php echo $i + 1; ?></td>
-                                        <td>
-                                            <a href="<?php echo base_url('admin/leads/view/' . $task['leadId']); ?>">
-                                                <?php echo ($task['comment']); ?>
-                                            </a>
-                                        </td>
-                                        <td><?php echo ($task['uName']); ?></td>
-                                        <td><?php echo ($task['location']); ?></td>
-                                        <td><?php echo ($task['budget']); ?></td>
-                                        <td>
-                                            <?php 
-                                            if (!empty($task['residential'])) {
-                                                echo '<span class="badge badge-info">R: ' . ($task['residential']) . '</span>';
-                                            }
-                                            if (!empty($task['commercial'])) {
-                                                if (!empty($task['residential'])) {
-                                                    echo '<br>';
-                                                }
-                                                echo '<span class="badge badge-success">C: ' . ($task['commercial']) . '</span>';
-                                            }
-                                            ?>
-                                        </td>
-                                         <td><?php echo  date('d M Y h:iA',strtotime($task['nextdt'])); ?></td>
-                                          <td><?php echo ($task['status']); ?></td>
-                                         
-                                    </tr>
-                                <?php }
-                            } else { ?>
-                               <tr><td colspan="6" class="text-center">No tasks found</td></tr>
-                            <?php } ?>
-                        </tbody>
-                    </table>
-                    </div>
-                <?php else: ?>
-                    <p class="text-muted text-center">No tasks found.</p>
-                <?php endif; ?>
-            </div>
+
+               
 
 <!-- Add custom CSS -->
 <style>

@@ -44,12 +44,32 @@ echo validation_errors();
    
    
     <div class="row">
-<div class="col-sm-6">
+<div class="col-sm-5">
+    <div class="min-h">
             <div class="form-group">
                 <label>Requirement</label>
                 <textarea name="requirement" class="form-control" placeholder="Requirement"><?php echo $info->requirement; ?></textarea>
             </div>
-        </div>
+        </div></div>
+   <div class="col-sm-7">
+    <div class="form-group" style="display:flex; align-items:center;">
+        <label style="margin-right:10px;">Additional Requirements</label>
+        <button type="button" id="add-requirement" class="btn btn-primary">Add Requirement</button>
+    </div>
+
+    <div id="additional-requirements-container">
+        <?php 
+        $additionalReqs = json_decode($info->new_requirement, true) ?? [''];
+        if(empty($additionalReqs)) $additionalReqs = ['']; 
+        foreach($additionalReqs as $req): ?>
+            <div class="input-group mb-2">
+                <input type="text" name="new_requirement[]" class="form-control" value="<?php echo htmlspecialchars($req); ?>" placeholder="Enter requirement">
+                <button type="button" class="btn btn-danger remove-btn">X</button>
+            </div>
+        <?php endforeach; ?>
+    </div>
+</div>
+
 		   <div class="col-sm-6">
             <div class="form-group">
                 <label>Description</label>
@@ -421,7 +441,29 @@ if ($("#leads_tags").val() !== "") {
     tags = $("#leads_tags").val().split("~-~");
 }
 renderTags();
+// Function same rahega
+function autoAddFieldValue(selector) {
+    const val = $(selector).val();
+    if (val && !tags.includes(val)) {
+        tags.push(val);
+        renderTags();
+    }
+}
 
+// Initial run (edit form ke liye)
+autoAddFieldValue("#propertyType");
+autoAddFieldValue("#residentialOptions");
+autoAddFieldValue("#commercialOptions");
+autoAddFieldValue("#priority");
+autoAddFieldValue("#leads_type");
+autoAddFieldValue("#cityInput");
+
+// Change event bind kar do taaki select karte hi add ho jaye
+$("#propertyType, #residentialOptions, #commercialOptions, #priority, #leads_type, #cityInput")
+    .on("change", function () {
+        autoAddFieldValue(this);
+    });
+ 
 // Function to render tag chips
 function renderTags() {
     $("#tag-container .tag").remove(); // remove old tags
@@ -490,6 +532,23 @@ function renderTags() {
 
 <script>
 jQuery(document).ready(function(){
+    
+    jQuery('#add-requirement').click(function(){
+    let html = `<div class="input-group mb-2">
+                    <input type="text" name="new_requirement[]" class="form-control" placeholder="Enter requirement">
+                    <button type="button" class="btn btn-danger remove-btn">Remove</button>
+                </div>`;
+    jQuery('#additional-requirements-container').append(html);
+});
+
+jQuery(document).on('click', '.remove-btn', function(){
+    jQuery(this).closest('.input-group').remove();
+});
+
+    jQuery(document).on('click', '.remove-btn', function(){
+        jQuery(this).closest('.input-group').remove();
+    });
+    
     jQuery('select[name="FollowUpStatus"]').change(function(){
         var followUpId = jQuery(this).data('id');
         var status = jQuery(this).val();

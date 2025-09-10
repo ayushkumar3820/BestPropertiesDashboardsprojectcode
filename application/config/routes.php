@@ -98,6 +98,9 @@ $route['get-user-meetings'] = 'api/AppApiMeeting/getMeetingsData';
 $route['add-user-meeting'] = 'api/AppApiMeeting/addMeeting';
 $route['edit-user-meeting'] = 'api/AppApiMeeting/editMeeting';
 
+//message api
+$route['get-message-leads'] = 'api/AppApiMeeting/getMessageLData';
+$route['add-message-leads'] = 'api/AppApiMeeting/addMessageLData';
 
 
 //meeting api 
@@ -105,10 +108,15 @@ $route['get-all-meeting'] = 'api/AppApiMeeting/getAllMeetings';
 $route['post-meeting'] = 'api/AppApiMeeting/postAllMeetings';
 $route['delete-meeting'] = 'api/AppApiMeeting/deleteAllMeetings';
 
+//properties fillter api
+$route['get_matching_properties'] = 'api/AppApiMeeting/getMatchingProperties';
+
+
 
 
 //property api delete
-$route["property-get"]='api/Properties/getProperty';
+$route["property-get"] = 'api/Properties/getProperty';
+
 $route["property-delete"] = 'api/Properties/deleteProperty';
 
 

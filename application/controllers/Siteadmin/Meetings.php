@@ -25,7 +25,7 @@ class Meetings extends CI_Controller {
     
     $meeting_id = $this->uri->segment('4');
      $this->db->where('user_id', $user_id);
-    $data['meeting'] = $this->AdminModel->getDataFromTable('meetings','id,lead_id,purpose,meeting_date,status');
+    $data['meeting'] = $this->AdminModel->getDataFromTable('meetings','id,lead_id,purpose, location,meeting_date,status');
    
     
 	$data['mainContent'] = 'siteAdmin/meetings'; 

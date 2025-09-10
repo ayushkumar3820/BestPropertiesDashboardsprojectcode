@@ -354,6 +354,7 @@
                                             <select name="bhk_carpet_area_unit" class="form-control">
                                                 <option value="">Select</option>
                                                 <option value="sq.ft" <?= ($carpet_unit == 'sq.ft') ? 'selected' : '' ?>>sq.ft</option>
+                                                <option value="sq.yard" <?= ($carpet_unit == 'sq.yard') ? 'selected' : '' ?>>sq.yard</option>
                                                 <option value="marla" <?= ($carpet_unit == 'marla') ? 'selected' : '' ?>>marla</option>
                                                 <option value="kanal" <?= ($carpet_unit == 'kanal') ? 'selected' : '' ?>>kanal</option>
                                             </select>
@@ -368,6 +369,7 @@
                                             <select name="bhk_built_area_unit" class="form-control">
                                                 <option value="">Select</option>
                                                 <option value="sq.ft" <?= ($built_unit == 'sq.ft') ? 'selected' : '' ?>>sq.ft</option>
+                                                <option value="sq.yard" <?= ($built_unit == 'sq.yard') ? 'selected' : '' ?>>sq.yard</option>
                                                 <option value="marla" <?= ($built_unit == 'marla') ? 'selected' : '' ?>>marla</option>
                                                 <option value="kanal" <?= ($built_unit == 'kanal') ? 'selected' : '' ?>>kanal</option>
                                             </select>
@@ -382,6 +384,7 @@
                                             <select name="bhk_land_area_unit" class="form-control">
                                                 <option value="">Select</option>
                                                 <option value="sq.ft" <?= ($land_unit == 'sq.ft') ? 'selected' : '' ?>>sq.ft</option>
+                                                <option value="sq.yard" <?= ($land_unit == 'sq.yard') ? 'selected' : '' ?>>sq.yard</option>
                                                 <option value="marla" <?= ($land_unit == 'marla') ? 'selected' : '' ?>>marla</option>
                                                 <option value="kanal" <?= ($land_unit == 'kanal') ? 'selected' : '' ?>>kanal</option>
                                             </select>
@@ -794,6 +797,7 @@
                                     <select name="floor_carpet_area_unit" class="form-control">
                                         <option value="">Select</option>
                                         <option value="sq.ft" <?= ($carpet_unit == 'sq.ft') ? 'selected' : '' ?>>sq.ft</option>
+                                        <option value="sq.yard" <?= ($carpet_unit == 'sq.yard') ? 'selected' : '' ?>>sq.yard</option>
                                         <option value="marla" <?= ($carpet_unit == 'marla') ? 'selected' : '' ?>>marla</option>
                                         <option value="kanal" <?= ($carpet_unit == 'kanal') ? 'selected' : '' ?>>kanal</option>
                                     </select>
@@ -960,6 +964,7 @@
                                           <select name="com_office_carpet_area_unit" class="form-control">
                                             <option value="">Select</option>
                                             <option value="sq.ft" <?php echo ($com_office_unit == "sq.ft") ? "selected" : ""; ?>>sq.ft</option>
+                                             <option value="sq.yard" <?php echo ($com_office_unit == "sq.yard") ? "selected" : ""; ?>>sq.yard</option>
                                             <option value="marla" <?php echo ($com_office_unit == "marla") ? "selected" : ""; ?>>marla</option>
                                             <option value="kanal" <?php echo ($com_office_unit == "kanal") ? "selected" : ""; ?>>kanal</option>
                                         </select>
@@ -1295,6 +1300,7 @@
                                     <select name="com_plot_carpet_area_unit" class="form-control">
                                         <option value="">Select</option>
                                         <option value="sq.ft" <?= ($com_plot_carpet_area_unit == 'sq.ft') ? 'selected' : ''; ?>>sq.ft</option>
+                                       <option value="sq.yard" <?= ($com_plot_carpet_area_unit == 'sq.yard') ? 'selected' : '' ?>>sq.yard</option>
                                         <option value="marla" <?= ($com_plot_carpet_area_unit == 'marla') ? 'selected' : ''; ?>>marla</option>
                                         <option value="kanal" <?= ($com_plot_carpet_area_unit == 'kanal') ? 'selected' : ''; ?>>kanal</option>
                                     </select>
@@ -1329,6 +1335,7 @@
                                         <select name="com_built_area_unit" class="form-control">
                                             <option value="">Select</option>
                                             <option value="sq.ft" <?= ($com_built_area_unit == "sq.ft") ? "selected" : ""; ?>>sq.ft</option>
+                                             <option value="sq.yard" <?= ($com_built_area_unit == "sq.yard") ? "selected" : ""; ?>>sq.yard</option>
                                             <option value="marla" <?= ($com_built_area_unit == "marla") ? "selected" : ""; ?>>marla</option>
                                             <option value="kanal" <?= ($com_built_area_unit == "kanal") ? "selected" : ""; ?>>kanal</option>
                                         </select>
@@ -1354,6 +1361,7 @@
                                         <select name="com_land_area_unit" class="form-control">
                                             <option value="">Select</option>
                                             <option value="sq.ft" <?= ($com_land_unit == "sq.ft") ? "selected" : ""; ?>>sq.ft</option>
+                                            <option value="sq.yard" <?= ($com_land_unit == "sq.yard") ? "selected" : ""; ?>>sq.yard</option>
                                             <option value="marla" <?= ($com_land_unit == "marla") ? "selected" : ""; ?>>marla</option>
                                             <option value="kanal" <?= ($com_land_unit == "kanal") ? "selected" : ""; ?>>kanal</option>
                                         </select>
@@ -1444,6 +1452,7 @@
                                     <select name="factory_built_area_unit" class="form-control">
                                         <option value="">Select</option>
                                         <option value="sq.ft" <?= ($built_unit == 'sq.ft') ? 'selected' : '' ?>>sq.ft</option>
+                                           <option value="sq.yard" <?= ($built_unit == 'sq.yard') ? 'selected' : '' ?>>sq.yard</option>
                                         <option value="marla" <?= ($built_unit == 'marla') ? 'selected' : '' ?>>marla</option>
                                         <option value="kanal" <?= ($built_unit == 'kanal') ? 'selected' : '' ?>>kanal</option>
                                     </select>
@@ -1459,6 +1468,7 @@
                                     <select name="factory_land_area_unit" class="form-control">
                                         <option value="">Select</option>
                                         <option value="sq.ft" <?= ($land_unit == 'sq.ft') ? 'selected' : '' ?>>sq.ft</option>
+                                        <option value="sq.yard" <?= ($land_unit == 'sq.yard') ? 'selected' : '' ?>>sq.yard</option>
                                         <option value="marla" <?= ($land_unit == 'marla') ? 'selected' : '' ?>>marla</option>
                                         <option value="kanal" <?= ($land_unit == 'kanal') ? 'selected' : '' ?>>kanal</option>
                                     </select>
@@ -1832,14 +1842,14 @@ $hot_deals = isset($properties[0]->hot_deals) ? $properties[0]->hot_deals : 'No'
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"></script>
-  <script>
+<script>
+jQuery(document).ready(function () {
 
-    jQuery(document).ready(function () {
-	
-	jQuery("#tag-input").autocomplete({
+    // ================= Autocomplete =================
+    jQuery("#tag-input").autocomplete({
         source: function(request, response) {
             jQuery.ajax({
-                url: "/Siteadmin/Properties/getTags",  // route/controller ka URL
+                url: "/Siteadmin/Properties/getTags",
                 type: "POST",
                 data: { term: request.term },
                 success: function(data) {
@@ -1854,272 +1864,212 @@ $hot_deals = isset($properties[0]->hot_deals) ? $properties[0]->hot_deals : 'No'
             return false;
         }
     });
-	
-        var i = 1;
 
-        function clearFields(selector) {
-            const container = jQuery(selector);
-            container.find('input, select, textarea').each(function () {
-                if (this.type === 'checkbox' || this.type === 'radio') {
-                    this.checked = false;
-                } else {
-                    jQuery(this).val('');
-                }
-            });
-        }
-// Property Tags Code
-let tags = [];
+    var i = 1;
 
-// Render tags function
-function renderTags() {
-    $("#tag-container .tag").remove(); // old tags remove
-    tags.forEach((tag, index) => {
-        $("#tag-input").before(`
-            <span class="tag badge bg-primary me-1 mb-1" 
-                  style="display: flex;justify-content: center;align-items: center;background: #007485 !important;font-size: 14px;font-weight: normal;text-transform: capitalize;gap: 5px;">
-                ${tag} 
-                <span class="remove-tag" data-index="${index}" 
-                      style="cursor:pointer;background: red;border-radius: 100px;display: flex;justify-content: center;align-items: flex-start;padding: 2px;font-size: 15px;height: 20px;width: 20px;">
-                    &times;
+    function clearFields(selector) {
+        const container = jQuery(selector);
+        container.find('input, select, textarea').each(function () {
+            if (this.type === 'checkbox' || this.type === 'radio') {
+                this.checked = false;
+            } else {
+                jQuery(this).val('');
+            }
+        });
+    }
+
+    // ================= Property Tags Code =================
+    let tags = [];
+
+    function renderTags() {
+        $("#tag-container .tag").remove();
+        tags.forEach((tag, index) => {
+            $("#tag-input").before(`
+                <span class="tag badge bg-primary me-1 mb-1" 
+                      style="display: flex;justify-content: center;align-items: center;background: #007485 !important;font-size: 14px;font-weight: normal;text-transform: capitalize;gap: 5px;">
+                    ${tag} 
+                    <span class="remove-tag" data-index="${index}" 
+                          style="cursor:pointer;background: red;border-radius: 100px;display: flex;justify-content: center;align-items: flex-start;padding: 2px;font-size: 15px;height: 20px;width: 20px;">
+                        &times;
+                    </span>
                 </span>
-            </span>
-        `);
-    });
-    $("#property_tags").val(tags.join("~-~")); // hidden input update
-}
+            `);
+        });
+        $("#property_tags").val(tags.join("~-~"));
+    }
 
-// ========== Load old tags in EDIT MODE ==========
-$(document).ready(function () {
+    // Load old tags in EDIT MODE
     let existingTags = $("#property_tags").val();
     if (existingTags) {
         tags = existingTags.split("~-~").map(t => t.trim()).filter(t => t !== "");
+    }
+
+    // Auto load category, property_type, city as tags
+    function loadFieldsAsTags() {
+        let autoTags = [];
+
+        let categoryVal = $("#categorySelector").val().trim();
+        if (categoryVal && !tags.includes(categoryVal)) autoTags.push(categoryVal);
+
+        let propertyTypeVal = $("#comPropertyType, #resPropertyType").val();
+        if (propertyTypeVal && !tags.includes(propertyTypeVal)) autoTags.push(propertyTypeVal);
+
+        let cityVal = $("input[name='city']").val().trim();
+        if (cityVal && !tags.includes(cityVal)) autoTags.push(cityVal);
+
+        autoTags.forEach(tag => {
+            if (tag && !tags.includes(tag)) tags.push(tag);
+        });
+
         renderTags();
     }
-});
 
-// Button click se add
-$("#add-tag-btn").on("click", function () {
-    const tagVal = $("#tag-input").val().trim();
-    if (tagVal !== "" && !tags.includes(tagVal)) {
-        tags.push(tagVal);
-        $("#tag-input").val("");
-        renderTags();
-    }
-});
+    // Initial render
+    loadFieldsAsTags();
 
-// Enter key se add
-$("#tag-input").on("keypress", function (e) {
-    if (e.which === 13) {
-        e.preventDefault();
-        $("#add-tag-btn").click();
-    }
-});
-
-// Remove tag
-$(document).on("click", ".remove-tag", function () {
-    const index = $(this).data("index");
-    tags.splice(index, 1);
-    renderTags();
-});
-
-
-        // Show/hide property age based on construction status
-            jQuery('#bhk_construction_status').on('change', function () {
-                const selectedValue = jQuery(this).val();
-                const ageGroup = jQuery('#bhk_property_age');
-
-                if (selectedValue === 'Re-Sale') {
-                    ageGroup.show();
-                } else {
-                    ageGroup.hide();
-                }
-            });
-
-         // Show/hide property age based on construction status
-            jQuery('#kothi_construction_status').on('change', function () {
-                const selectedValue = jQuery(this).val();
-                const ageGroup = jQuery('#kothi_property_age');
-
-                if (selectedValue === 'Re-Sale') {
-                    ageGroup.show();
-                } else {
-                    ageGroup.hide();
-                }
-            });
-
-        // ========== Toggle Residential/Commercial Fields ==========
-        function toggleCategoryFields() {
-            const category = jQuery('#categorySelector').val();
-            if (category === 'Residential') {
-                jQuery('#residential-fields').slideDown();
-                jQuery('#commercial-fields').slideUp();
-            } else if (category === 'Commercial') {
-                jQuery('#commercial-fields').slideDown();
-                jQuery('#residential-fields').slideUp();
-            } else {
-                jQuery('#residential-fields, #commercial-fields').slideUp();
-            }
+    // Add tag button
+    $("#add-tag-btn").on("click", function () {
+        const tagVal = $("#tag-input").val().trim();
+        if (tagVal !== "" && !tags.includes(tagVal)) {
+            tags.push(tagVal);
+            $("#tag-input").val("");
+            renderTags();
         }
-
-        // ========== Show Residential Sub-Type Fields ==========
-        function showResidentialSubFields() {
-            const type = jQuery('#resPropertyType').val();
-            jQuery('#studio-options,#other-options,#bhk-options, #kothi-options, #plot-options, #farmhouse-options, #floor-options').hide();
-
-
-            if (type === 'Apartment / Flat') {
-                jQuery('#bhk-options').show();
-            } else if (type === 'Independent House / Kothi') {
-                jQuery('#kothi-options').show();
-            } else if (type === 'Residential Plot') {
-                jQuery('#plot-options').show();
-            } else if (type === 'Farm House') {
-                jQuery('#farmhouse-options').show();
-            } else if (type === 'Builder Floor') {
-                jQuery('#floor-options').show();
-            }else if (type === 'Studio Apartment') {
-                jQuery('#studio-options').show();
-            }else if (type === 'Other') {
-                jQuery('#other-options').show();
-            }
-        }
-
-        // ========== Show Commercial Sub-Type Fields ==========
-       function toggleCommercialSubFields(type) {
-            $('#com-factory-fields,#com-other-options, #com-hospital-fields, #com-office-fields, #com-retail-fields, #com-plot-fields, #com-storage-fields').hide();
-            switch (type) {
-                case "Office":
-                    $("#com-office-fields").show();
-                    break;
-                case "Retail":
-                    $("#com-retail-fields").show();
-                    break;
-                case "Plot":
-                    $("#com-plot-fields").show();
-                    break;
-                case "Storage":
-                    $("#com-storage-fields").show();
-                    break;
-                case "Industry/Factory":
-                    $("#com-factory-fields").show();
-                    break;
-                case "Hospital":
-                    $("#com-hospital-fields").show();
-                    break;
-                case "Other":
-                    $("#com-other-options").show();
-                    break;
-            }
-            console.log('Selected type:', type);
-        }
-
-        // ========== Under Construction Toggle for All Sections ==========
-
-
-        // ========== Toggle Extra Fields ==========
-        jQuery('#toggleExtraFields').change(function () {
-            if (jQuery(this).is(':checked')) {
-                jQuery('#extra-fields').slideDown();
-            } else {
-                jQuery('#extra-fields').slideUp();
-            }
-        });
-
-        // ========== Add Custom Fields Dynamically ==========
-        jQuery('#add').click(function () {
-            i++;
-            jQuery('#label').show();
-            jQuery('#dynamic_field').append(
-                '<div id="custom' + i + '" class="row">' +
-                    '<div class="col-md-3"><div class="form-group">' +
-                        '<input type="text" class="form-control" name="additional[]" placeholder="label">' +
-                    '</div></div>' +
-                    '<div class="col-sm-6"><div class="form-group">' +
-                        '<input type="text" class="form-control" name="custom_value[]" placeholder="value">' +
-                    '</div></div>' +
-                    '<div class="col-sm-2">' +
-                        '<button type="button" name="remove" id="' + i + '" class="btn btn-danger btn_remove">X</button>' +
-                    '</div>' +
-                '</div>'
-            );
-        });
-
-        jQuery(document).on('click', '.btn_remove', function () {
-            const button_id = jQuery(this).attr("id");
-            jQuery('#custom' + button_id).remove();
-        });
-
-
-        // ========== Triggered on Load ==========
-        toggleCategoryFields();
-       const category = "<?= isset($properties[0]->category) ? $properties[0]->category : '' ?>";
-
-        if (category === 'Residential') {
-            showResidentialSubFields();
-        } else if (category === 'Commercial') {
-            toggleCommercialSubFields(jQuery('#comPropertyType').val());
-        }
-
-        // ========== Event Bindings ==========
-        jQuery('#categorySelector').change(toggleCategoryFields);
-        jQuery('#resPropertyType').change(function () {
-            const sections = [
-                '#studio-options',
-                '#other-options',
-                '#bhk-options',
-                '#kothi-options',
-                '#plot-options',
-                '#farmhouse-options',
-                '#floor-options',
-                '#com-factory-fields',
-                '#com-hospital-fields',
-                '#com-office-fields',
-                '#com-retail-fields',
-                '#com-plot-fields',
-                '#com-storage-fields'
-            ];
-
-            // Hide and clear all
-            sections.forEach(section => {
-                jQuery(section).hide();
-                clearFields(section);
-            });
-
-            // Then show the relevant section
-            showResidentialSubFields();
-        });
-
-        jQuery('#comPropertyType').change(function () {
-
-             const sections = [
-                '#studio-options',
-                '#other-options',
-                '#bhk-options',
-                '#kothi-options',
-                '#plot-options',
-                '#farmhouse-options',
-                '#floor-options',
-                '#com-factory-fields',
-                '#com-hospital-fields',
-                '#com-office-fields',
-                '#com-retail-fields',
-                '#com-plot-fields',
-                '#com-storage-fields',
-                '#com-other-options'
-            ];
-
-            sections.forEach(section => {
-                jQuery(section).hide();
-                clearFields(section);
-            });
-
-            toggleCommercialSubFields(jQuery(this).val());
-        });
-
-
-
     });
+
+    // Add tag on Enter
+    $("#tag-input").on("keypress", function (e) {
+        if (e.which === 13) {
+            e.preventDefault();
+            $("#add-tag-btn").click();
+        }
+    });
+
+    // Remove tag
+    $(document).on("click", ".remove-tag", function () {
+        const index = $(this).data("index");
+        tags.splice(index, 1);
+        renderTags();
+    });
+
+    // Update tags if fields change
+    $("#categorySelector, #comPropertyType, #resPropertyType, input[name='city']").on("change keyup", function() {
+        loadFieldsAsTags();
+    });
+
+    // ================= Show/hide property age =================
+    jQuery('#bhk_construction_status').on('change', function () {
+        const selectedValue = jQuery(this).val();
+        const ageGroup = jQuery('#bhk_property_age');
+        if (selectedValue === 'Re-Sale') { ageGroup.show(); } else { ageGroup.hide(); }
+    });
+
+    jQuery('#kothi_construction_status').on('change', function () {
+        const selectedValue = jQuery(this).val();
+        const ageGroup = jQuery('#kothi_property_age');
+        if (selectedValue === 'Re-Sale') { ageGroup.show(); } else { ageGroup.hide(); }
+    });
+
+    // ================= Toggle Residential/Commercial Fields =================
+    function toggleCategoryFields() {
+        const category = jQuery('#categorySelector').val();
+        if (category === 'Residential') {
+            jQuery('#residential-fields').slideDown();
+            jQuery('#commercial-fields').slideUp();
+        } else if (category === 'Commercial') {
+            jQuery('#commercial-fields').slideDown();
+            jQuery('#residential-fields').slideUp();
+        } else {
+            jQuery('#residential-fields, #commercial-fields').slideUp();
+        }
+    }
+
+    function showResidentialSubFields() {
+        const type = jQuery('#resPropertyType').val();
+        jQuery('#studio-options,#other-options,#bhk-options, #kothi-options, #plot-options, #farmhouse-options, #floor-options').hide();
+
+        if (type === 'Apartment / Flat') { jQuery('#bhk-options').show(); }
+        else if (type === 'Independent House / Kothi') { jQuery('#kothi-options').show(); }
+        else if (type === 'Residential Plot') { jQuery('#plot-options').show(); }
+        else if (type === 'Farm House') { jQuery('#farmhouse-options').show(); }
+        else if (type === 'Builder Floor') { jQuery('#floor-options').show(); }
+        else if (type === 'Studio Apartment') { jQuery('#studio-options').show(); }
+        else if (type === 'Other') { jQuery('#other-options').show(); }
+    }
+
+    function toggleCommercialSubFields(type) {
+        $('#com-factory-fields,#com-other-options, #com-hospital-fields, #com-office-fields, #com-retail-fields, #com-plot-fields, #com-storage-fields').hide();
+        switch (type) {
+            case "Office": $("#com-office-fields").show(); break;
+            case "Retail": $("#com-retail-fields").show(); break;
+            case "Plot": $("#com-plot-fields").show(); break;
+            case "Storage": $("#com-storage-fields").show(); break;
+            case "Industry/Factory": $("#com-factory-fields").show(); break;
+            case "Hospital": $("#com-hospital-fields").show(); break;
+            case "Other": $("#com-other-options").show(); break;
+        }
+    }
+
+    // ================= Toggle Extra Fields =================
+    jQuery('#toggleExtraFields').change(function () {
+        if (jQuery(this).is(':checked')) { jQuery('#extra-fields').slideDown(); } 
+        else { jQuery('#extra-fields').slideUp(); }
+    });
+
+    // ================= Add Custom Fields Dynamically =================
+    jQuery('#add').click(function () {
+        i++;
+        jQuery('#label').show();
+        jQuery('#dynamic_field').append(
+            '<div id="custom' + i + '" class="row">' +
+                '<div class="col-md-3"><div class="form-group">' +
+                    '<input type="text" class="form-control" name="additional[]" placeholder="label">' +
+                '</div></div>' +
+                '<div class="col-sm-6"><div class="form-group">' +
+                    '<input type="text" class="form-control" name="custom_value[]" placeholder="value">' +
+                '</div></div>' +
+                '<div class="col-sm-2">' +
+                    '<button type="button" name="remove" id="' + i + '" class="btn btn-danger btn_remove">X</button>' +
+                '</div>' +
+            '</div>'
+        );
+    });
+
+    jQuery(document).on('click', '.btn_remove', function () {
+        const button_id = jQuery(this).attr("id");
+        jQuery('#custom' + button_id).remove();
+    });
+
+    // ================= Trigger on Load =================
+    toggleCategoryFields();
+    const category = "<?= isset($properties[0]->category) ? $properties[0]->category : '' ?>";
+    if (category === 'Residential') { showResidentialSubFields(); } 
+    else if (category === 'Commercial') { toggleCommercialSubFields(jQuery('#comPropertyType').val()); }
+
+    // ================= Event Bindings =================
+    jQuery('#categorySelector').change(toggleCategoryFields);
+
+    jQuery('#resPropertyType').change(function () {
+        const sections = [
+            '#studio-options','#other-options','#bhk-options','#kothi-options','#plot-options','#farmhouse-options','#floor-options',
+            '#com-factory-fields','#com-hospital-fields','#com-office-fields','#com-retail-fields','#com-plot-fields','#com-storage-fields'
+        ];
+        sections.forEach(section => { jQuery(section).hide(); clearFields(section); });
+        showResidentialSubFields();
+    });
+
+    jQuery('#comPropertyType').change(function () {
+        const sections = [
+            '#studio-options','#other-options','#bhk-options','#kothi-options','#plot-options','#farmhouse-options','#floor-options',
+            '#com-factory-fields','#com-hospital-fields','#com-office-fields','#com-retail-fields','#com-plot-fields','#com-storage-fields','#com-other-options'
+        ];
+        sections.forEach(section => { jQuery(section).hide(); clearFields(section); });
+        toggleCommercialSubFields(jQuery(this).val());
+    });
+
+});
 </script>
+
 <script>
     $(document).ready(function () {
         $('#propertyForm').on('submit', function (e) {

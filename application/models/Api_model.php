@@ -266,4 +266,143 @@ public function addDataInTable($data, $table)
     return $this->db->insert_id();
 }
 
+
+
+/**
+ * Fetch meetings for multiple lead IDs in one query
+ * and return them grouped by lead_id:
+ *  [ lead_id => [ meeting1, meeting2, ... ], ... ]
+ */
+// ✅ Fetch all meetings grouped by lead_id
+public function getMeetingsByLeadIds($leadIds = [])
+{
+    if (empty($leadIds)) {
+        return [];
+    }
+
+    $this->db->select('*');
+    $this->db->from('meetings');
+    $this->db->where_in('lead_id', $leadIds);
+    $query = $this->db->get();
+
+    $meetings = $query->result_array();
+    $grouped = [];
+
+    foreach ($meetings as $m) {
+        $grouped[$m['lead_id']][] = $m;
+    }
+
+    return $grouped;
+}
+
+// ✅ Fetch property safely by ID
+public function getPropertyById($propertyId)
+{
+    $propertyId = intval(trim($propertyId));
+    if ($propertyId <= 0) {
+        return null;
+    }
+
+    $this->db->select('id, name, property_builder, city, state, budget, phone, bhk, sqft, bathrooms, bedrooms, status, image_one');
+    $this->db->from('properties');
+    $this->db->where('id', $propertyId);
+    $query = $this->db->get();
+
+    return $query->num_rows() > 0 ? $query->row_array() : null;
+}
+
+// Fetch multiple properties with only required fields
+public function getPropertiesByIds($ids = [])
+{
+    if (empty($ids)) {
+        return [];
+    }
+
+    $this->db->select('id, name,address,person, budget, phone');
+    $this->db->from('properties');
+    $this->db->where_in('id', $ids);
+    $query = $this->db->get();
+
+    return $query->num_rows() > 0 ? $query->result_array() : [];
+}
+
+
+public function getCommentsByLeadId($leadId)
+{
+    $this->db->select('leadId, comment, nextdt, choice, userId');
+    $this->db->from('leads_comment');
+    $this->db->where('leadId', $leadId);
+    $query = $this->db->get();
+    return $query->result_array();
+}
+public function getMatchingProperties($lead) {
+    $this->db->select('p.*');
+    $this->db->from('properties p');
+
+    // Sirf active properties fetch karo
+    $this->db->where('p.status', 'active');
+
+    // Property type condition
+    if (!empty($lead->propertyType)) {
+        $this->db->where('p.category', $lead->propertyType);
+    }
+
+    // Budget condition
+    if (isset($lead->max_budget) && $lead->max_budget > 0) {
+        $budgetInWords = $this->convertNumberToWords($lead->max_budget);
+        $minBudget = $lead->max_budget - ($lead->max_budget * 0.15);
+        $maxBudget = $lead->max_budget + ($lead->max_budget * 0.15);
+
+        $this->db->group_start(); 
+        $this->db->where('p.budget', $lead->max_budget);
+        $this->db->or_where('p.budget_in_words', $budgetInWords);
+        $this->db->or_where("p.budget BETWEEN {$minBudget} AND {$maxBudget}");
+        $this->db->group_end();
+    }
+
+    // Exclude deals only for this lead
+    if (!empty($lead->deal)) {
+        $dealIds = explode(',', $lead->deal); 
+        $dealIds = array_map('trim', $dealIds); 
+        if (!empty($dealIds)) {
+            $this->db->where_not_in('p.id', $dealIds);
+        }
+    }
+
+    // Random 4 properties
+    $this->db->order_by('RAND()');
+    $this->db->limit(5);
+
+    $query = $this->db->get();
+    return $query->result();
+}
+
+
+
+
+
+private function convertNumberToWords($number) {
+    $words = "";
+    if ($number >= 10000000) {
+        $crore = floor($number / 10000000);
+        $words .= $crore . " Crore";
+        $number %= 10000000;
+    }
+    if ($number >= 100000) {
+        $lakh = floor($number / 100000);
+        $words .= ($words ? " " : "") . $lakh . " Lakh";
+        $number %= 100000;
+    }
+    if ($number >= 1000) {
+        $thousand = floor($number / 1000);
+        $words .= ($words ? " " : "") . $thousand . " Thousand";
+        $number %= 1000;
+    }
+    if ($number > 0) {
+        $words .= ($words ? " " : "") . $number;
+    }
+    return $words;
+}
+
+
 }

@@ -129,7 +129,9 @@ class Leads extends CI_Controller
     }
 
 public function meeting()
-{
+{ 
+    
+      $meeting_id = $this->uri->segment('4');
     $data["meeting_tasks"] = $this->AdminModel->get_tasks_with_conditions("meeting");
 
     // Meetings by date
@@ -356,7 +358,12 @@ public function meeting()
                     });
                 }
                 $encodedAdditionalInfo = json_encode($filteredInfo);
-
+                        $newRequirements = $this->input->post('new_requirement');
+        $filteredRequirements = [];
+        if (is_array($newRequirements)) {
+            $filteredRequirements = array_filter($newRequirements, fn($val) => trim($val) !== '');
+        }
+        $encodedNewRequirements = json_encode($filteredRequirements);
 
                 $updateData = [
                     "budget"             => $this->input->post("budget"),
@@ -367,6 +374,7 @@ public function meeting()
                      "leads_tags" => $this->input->post("leads_tags"),
                     "propertyType"       => $this->input->post("propertyType"),
                     "requirement"        => $this->input->post("requirement"),
+                     "new_requirement"    => $encodedNewRequirements,
                     "Profession"         => $this->input->post("Profession"),
                     "description"        => $this->input->post("description"),
                     "status"             => $this->input->post("status"),
@@ -1024,6 +1032,13 @@ public function addDeal() {
         $this->form_validation->set_rules("phone", "phone", "trim");
         $this->form_validation->set_error_delimiters('<div class="alert alert-danger">', "</div>");
         if ($this->form_validation->run() != false) {
+                 $buyer = $this->db->where('id', $leadId)->get('buyers')->row();
+      if (!$buyer || empty($buyer->preferred_location) || empty($buyer->budget) || empty($buyer->leads_type)) {
+    $this->session->set_flashdata('error', 'Please fill Preferred Location, Budget, and Lead Type in Leads details before adding a deal.');
+    redirect($_SERVER['HTTP_REFERER']); // jis page se aaya tha usi pe redirect karega
+    exit;
+}
+
             $propertyId = $this->input->post("addProperty");
             $idWhere = ["id" => $propertyId, "status" => "active"];
             $checkpropertyID = $this->AdminModel->getDataByMultipleColumns($idWhere, "properties", "id,status");

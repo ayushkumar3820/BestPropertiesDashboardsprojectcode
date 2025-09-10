@@ -297,6 +297,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
         <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+
         const toggleButton = document.getElementById('toggleButton');
         const moreInfoSection = document.getElementById('more-information');
         
@@ -359,10 +360,8 @@ defined('BASEPATH') or exit('No direct script access allowed');
 </script>
 
 <script>
-      jQuery(document).ready(function () {
-          
-          
-            jQuery("#tag-input").autocomplete({
+jQuery(document).ready(function () {
+    jQuery("#tag-input").autocomplete({
         source: function(request, response) {
             jQuery.ajax({
                 url: "/Siteadmin/Properties/getTags",  
@@ -380,50 +379,72 @@ defined('BASEPATH') or exit('No direct script access allowed');
             return false;
         }
     });
+
     // Store selected tags
-            let tags = [];
-            
-            // Function to render tag chips
-            function renderTags() {
-                $("#tag-container .tag").remove(); // remove old tags
-                tags.forEach((tag, index) => {
-                    $("#tag-input").before(`
-                        <span class="tag badge bg-primary me-1 mb-1" style="color:white; margin-right:3px;display: flex;justify-content: center;align-items: center;background: #007485 !important;font-size: 14px;font-weight: normal;text-transform: capitalize;gap: 5px;">
-                            ${tag} 
-                            <span class="remove-tag" data-index="${index}" style="cursor:pointer;background: red;border-radius: 100px;display: flex;justify-content: center;align-items: flex-start; padding: 2px;font-size: 15px;height: 20px; width: 20px;">&times;</span>
-                        </span>
-                    `);
-                });
-                $("#leads_tags").val(tags.join("~-~")); // hidden input store
-            }
-            
-            // Add tag manually on button click
-            $("#add-tag-btn").on("click", function () {
-                const tagVal = $("#tag-input").val().trim();
-                if (tagVal !== "" && !tags.includes(tagVal)) {
-                    tags.push(tagVal);
-                    $("#tag-input").val("");
-                    renderTags();
-                }
-            });
-            
-            // Enter key add support
-            $("#tag-input").on("keypress", function (e) {
-                if (e.which === 13) {
-                    e.preventDefault();
-                    $("#add-tag-btn").click();
-                }
-            });
-            
-            // Remove tag
-            $(document).on("click", ".remove-tag", function () {
-                const index = $(this).data("index");
-                tags.splice(index, 1);
-                renderTags();
-            });
-})
-            // End Property Tag Code
+    let tags = [];
+
+    // Function to render tag chips
+    function renderTags() {
+        $("#tag-container .tag").remove();
+        tags.forEach((tag, index) => {
+            $("#tag-input").before(`
+                <span class="tag badge bg-primary me-1 mb-1" style="color:white; margin-right:3px;display: flex;justify-content: center;align-items: center;background: #007485 !important;font-size: 14px;font-weight: normal;text-transform: capitalize;gap: 5px;">
+                    ${tag} 
+                    <span class="remove-tag" data-index="${index}" style="cursor:pointer;background: red;border-radius: 100px;display: flex;justify-content: center;align-items: flex-start; padding: 2px;font-size: 15px;height: 20px; width: 20px;">&times;</span>
+                </span>
+            `);
+        });
+        $("#leads_tags").val(tags.join("~-~")); // separator
+    }
+
+    // Add tag function
+    function addTag(val) {
+        if (val !== "" && !tags.includes(val)) {
+            tags.push(val);
+            renderTags();
+        }
+    }
+
+    // Add tag manually
+    $("#add-tag-btn").on("click", function () {
+        const tagVal = $("#tag-input").val().trim();
+        addTag(tagVal);
+        $("#tag-input").val("");
+    });
+
+    // Enter key support
+    $("#tag-input").on("keypress", function (e) {
+        if (e.which === 13) {
+            e.preventDefault();
+            $("#add-tag-btn").click();
+        }
+    });
+
+    // Remove tag
+    $(document).on("click", ".remove-tag", function () {
+        const index = $(this).data("index");
+        tags.splice(index, 1);
+        renderTags();
+    });
+
+    // --- AUTO TAGGING FROM OTHER FIELDS ---
+    $("#propertyType").on("change", function() { addTag($(this).val()); });
+    $("#residentialOptions").on("change", function() { addTag($(this).val()); });
+    $("#commercialOptions").on("change", function() { addTag($(this).val()); });
+    $("#priority").on("change", function() { addTag($(this).val()); });
+    $("#leads_type").on("change", function() { addTag($(this).val()); });
+
+    // City field (jab user kuch likh ke bahar nikle)
+    $("#cityInput").on("blur", function() { 
+        let val = $(this).val().trim();
+        if(val !== "") {
+            addTag(val);
+            // city field clear nahi karenge
+        }
+    });
+});
 </script>
+
 
 <script>
     // PHP array ko JS me bhej diya

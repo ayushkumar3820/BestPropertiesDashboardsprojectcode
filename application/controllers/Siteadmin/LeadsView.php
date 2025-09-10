@@ -74,6 +74,7 @@ if ($this->form_validation->run() != FALSE) {
     $insertData = array(
         'leadId' => $leadId,
         'comment' => $this->input->post('comment'),
+        'userid' => $userId,
         'nextdt' => $this->input->post('nextdt'),
         'choice' => $choice
     );

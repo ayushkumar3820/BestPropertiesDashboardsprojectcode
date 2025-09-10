@@ -299,7 +299,7 @@ textarea.form-control {
                         <th>Choice</th>
                         <th>Message</th>
                         <th>  Date & Time</th>
-                        <th>Status</th>
+                        
                     </tr>
                 </thead>
                 <tbody>
@@ -315,20 +315,20 @@ textarea.form-control {
 
                                  
                                <!--td><a href="<?php // echo base_url().'admin/leads/delete-comment/'.$leadsc->id .'/'.$leadsc->leadId;?>" class="btn btn-danger btn-sm">Delete</a></td-->
-<td>
-    <?php if ($leadsc->status == 'Completed'): ?>
-        <span>Completed</span>
-    <?php elseif ($leadsc->choice == 'Meeting' && ($leadsc->status == 'Active' || $leadsc->status == '')): ?>
-        <select name="FollowUpStatus" data-id="<?php echo ($leadsc->id); ?>">
-            <option value="Active" <?php echo ($leadsc->status == 'Active') ? 'selected' : ''; ?>>Active</option>
-            <option value="Cancelled" <?php echo ($leadsc->status == 'Cancelled') ? 'selected' : ''; ?>>Cancelled</option>
-            <option value="Postponed" <?php echo ($leadsc->status == 'Postponed') ? 'selected' : ''; ?>>Postponed</option>
-            <option value="Completed" <?php echo ($leadsc->status == 'Completed') ? 'selected' : ''; ?>>Completed</option>
-        </select>
-    <?php elseif ($leadsc->choice == 'Meeting' && $leadsc->status != 'Active'): ?>
-        <span><?php echo ($leadsc->status); ?></span>
-    <?php endif; ?>
-</td>
+<!--<td>-->
+<!--    <?php if ($leadsc->status == 'Completed'): ?>-->
+<!--        <span>Completed</span>-->
+<!--    <?php elseif ($leadsc->choice == 'Meeting' && ($leadsc->status == 'Active' || $leadsc->status == '')): ?>-->
+<!--        <select name="FollowUpStatus" data-id="<?php echo ($leadsc->id); ?>">-->
+<!--            <option value="Active" <?php echo ($leadsc->status == 'Active') ? 'selected' : ''; ?>>Active</option>-->
+<!--            <option value="Cancelled" <?php echo ($leadsc->status == 'Cancelled') ? 'selected' : ''; ?>>Cancelled</option>-->
+<!--            <option value="Postponed" <?php echo ($leadsc->status == 'Postponed') ? 'selected' : ''; ?>>Postponed</option>-->
+<!--            <option value="Completed" <?php echo ($leadsc->status == 'Completed') ? 'selected' : ''; ?>>Completed</option>-->
+<!--        </select>-->
+<!--    <?php elseif ($leadsc->choice == 'Meeting' && $leadsc->status != 'Active'): ?>-->
+<!--        <span><?php echo ($leadsc->status); ?></span>-->
+<!--    <?php endif; ?>-->
+<!--</td>-->
 
                             </tr>
                     <?php

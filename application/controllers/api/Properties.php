@@ -14,6 +14,112 @@ class Properties extends REST_Controller
         if (!$checkToken) { die(); }
     }
 
+public function getProperty_get()
+{
+    $this->load->database();
+
+    // Fetch all properties
+    $this->db->select('
+        p.id,
+        p.name,
+        p.type,
+        p.phone,
+        p.budget,
+        p.budget_in_words,
+        p.property_type,
+        p.address,
+        p.created_at,
+        p.bathrooms,
+        p.amenities,
+        p.bedrooms,
+        p.sqft,
+        p.measureUnit,
+        p.verified,
+        p.city,
+        CONCAT("' . base_url() . 'assets/properties/", p.image_one) as image
+    ');
+    $this->db->from('properties p');
+    $this->db->where('p.status', 'active');
+    $this->db->order_by('p.id', 'DESC');
+
+    $query = $this->db->get();
+    $properties = $query->result_array();
+
+    if (empty($properties)) {
+        $return['message'] = 'No Properties found';
+    } else {
+        foreach ($properties as &$item) {
+            // Generate unique_id
+            $cityPrefix = substr(preg_replace('/\s+/', '', strtolower($item['city'] ?? 'MO')), 0, 2);
+            $item['unique_id'] = strtoupper($cityPrefix . $item['id']);
+
+            // ✅ Fetch related meetings
+            $this->db->select('
+                m.id,
+                m.lead_id,
+                m.comment,
+                m.offer,
+                m.purpose,
+                m.location,
+                m.outcome,
+                m.meeting_date,
+                m.status,
+                m.next_step,
+                m.user_id,
+                m.property_id
+            ');
+            $this->db->from('meetings m');
+            $this->db->like('m.property_id', '"' . $item['id'] . '"');
+            $meetingsQuery = $this->db->get();
+            $meetings = $meetingsQuery->result_array();
+
+            // ✅ Add buyer info for each meeting
+            foreach ($meetings as &$meeting) {
+                $this->db->select('uName, mobile, email,preferred_location,budget');
+                $this->db->from('buyers');
+                $this->db->where('id', $meeting['lead_id']);
+                $buyerQuery = $this->db->get();
+                $buyer = $buyerQuery->row_array();
+
+                if ($buyer) {
+                    $meeting['buyer'] = [
+                        'name'  => $buyer['uName'],
+                        'phone' => $buyer['mobile'],
+                        'email' => $buyer['email'],
+                        'preferred_location'=>$buyer['preferred_location'],
+                        'budget'=>$buyer['budget']
+                    ];
+                } else {
+                    $meeting['buyer'] = null;
+                }
+            }
+
+            // Attach meetings under property
+            $item['meetings'] = $meetings;
+        }
+
+        $return['result'] = $properties;
+    }
+
+    $this->response($return, REST_Controller::HTTP_OK);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     /** Add Property API **/
 public function addAdminProperty_post()
 {

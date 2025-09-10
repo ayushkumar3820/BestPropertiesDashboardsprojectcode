@@ -25,13 +25,41 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 				</div>
             </div>
 	      
-         
-             <div class="col-sm-4">
-                <div class="form-group">
-					<label>Purpose</label>
-                    <input type="text"  name="purpose" value=""  class="form-control" placeholder="Purpose" required></textarea>
-				</div>
-            </div>
+            
+  <div class="form-group col-sm-4">
+    <label>Purpose</label>
+    <select name="purpose" class="form-control">
+        <option value="">Select Purpose</option>
+        <?php 
+        $meetingPurpose = meetingPurpose();
+
+        foreach ($meetingPurpose as $opdtion) {
+            $selected = (isset($_POST['purpose']) && $_POST['purpose'] == $opdtion) ? 'selected' : '';
+            echo "<option value='$opdtion' $selected>$opdtion</option>";
+        }
+        ?>
+    </select>
+</div>
+
+
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
              <div class="col-sm-4">
                 <div class="form-group">
 					<label>Meeting Location</label>

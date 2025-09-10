@@ -256,21 +256,21 @@ public function deleteRow($value, $table, $field) {
 
 public function get_calendar_meetings()
 {
-    $this->db->select('nextdt, comment, leadId'); 
-    $query = $this->db->get('leads_comment');
+    $this->db->select('id, meeting_date, purpose, lead_id'); 
+    $query = $this->db->get('meetings');
 
     $results = $query->result_array();
 
     $meetings = [];
 
     foreach ($results as $row) {
-        $date = date('Y-m-d', strtotime($row['nextdt']));
+        $date = date('Y-m-d', strtotime($row['meeting_date']));
         if (!isset($meetings[$date])) {
             $meetings[$date] = [];
         }
         $meetings[$date][] = [
-            'comment' => $row['comment'],
-            'leadId' => $row['leadId']
+            'purpose' => $row['purpose'],
+            'id' => $row['id']
         ];
     }
 
@@ -500,17 +500,15 @@ public function get_meeting_list() {
 
 
 public function getMatchingProperties($lead) {
-    $this->db->select('p.*, pc.property_url');
+    $this->db->select('p.*');
     $this->db->from('properties p');
-    $this->db->join('properties_clone pc', 'p.clone_id = pc.id', 'left');
-    // $this->db->where('p.status', 'active');
 
-    $hasConditions = false;
+    // Sirf active properties fetch karo
+    $this->db->where('p.status', 'active');
 
     // Property type condition
-    if (!empty($lead->propertyType_sub)) {
+    if (!empty($lead->propertyType)) {
         $this->db->where('p.category', $lead->propertyType);
-        $hasConditions = true;
     }
 
     // Budget condition
@@ -524,19 +522,25 @@ public function getMatchingProperties($lead) {
         $this->db->or_where('p.budget_in_words', $budgetInWords);
         $this->db->or_where("p.budget BETWEEN {$minBudget} AND {$maxBudget}");
         $this->db->group_end();
-
-        $hasConditions = true;
     }
 
-    // Only wrap conditions in group if any exist
-    if ($hasConditions) {
-        // Already added above with group_start where needed
+    // Exclude deals only for this lead
+    if (!empty($lead->deal)) {
+        $dealIds = explode(',', $lead->deal); 
+        $dealIds = array_map('trim', $dealIds); 
+        if (!empty($dealIds)) {
+            $this->db->where_not_in('p.id', $dealIds);
+        }
     }
 
-    $this->db->order_by('p.id', 'DESC');
+    // Random 4 properties
+    $this->db->order_by('RAND()');
+    $this->db->limit(4);
+
     $query = $this->db->get();
     return $query->result();
 }
+
 
 
 // Convert number to words (unchanged)

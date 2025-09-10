@@ -310,6 +310,8 @@
                                     <select name="bhk_carpet_area_unit" class="form-control">
                                         <option value="">Select</option>
                                         <option value="sq.ft">sq.ft</option>
+                                        <option value="sq.yard">sq.yard</option>
+                                       
                                         <option value="marla">marla</option>
                                         <option value="kanal">kanal</option>
                                     </select>
@@ -322,6 +324,7 @@
                                     <select name="bhk_built_area_unit" class="form-control">
                                         <option value="">Select</option>
                                         <option value="sq.ft">sq.ft</option>
+                                        <option value="sq.yard">sq.yard</option>
                                         <option value="marla">marla</option>
                                         <option value="kanal">kanal</option>
                                     </select>
@@ -334,6 +337,7 @@
                                     <select name="bhk_land_area_unit" class="form-control">
                                         <option value="">Select</option>
                                         <option value="sq.ft">sq.ft</option>
+                                     <option value="sq.yard">sq.yard</option>
                                         <option value="marla">marla</option>
                                         <option value="kanal">kanal</option>
                                     </select>
@@ -511,6 +515,7 @@
                                     <select name="farm_carpet_area_unit" class="form-control">
                                         <option value="">Select</option>
                                         <option value="sq.ft">sq.ft</option>
+                                        <option value="sq.yard">sq.yard</option>
                                         <option value="marla">marla</option>
                                         <option value="kanal">kanal</option>
                                     </select>
@@ -538,6 +543,7 @@
                                     <select name="floor_carpet_area_unit" class="form-control">
                                         <option value="">Select</option>
                                         <option value="sq.ft">sq.ft</option>
+                                        <option value="sq.yard">sq.yard</option>
                                         <option value="marla">marla</option>
                                         <option value="kanal">kanal</option>
                                     </select>
@@ -583,6 +589,7 @@
                                     <select name="studio_carpet_area_unit" class="form-control">
                                         <option value="">Select</option>
                                         <option value="sq.ft">sq.ft</option>
+                                        <option value="sq.yard">sq.yard</option>
                                         <option value="marla">marla</option>
                                         <option value="kanal">kanal</option>
                                     </select>
@@ -671,6 +678,7 @@
                                     <select name="com_office_carpet_area_unit" class="form-control">
                                         <option value="">Select</option>
                                         <option value="sq.ft">sq.ft</option>
+                                        <option value="sq.yard">sq.yard</option>
                                         <option value="marla">marla</option>
                                         <option value="kanal">kanal</option>
                                     </select>
@@ -818,6 +826,7 @@
                                     <select name="com_plot_carpet_area_unit" class="form-control">
                                         <option value="">Select</option>
                                         <option value="sq.ft">sq.ft</option>
+                                        <option value="sq.yard">sq.yard</option>
                                         <option value="marla">marla</option>
                                         <option value="kanal">kanal</option>
                                     </select>
@@ -836,6 +845,7 @@
                                         <select name="com_built_area_unit" class="form-control">
                                             <option value="">Select</option>
                                             <option value="sq.ft">sq.ft</option>
+                                            <option value="sq.yard">sq.yard</option>
                                             <option value="marla">marla</option>
                                             <option value="kanal">kanal</option>
                                         </select>
@@ -849,6 +859,7 @@
                                         <select name="com_land_area_unit" class="form-control">
                                             <option value="">Select</option>
                                             <option value="sq.ft">sq.ft</option>
+                                            <option value="sq.yard">sq.yard</option>
                                             <option value="marla">marla</option>
                                             <option value="kanal">kanal</option>
                                         </select>
@@ -883,6 +894,7 @@
                                     <select name="factory_built_area_unit" class="form-control">
                                         <option value="">Select</option>
                                         <option value="sq.ft">sq.ft</option>
+                                         <option value="sq.yard">sq.yard</option>
                                         <option value="marla">marla</option>
                                         <option value="kanal">kanal</option>
                                     </select>
@@ -896,6 +908,7 @@
                                     <select name="factory_land_area_unit" class="form-control">
                                         <option value="">Select</option>
                                         <option value="sq.ft">sq.ft</option>
+                                       <option value="sq.yard">sq.yard</option>
                                         <option value="marla">marla</option>
                                         <option value="kanal">kanal</option>
                                     </select>
@@ -1502,6 +1515,60 @@
         });
 
         $(document).ready(function () {
+            // 🔹 Property Tags
+let tags = [];
+
+function renderTags() {
+    $("#tag-container .tag").remove();
+    tags.forEach((tag, index) => {
+        $("#tag-input").before(`
+            <span class="tag badge bg-primary me-1 mb-1" 
+                  style="display:flex;align-items:center;background:#007485!important;font-size:14px;gap:5px;">
+                ${tag} 
+                <span class="remove-tag" data-index="${index}" 
+                      style="cursor:pointer;background:red;border-radius:100px;
+                      display:flex;align-items:center;justify-content:center;
+                      height:20px;width:20px;">&times;</span>
+            </span>
+        `);
+    });
+    $("#property_tags").val(tags.join("~-~"));
+}
+
+function addTag(val) {
+    if (val && !tags.includes(val)) {
+        tags.push(val);
+        renderTags();
+    }
+}
+
+$("#add-tag-btn").on("click", function () {
+    addTag($("#tag-input").val().trim());
+    $("#tag-input").val("");
+});
+
+$("#tag-input").on("keypress", function (e) {
+    if (e.which === 13) {
+        e.preventDefault();
+        $("#add-tag-btn").click();
+    }
+});
+
+$(document).on("click", ".remove-tag", function () {
+    const index = $(this).data("index");
+    tags.splice(index, 1);
+    renderTags();
+});
+
+// --- AUTO TAGGING FROM OTHER FIELDS ---
+$("input[name='category']").on("change", function() { addTag($(this).val()); });
+$("#resPropertyType").on("change", function() { addTag($(this).val()); });
+$("#comPropertyType").on("change", function() { addTag($(this).val()); });
+$("input[name='city']").on("blur", function() { 
+    let val = $(this).val().trim();
+    if(val !== "") { addTag(val); }
+});
+
             $('#propertyForm').on('submit', function (e) {
                 e.preventDefault();
 

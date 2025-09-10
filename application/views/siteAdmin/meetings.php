@@ -54,13 +54,18 @@ if ($hour >= 0 && $hour <= 24) {
 ?>
 </td>
 
-						                 <td><?php echo $meeting->purpose;?></td>
+						                 <td><?php echo $meeting->purpose;?><br>
+						                <small> <?php echo $meeting->location;?></small>
+						                 </td>
 						                
 						                <td><?php echo $meeting->status;?></td>
                                       
                                         
                                         
-						                <td><a href="<?php echo base_url().'admin/meeting/edit/'.$meeting->id;?>" class="btn btn-success btn-sm">Edit</a>
+						                <td class="img-flx">
+						                    <a href="<?php echo base_url().'admin/meeting/edit/'.$meeting->id;?>" class="btn btn-success btn-sm">Edit</a>
+						                     <a href="<?php echo base_url().'admin/meeting/edit/'.$meeting->id;?>?type=status" class="btn btn-success btn-sm">Update Status</a>
+						                      <a href="<?php echo base_url().'admin/meeting/edit/'.$meeting->id;?>?type=rechedule" class="btn btn-success btn-sm">Rechedule</a>
 						               
 						                 <a href="<?php echo base_url().'admin/meeting/delete/'.$meeting->id;?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this project?')">Delete</a>
 						                </td>

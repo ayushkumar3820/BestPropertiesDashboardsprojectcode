@@ -13,6 +13,9 @@ class AppApiMeeting extends REST_Controller
         $this->load->database();
         $this->load->helper('url');
         $this->load->model('Api_model');
+         $this->load->model('AdminModel');
+         $this->load->helper('headerdata');
+        
 
         $checkToken = $this->checkForToken();
         if (!$checkToken) {
@@ -123,6 +126,20 @@ if($lastMeeting && $lastMeeting->status != 'Complete') {
     return; // exit function
 }
 
+   $buyer = $this->db->where('id', $leadId)->get('buyers')->row();
+                if (!$buyer || empty($buyer->preferred_location) || empty($buyer->budget) || empty($buyer->leads_type)) {
+                    $return['message'] = 'Please fill Preferred Location, Budget, and Lead Type in buyer details before adding a meeting.';
+                    $this->response($return, REST_Controller::HTTP_OK);
+                    return;
+                }
+                $allowedPurposes = meetingPurpose();
+
+              if (!in_array($data['purpose'], $allowedPurposes)) {
+                  $return['message'] = 'Invalid purpose selected.';
+                  $this->response($return, REST_Controller::HTTP_OK);
+                  return;
+              }
+
                 $insertData = array(
                     'user_id'      => $userId,
                     'lead_id'      => $leadId,
@@ -185,7 +202,19 @@ public function editMeeting_post()
     $return['message'] = 'Invalid meeting time. Please select between 7 AM to 7 PM.';
     $this->response($return, REST_Controller::HTTP_OK);
     return;
+}  
+
+$allowedPurposes = meetingPurpose();
+
+if (isset($data['purpose']) && $data['purpose'] !== '') {
+    if (!in_array($data['purpose'], $allowedPurposes)) {
+        $return['message'] = 'Invalid purpose selected.';
+        $this->response($return, REST_Controller::HTTP_OK);
+        return;
+    }
 }
+
+             
 
                 $updateData = array(
                     'meeting_date' => $data['meeting_date'] ?? '',
@@ -399,6 +428,191 @@ public function deleteMeeting_delete()
     return $this->response($response, REST_Controller::HTTP_OK);
 }
 
+public function getMessageLData_post()
+{
+    $return = array('status' => 'error', 'message' => 'Please send all required parameters', 'result' => '');
 
-    
+    $json = file_get_contents('php://input');
+    $data = json_decode($json, true);
+
+    $token  = removeAllSpecialCharcter($data['token'] ?? '');
+    $userId = removeAllSpecialCharcter($data['user_id'] ?? '');
+    $leadId = removeAllSpecialCharcter($data['leadId'] ?? '');
+
+    if ($token == '') {
+        $return['message'] = 'Please pass the valid token.';
+    } elseif (!$userId || !is_numeric($userId)) {
+        $return['message'] = 'Please pass a valid user id.';
+    } elseif (!$leadId || !is_numeric($leadId)) {
+        $return['message'] = 'Please pass a valid lead id.';
+    } else {
+
+        $checkToken = $this->Api_model->getRecordByColumn('token', $token, 'adminLogin');
+
+        if ($checkToken) {
+            $loginUser = $checkToken[0]; 
+            $dbUserId  = $loginUser['id']; 
+            $role      = strtolower($loginUser['role'] ?? '');
+
+            if ($dbUserId != $userId) {
+                $return['message'] = 'Invalid user id.';
+                $this->response($return, REST_Controller::HTTP_UNAUTHORIZED);
+                return;
+            }
+
+            
+            $commentsData = $this->Api_model->getCommentsByLeadId($leadId);
+
+            if (!empty($commentsData)) {
+                $return['status']  = 'done';
+                $return['message'] = 'Comments fetched successfully.';
+                $return['result']  = $commentsData;
+            } else {
+                $return['status']  = 'Fail';
+                $return['message'] = 'No records found.';
+            }
+        } else {
+            $return['message'] = 'Invalid token.';
+        }
+    }
+
+    $this->response($return, REST_Controller::HTTP_OK);
+}
+public function addMessageLData_post()
+{
+    $return = array('status' => 'error', 'message' => 'Please send all required parameters', 'result' => '');
+
+    $json = file_get_contents('php://input');
+    $data = json_decode($json, true);
+
+    $token   = removeAllSpecialCharcter($data['token'] ?? '');
+    $userId  = removeAllSpecialCharcter($data['user_id'] ?? '');
+    $leadId  = removeAllSpecialCharcter($data['leadId'] ?? '');
+    $comment = trim($data['comment'] ?? '');
+    $nextdt  = trim($data['nextdt'] ?? '');
+    $choice  = trim($data['choice'] ?? '');
+
+    if ($token == '') {
+        $return['message'] = 'Please pass the valid token.';
+    } elseif (!$userId || !is_numeric($userId)) {
+        $return['message'] = 'Please pass a valid user id.';
+    } elseif (!$leadId || !is_numeric($leadId)) {
+        $return['message'] = 'Please pass a valid lead id.';
+    } elseif ($comment == '') {
+        $return['message'] = 'Please enter comment.';
+    } elseif (!in_array($choice, ['Followup', 'Message'])) {
+        $return['message'] = 'Please select a valid choice (Followup or Message).';
+    } else {
+
+        $checkToken = $this->Api_model->getRecordByColumn('token', $token, 'adminLogin');
+
+        if ($checkToken) {
+            $loginUser = $checkToken[0];
+            $dbUserId  = $loginUser['id'];
+            $role      = strtolower($loginUser['role'] ?? '');
+
+            if ($dbUserId != $userId) {
+                $return['message'] = 'Invalid user id.';
+                $this->response($return, REST_Controller::HTTP_UNAUTHORIZED);
+                return;
+            }
+
+           
+            $insertData = array(
+                'leadId' => $leadId,
+                'comment' => $comment,
+                'nextdt' => $nextdt,
+                'choice' => $choice,
+                'userId' => $userId
+            );
+
+            $insertId = $this->Api_model->add_data_in_table($insertData, 'leads_comment');
+
+            if ($insertId) {
+                $return['status']  = 'done';
+                $return['message'] = 'Comment added successfully.';
+               
+            } else {
+                $return['message'] = 'Failed to add comment.';
+            }
+        } else {
+            $return['message'] = 'Invalid token.';
+        }
+    }
+
+    $this->response($return, REST_Controller::HTTP_OK);
+}
+
+public function getMatchingProperties_post()
+{
+    $return = array('status' => 'error', 'message' => 'Please send all required parameters', 'result' => '');
+
+    $json = file_get_contents('php://input');
+    $data = json_decode($json, true);
+
+    $token  = removeAllSpecialCharcter($data['token'] ?? '');
+    $userId = removeAllSpecialCharcter($data['user_id'] ?? '');
+    $leadId = removeAllSpecialCharcter($data['leadId'] ?? '');
+    $propertyType = trim($data['propertyType'] ?? '');
+    $maxBudget    = trim($data['max_budget'] ?? '');
+    $deal         = trim($data['deal'] ?? '');
+
+    if ($token == '') {
+        $return['message'] = 'Please pass the valid token.';
+    } elseif (!$userId || !is_numeric($userId)) {
+        $return['message'] = 'Please pass a valid user id.';
+    } elseif (!$leadId || !is_numeric($leadId)) {
+        $return['message'] = 'Please pass a valid lead id.';
+    } else {
+        // Token validation
+        $checkToken = $this->Api_model->getRecordByColumn('token', $token, 'adminLogin');
+
+        if ($checkToken) {
+            $loginUser = $checkToken[0];
+            $dbUserId  = $loginUser['id'];
+
+            if ($dbUserId != $userId) {
+                $return['message'] = 'Invalid user id.';
+                $this->response($return, REST_Controller::HTTP_UNAUTHORIZED);
+                return;
+            }
+
+            // ✅ Check if lead exists in buyers table
+            $buyer = $this->db->get_where('buyers', ['id' => $leadId])->row();
+            if (!$buyer) {
+                $return['status'] = 'fail';
+                $return['message'] = 'Invalid lead id.';
+                $this->response($return, REST_Controller::HTTP_OK);
+                return;
+            }
+
+            // Prepare lead object
+            $lead = new stdClass();
+            $lead->leadId = $leadId;
+            $lead->propertyType = $propertyType;
+            $lead->max_budget = is_numeric($maxBudget) ? (float)$maxBudget : 0;
+            $lead->deal = $deal;
+
+            // Fetch matching properties
+            $properties = $this->Api_model->getMatchingProperties($lead);
+
+            if (!empty($properties)) {
+                $return['status'] = 'done';
+                $return['message'] = 'Properties fetched successfully.';
+                $return['result'] = $properties;
+            } else {
+                $return['status'] = 'fail';
+                $return['message'] = 'No properties found.';
+            }
+
+        } else {
+            $return['message'] = 'Invalid token.';
+        }
+    }
+
+    $this->response($return, REST_Controller::HTTP_OK);
+}
+
+
+
 }
