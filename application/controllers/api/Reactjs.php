@@ -119,7 +119,7 @@ class Reactjs extends REST_Controller
         $this->db->where('p.status', 'active');
 
           // ✅ Only include properties created in last 6 months
-        $this->db->where('p.created_at >=', date('Y-m-d H:i:s', strtotime('-6 months')));
+        // $this->db->where('p.created_at >=', date('Y-m-d H:i:s', strtotime('-6 months')));
 
         $this->db->order_by('p.id', 'DESC');
 

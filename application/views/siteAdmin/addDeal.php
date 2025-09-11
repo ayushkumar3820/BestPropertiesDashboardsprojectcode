@@ -42,8 +42,8 @@
                             <tr data-property-id="<?php echo $property->properties_id; ?>">
                                 <td><?php echo $i; ?></td>
                                 <td><?php echo $property->name; ?></td>
-                                <td>
-                                    <select name="interestedDropDown" data-id="<?php echo $property->properties_id; ?>">
+                                <td     >
+                                    <select name="interestedDropDown" data-id="<?php echo $property->properties_id; ?>" style="width:35% !important;">
                                         <option value="Interested" <?php if ($property->status == 'Interested') echo 'selected'; ?>>Interested</option>
                                         <option value="Not Interested" <?php if ($property->status == 'Not Interested') echo 'selected'; ?>>Not Interested</option>
                                     </select>

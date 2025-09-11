@@ -8,7 +8,7 @@
     </div>
              <a href="<?php echo base_url('admin/leads');?>" style="float: right;margin: 14px 2px;" class="btn btn-sm btn-info back-btn">Back</a>
             <a href="<?php echo base_url('admin/meeting/add/').$this->uri->segment('4');?>" style="float: right;margin: 14px 2px;" class="btn btn-sm btn-info back-btn">Add New</a>
-            <h1 class="d-sm-block heading"><?php echo $title; ?></h1>
+            <h1 class="d-sm-block heading" style="margin-left:10px;"><?php echo $title; ?></h1>
             <div class="clearfix"></div>
             <?php $message = $this->session->flashdata('message');
         	  if($message != ''){
@@ -17,7 +17,7 @@
             <div class="clearfix"></div>
             
             <div class="row">
-                <div class="col-sm-12">
+                <div class="col-sm-12" style="    margin-left: 10px;">
                     <div class="table-responsive">
                         <div class="table-main-div">
 		              <table class="table table-striped">
@@ -158,5 +158,10 @@ background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBo
     transition: all 0.5s ease;
     color: #fff;
     font-size: 14px;
+}
+.img-flx{
+  display: flex;
+  gap:6px
+
 }
 </style>

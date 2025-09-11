@@ -613,6 +613,144 @@ public function getMatchingProperties_post()
     $this->response($return, REST_Controller::HTTP_OK);
 }
 
+public function addLeadDeals_post(){
+    
+
+    $json = file_get_contents('php://input');
+    $data = json_decode($json, true);
+
+    $token = removeAllSpecialCharcter($data['token'] ?? '');
+    $userId = removeAllSpecialCharcter($data['user_id'] ?? '');
+    $leadId = removeAllSpecialCharcter($data['leadId'] ?? '');
+    $propertyIds = $data['property_ids'] ?? []; // Array of property IDs
+    $status = $data['status'] ?? 'Interested'; // Default Interested
+
+    if($token == ''){
+        $return['message'] = 'Please pass a valid token.';
+    } elseif(!$userId || !is_numeric($userId)){
+        $return['message'] = 'Please pass a valid user id.';
+    } elseif(!$leadId || !is_numeric($leadId)){
+        $return['message'] = 'Please pass a valid lead id.';
+    } elseif(empty($propertyIds)){
+        $return['message'] = 'Please select at least one property.';
+    } else {
+        $checkToken = $this->Api_model->getRecordByColumn('token', $token, 'adminLogin');
+
+        if($checkToken){
+            $loginUser = $checkToken[0];
+            $dbUserId = $loginUser['id'];
+
+            if($dbUserId != $userId){
+                $return['message'] = 'Invalid user id.';
+                $this->response($return, REST_Controller::HTTP_UNAUTHORIZED);
+                return;
+            }
+
+            // Insert multiple deals
+            $this->Api_model->insertMultipleDeals($leadId, $propertyIds, $status);
+
+            $return['status'] = 'done';
+            $return['message'] = 'Deals added successfully.';
+        } else {
+            $return['message'] = 'Invalid token.';
+        }
+    }
+
+    $this->response($return, REST_Controller::HTTP_OK);
+}
+
+public function getLeadDeals_post() {
+    $json = file_get_contents('php://input');
+    $data = json_decode($json, true);
+
+    $token = removeAllSpecialCharcter($data['token'] ?? '');
+    $userId = removeAllSpecialCharcter($data['user_id'] ?? '');
+    $leadId = removeAllSpecialCharcter($data['leadId'] ?? '');
+
+    if($token == ''){
+        $return['message'] = 'Please pass a valid token.';
+    } elseif(!$userId || !is_numeric($userId)){
+        $return['message'] = 'Please pass a valid user id.';
+    } elseif(!$leadId || !is_numeric($leadId)){
+        $return['message'] = 'Please pass a valid lead id.';
+    } else {
+        $checkToken = $this->Api_model->getRecordByColumn('token', $token, 'adminLogin');
+
+        if($checkToken){
+            $loginUser = $checkToken[0];
+            $dbUserId = $loginUser['id'];
+
+            if($dbUserId != $userId){
+                $return['message'] = 'Invalid user id.';
+                $this->response($return, REST_Controller::HTTP_UNAUTHORIZED);
+                return;
+            }
+
+            // Get lead deals by lead_id
+            $where = ['lead_id' => $leadId];
+            $deals = $this->Api_model->getDataByMultipleColumns($where, 'leadDeal');
+
+            if(!empty($deals)){
+                $return['status'] = 'done';
+                $return['message'] = 'Deals fetched successfully.';
+                $return['result'] = $deals;
+            } else {
+                $return['status'] = 'fail';
+                $return['message'] = 'No deals found for this lead.';
+            }
+        } else {
+            $return['message'] = 'Invalid token.';
+        }
+    }
+
+    $this->response($return, REST_Controller::HTTP_OK);
+}
+public function updateLeadDealStatus_post() {
+    $json = file_get_contents('php://input');
+    $data = json_decode($json, true);
+
+    $token = removeAllSpecialCharcter($data['token'] ?? '');
+    $userId = removeAllSpecialCharcter($data['user_id'] ?? '');
+    $leadId = removeAllSpecialCharcter($data['leadId'] ?? '');
+    $propertyId = removeAllSpecialCharcter($data['propertyId'] ?? '');
+    $status = $data['status'] ?? '';
+
+    if($token == ''){
+        $return['message'] = 'Please pass a valid token.';
+    } elseif(!$userId || !is_numeric($userId)){
+        $return['message'] = 'Please pass a valid user id.';
+    } elseif(!$leadId || !is_numeric($leadId)){
+        $return['message'] = 'Please pass a valid lead id.';
+    } elseif(!$propertyId || !is_numeric($propertyId)){
+        $return['message'] = 'Please pass a valid property id.';
+    } elseif($status == ''){
+        $return['message'] = 'Please pass a valid status.';
+    } else {
+        $checkToken = $this->Api_model->getRecordByColumn('token', $token, 'adminLogin');
+
+        if($checkToken){
+            $loginUser = $checkToken[0];
+            $dbUserId = $loginUser['id'];
+
+            if($dbUserId != $userId){
+                $return['message'] = 'Invalid user id.';
+                $this->response($return, REST_Controller::HTTP_UNAUTHORIZED);
+                return;
+            }
+
+           
+            $this->Api_model->updateTable('properties_id', $propertyId, 'leadDeal', ['status' => $status]);
+
+            $return['status'] = 'done';
+            $return['message'] = 'Status updated successfully.';
+        } else {
+            $return['message'] = 'Invalid token.';
+        }
+    }
+
+    $this->response($return, REST_Controller::HTTP_OK);
+}
+
 
 
 }

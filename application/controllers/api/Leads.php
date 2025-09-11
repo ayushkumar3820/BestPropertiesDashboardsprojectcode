@@ -272,6 +272,11 @@ public function updateLeadsData_post($id = null)
         ], REST_Controller::HTTP_BAD_REQUEST);
     }
 
+    // Convert new_requirement array to JSON string before saving
+    if (isset($data['new_requirement']) && is_array($data['new_requirement'])) {
+        $data['new_requirement'] = json_encode($data['new_requirement']);
+    }
+
     // Database update
     $updated = $this->Api_model->updateTable('id', $id, 'buyers', $data);
 

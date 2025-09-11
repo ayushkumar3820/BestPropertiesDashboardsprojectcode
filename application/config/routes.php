@@ -111,6 +111,14 @@ $route['delete-meeting'] = 'api/AppApiMeeting/deleteAllMeetings';
 //properties fillter api
 $route['get_matching_properties'] = 'api/AppApiMeeting/getMatchingProperties';
 
+//deal api
+$route['add_lead_deals']= 'api/AppApiMeeting/addLeadDeals';
+$route['get_lead_deals'] = 'api/AppApiMeeting/getLeadDeals';
+$route['update_lead_deal_status'] = 'api/AppApiMeeting/updateLeadDealStatus';
+
+
+
+
 
 
 

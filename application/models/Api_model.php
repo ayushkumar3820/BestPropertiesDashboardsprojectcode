@@ -378,9 +378,6 @@ public function getMatchingProperties($lead) {
 }
 
 
-
-
-
 private function convertNumberToWords($number) {
     $words = "";
     if ($number >= 10000000) {
@@ -402,6 +399,34 @@ private function convertNumberToWords($number) {
         $words .= ($words ? " " : "") . $number;
     }
     return $words;
+}
+public function getDataByMultipleColumns($where, $table, $columns='*', $orderBy='', $orderByValue='asc', $limit=''){
+    $this->db->select($columns);
+    $this->db->from($table);
+    $this->db->where($where);
+    if($orderBy != '') { $this->db->order_by($orderBy, $orderByValue); }
+    if($limit != '') { $this->db->limit($limit); }
+    $query = $this->db->get();
+    return $query->result(); 
+}
+public function insertMultipleDeals($leadId, $propertyIds, $status='Interested'){
+    if(empty($propertyIds) || !$leadId) return false;
+
+    foreach($propertyIds as $propertyId){
+        // Get property name
+        $propertyData = $this->getDataByMultipleColumns(['id'=>$propertyId], 'properties', 'name');
+        if(!empty($propertyData)){
+            $dataToInsert = [
+                'name' => $propertyData[0]->name,
+                'lead_id' => $leadId,
+                'properties_id' => $propertyId,
+                'status' => $status,
+                'date' => date('Y-m-d H:i:s')
+            ];
+            $this->insertData('leadDeal', $dataToInsert);
+        }
+    }
+    return true;
 }
 
 

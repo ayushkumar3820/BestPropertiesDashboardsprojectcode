@@ -1,13 +1,251 @@
 /*Start Css  31-05-25*/
+/* Container ko flex banate hain */
+#additional-requirements-container,
+.form-group label {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* Label ke saath button same line me */
+#add-requirement {
+        margin-left: 120px; /* thoda space label se */
+    height: 35px;      /* input ke height ke saath match */
+}
+
+/* Individual input group ko full width rakho */
+.input-group {
+    width: 100%;
+    margin-top: 5px;
+}
 .advance-search {
 	flex-wrap: nowrap !important;
 	gap: 6px;
 	justify-content: center;
 }
+.img-flx a.btn.btn-success.btn-sm {
+    padding: 1px 5px 1px 5px !important;
+    /* width: 100% !important; */
+    font-weight: normal;
+    font-size: 15px;
+}
+
+.min-h textarea.form-control {
+    height: 100px;
+}
+
+
+.img-flx a.btn.btn-danger.btn-sm {
+    padding: 1px 5px 1px 5px !important;
+    /* width: 100% !important; */
+    font-weight: normal;
+    font-size: 15px;
+        margin-bottom: 13px !important;
+}
+
+element.style {
+    /* margin-left: 24px; */
+}
+.form {
+    margin-left: 15px !important;
+}
+
+.btn-csssa.btn.btn-success.btn-sm {
+    /* width: 34%; */
+    hight: 10px !important;
+    padding: 5px 5px 5px 5px !important;
+}
+You, Now
+.main .heading {
+    font-size: 36px;
+    font-weight: 600;
+    /* margin-top: 30px; */
+    margin-bottom: 25px;
+    color: #007485;
+    text-transform: uppercase;
+}
+
 .table th,
 .table td {
 	padding: 3px;
 }
+#tag-container{
+    gap: 5px !important;
+}
+#filterForm .form-group input, select {
+    width: 100%;
+}
+
+/* =--------- Start Css  22-08-25 ---------*/
+.btn-primary {
+  color: #fff;
+  background-color: #007485 !important;
+  border-color: #007485 !important;
+}
+.button-container {
+    margin-top: 30px;
+        margin-left: 10px !important;
+}
+
+.btn-primary:hover {
+  color: #fff;
+  background-color: #00424d !important;
+  border-color: #00424d !important;
+}
+
+.btn {
+  padding: 0.375rem 0.75rem !important;
+}
+
+.btn-sm, .btn-group-sm > .btn {
+  font-weight: 400;
+  padding: 0.375rem 0.75rem !important;
+  font-size: 1rem;
+  line-height: 1.5;
+  border-radius: 0.25rem;
+}
+
+
+.advance-search-toggle {
+   color: #007485 !important;
+   text-decoration: none !important;
+   font-weight: 600 !important;
+   font-size: 14px !important;
+   padding: 8px 16px !important;
+   border: 2px solid #007485 !important;
+   border-radius: 4px !important;
+   background: transparent !important;
+   transition: all 0.3s ease !important;
+   display: inline-block !important;
+}
+
+.advance-search-toggle:hover {
+   background: #007485 !important;
+   color: white !important;
+   text-decoration: none !important;
+   transform: translateY(-1px) !important;
+   box-shadow: 0 2px 8px rgba(0, 116, 133, 0.3) !important;
+}
+
+.nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link {
+    color: #ffffff !important;
+    background-color: #007485 !important;
+    
+}
+  #propertyTabs .nav-link:not(.active) {
+    color: black !important;
+  }
+
+
+    .btn-sm, .btn-group-sm > .btn {
+	  padding: 0.375rem 0.75rem !important;
+  font-weight: 400;
+  padding: 0.375rem 0.75rem !important;
+  font-size: 1rem;
+  line-height: 1.5;
+  border-radius: 0.25rem;
+}
+
+.bottom {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 12px 0 !important;
+  font-family: Arial, sans-serif !important;
+}
+
+.dataTables_info {
+  color: #6c757d !important;
+  font-size: 14px !important;
+}
+
+.dataTables_paginate {
+  display: flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+}
+
+.dataTables_paginate .paginate_button {
+  display: inline-block !important;
+  padding: 6px 12px !important;
+  border-radius: 6px !important;
+  font-size: 14px !important;
+  color: #495057 !important;
+  background-color: transparent !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+  transition: background-color 0.2s ease-in-out !important;
+}
+
+.dataTables_paginate .paginate_button:hover {
+  background-color: #f8f9fa !important;
+}
+.dataTables_paginate .paginate_button.current {
+  background-color: #00838f !important;
+  color: #fff !important;
+  font-weight: 500 !important;
+  border-radius: 6px !important;
+  cursor: default !important;
+}
+.dataTables_paginate .paginate_button.disabled {
+  color: #adb5bd !important;
+  cursor: not-allowed !important;
+  background-color: transparent !important;
+}
+.dataTables_paginate .ellipsis {
+  padding: 6px 10px !important;
+  color: #6c757d !important;
+}
+
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current, .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+    color: white !important;
+     border: 0px solid rgba(0, 0, 0, 0.0) !important;
+}
+
+.dataTables_paginate .paginate_button:not(.current):hover {
+  background-color: #f8f9fa !important;
+  color: #495057 !important;
+}
+.dataTables_paginate .paginate_button.current:hover {
+  background-color: #00838f !important;
+  color: #fff !important;
+  cursor: default !important;
+}
+/* =--------- End Css  22-08-25 ---------*/
+
+
+
+
+
+
+
+/* =--------- Start Css  20-08-25 ---------*/
+table#propertiesTable tbody td {
+    padding: 2px 8px !important;
+    vertical-align: middle;
+}
+table#propertiesTable th {
+    text-wrap: nowrap;
+	    padding: 12px 5px;
+}
+table#propertiesTable tbody td .btn {
+    padding: 3px 6px !important;
+}
+div#residential-fields {
+    background: linear-gradient(45deg, #2993a340, #defbff3d);
+    padding: 15px;
+    margin: 10px 0 !important;
+    border-radius: 10px !important;
+}
+
+div#commercial-fields{
+    background: linear-gradient(45deg, #2993a340, #defbff3d);
+    padding: 15px;
+    margin: 10px 0 !important;
+    border-radius: 10px !important;
+}
+/* =--------- End  Css  20-08-25 ---------*/
 
 .advance-search input[type="date"] {
 	width: 130px;
@@ -430,7 +668,7 @@ footer.container-fluid p {
 .col.main.pt-5.mt-3 {
 	/*padding-left: 377px !important;*/
 	padding-left: 18% !important;
-	padding-top: 40px !important;
+	padding-top: 10px !important;
 }
 
 .navbar .navbar-brand .img-fluid {
