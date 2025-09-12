@@ -429,5 +429,31 @@ public function insertMultipleDeals($leadId, $propertyIds, $status='Interested')
     return true;
 }
 
+// Inside Api_model.php
+
+public function getPropertyDetailsForDeal($propertyId) {
+    $propertyId = intval(trim($propertyId));
+    if ($propertyId <= 0) {
+        return null;
+    }
+
+    $this->db->select('id, name, description, address,budget_in_words, city, state,image_one,image_two');
+    $this->db->from('properties');
+    $this->db->where('id', $propertyId);
+    // $this->db->where_in('status', ['active', 'Active', '1']);
+    $query = $this->db->get();
+
+    return $query->num_rows() > 0 ? $query->row_array() : null;
+}
+
+
+
+
+
+
+
+
+
+
 
 }

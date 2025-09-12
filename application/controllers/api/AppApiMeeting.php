@@ -659,6 +659,9 @@ public function addLeadDeals_post(){
     $this->response($return, REST_Controller::HTTP_OK);
 }
 
+
+
+
 public function getLeadDeals_post() {
     $json = file_get_contents('php://input');
     $data = json_decode($json, true);
@@ -667,33 +670,47 @@ public function getLeadDeals_post() {
     $userId = removeAllSpecialCharcter($data['user_id'] ?? '');
     $leadId = removeAllSpecialCharcter($data['leadId'] ?? '');
 
-    if($token == ''){
+    if ($token == '') {
         $return['message'] = 'Please pass a valid token.';
-    } elseif(!$userId || !is_numeric($userId)){
+    } elseif (!$userId || !is_numeric($userId)) {
         $return['message'] = 'Please pass a valid user id.';
-    } elseif(!$leadId || !is_numeric($leadId)){
+    } elseif (!$leadId || !is_numeric($leadId)) {
         $return['message'] = 'Please pass a valid lead id.';
     } else {
         $checkToken = $this->Api_model->getRecordByColumn('token', $token, 'adminLogin');
 
-        if($checkToken){
+        if ($checkToken) {
             $loginUser = $checkToken[0];
             $dbUserId = $loginUser['id'];
 
-            if($dbUserId != $userId){
+            if ($dbUserId != $userId) {
                 $return['message'] = 'Invalid user id.';
                 $this->response($return, REST_Controller::HTTP_UNAUTHORIZED);
                 return;
             }
 
-            // Get lead deals by lead_id
-            $where = ['lead_id' => $leadId];
-            $deals = $this->Api_model->getDataByMultipleColumns($where, 'leadDeal');
+            // Fetch all deals for this lead
+            $deals = $this->Api_model->getDataByMultipleColumns(['lead_id' => $leadId], 'leadDeal');
 
-            if(!empty($deals)){
+            if (!empty($deals)) {
+                $result = [];
+                foreach ($deals as $deal) {
+                    $propertyDetails = $this->Api_model->getPropertyDetailsForDeal($deal->properties_id);
+
+                    $result[] = [
+                        'Id' => $deal->Id,
+                        'Name' => $deal->Name,
+                        'lead_id' => $deal->lead_id,
+                        'properties_id' => $deal->properties_id,
+                        'Status' => $deal->Status,
+                        'Date' => $deal->Date,
+                        'property_detail' => $propertyDetails ?? new stdClass()
+                    ];
+                }
+
                 $return['status'] = 'done';
                 $return['message'] = 'Deals fetched successfully.';
-                $return['result'] = $deals;
+                $return['result'] = $result;
             } else {
                 $return['status'] = 'fail';
                 $return['message'] = 'No deals found for this lead.';
@@ -705,6 +722,10 @@ public function getLeadDeals_post() {
 
     $this->response($return, REST_Controller::HTTP_OK);
 }
+
+
+
+
 public function updateLeadDealStatus_post() {
     $json = file_get_contents('php://input');
     $data = json_decode($json, true);

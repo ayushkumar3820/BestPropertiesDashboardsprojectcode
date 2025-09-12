@@ -102,6 +102,10 @@ $route['edit-user-meeting'] = 'api/AppApiMeeting/editMeeting';
 $route['get-message-leads'] = 'api/AppApiMeeting/getMessageLData';
 $route['add-message-leads'] = 'api/AppApiMeeting/addMessageLData';
 
+//assign_leads
+$route['assign-leads']='api/AppApiMeeting/assignLeads';
+
+
 
 //meeting api 
 $route['get-all-meeting'] = 'api/AppApiMeeting/getAllMeetings';

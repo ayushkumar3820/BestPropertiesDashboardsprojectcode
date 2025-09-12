@@ -44,15 +44,13 @@ public function getLeadsData_post()
             $role = strtolower($checkToken[0]['role'] ?? '');
 
             if ($role === 'admin') {
-                // 🔥 Admin gets ALL buyers (no filter)
                 $this->db->select('*');
                 $this->db->from('buyers');
-                $this->db->order_by('id', 'DESC');   // ✅ latest first
+                $this->db->order_by('id', 'DESC');   
                 $query = $this->db->get();
                 $leadsData = $query->num_rows() > 0 ? $query->result_array() : [];
 
             } else {
-                // 🔥 Non-admin = only assigned leads
                 $assignedLeads = $this->Api_model->getRecordByColumn('userid', $userId, 'assigned_leads', 'leadid');
 
                 if ($assignedLeads) {
@@ -62,59 +60,60 @@ public function getLeadsData_post()
                     $leadsData = [];
                 }
             }
-
-            // ✅ Attach meetings + property info
             if (!empty($leadsData)) {
                 $leadIds = array_column($leadsData, 'id');
                 $meetingsByLead = $this->Api_model->getMeetingsByLeadIds($leadIds);
 
-                foreach ($leadsData as &$lead) {
+                foreach ($leadsData as $key => &$lead) {
                     $leadId = $lead['id'];
+                    if (empty($lead['preferred_location']) || empty($lead['budget']) || empty($lead['leads_type'])) {
+                        unset($leadsData[$key]); 
+                        continue;
+                    }
+
                     $lead['meetings'] = isset($meetingsByLead[$leadId]) ? $meetingsByLead[$leadId] : [];
 
-                    // Attach property details for each meeting
-                   foreach ($lead['meetings'] as &$meeting) {
-    $meeting['property'] = [];
+                    foreach ($lead['meetings'] as &$meeting) {
+                        $meeting['property'] = [];
 
-    if (!empty($meeting['property_id'])) {
-        $ids = [];
+                        if (!empty($meeting['property_id'])) {
+                            $ids = [];
 
-        // Normalize JSON or string
-        $decoded = json_decode($meeting['property_id'], true);
-        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-            // JSON array [{"id":"1923"},{"id":"1924"}]
-            foreach ($decoded as $item) {
-                if (isset($item['id'])) $ids[] = intval($item['id']);
-            }
-        } else {
-            // Comma-separated "1923,1924" or other string
-            $parts = preg_split('/[\s,]+/', $meeting['property_id']);
-            foreach ($parts as $p) {
-                $id = intval(trim($p));
-                if ($id > 0) $ids[] = $id;
-            }
-        }
+                            $decoded = json_decode($meeting['property_id'], true);
+                            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                                foreach ($decoded as $item) {
+                                    if (isset($item['id'])) $ids[] = intval($item['id']);
+                                }
+                            } else {
+                                $parts = preg_split('/[\s,]+/', $meeting['property_id']);
+                                foreach ($parts as $p) {
+                                    $id = intval(trim($p));
+                                    if ($id > 0) $ids[] = $id;
+                                }
+                            }
 
-        $ids = array_unique($ids); // remove duplicates
+                            $ids = array_unique($ids);
 
-        if (!empty($ids)) {
-            // fetch only the properties that exist in the properties table
-            $properties = $this->Api_model->getPropertiesByIds($ids);
-
-            // 🔹 Keep only existing properties, ignore missing IDs
-            $meeting['property'] = $properties ?: [];
-        }
-    }
-}
-unset($meeting);
-
+                            if (!empty($ids)) {
+                                $properties = $this->Api_model->getPropertiesByIds($ids);
+                                $meeting['property'] = $properties ?: [];
+                            }
+                        }
+                    }
+                    unset($meeting);
                 }
-                unset($lead); // break reference
-                unset($meeting);
+                unset($lead);
 
-                $return['status'] = 'done';
-                $return['message'] = 'Leads fetched successfully.';
-                $return['result'] = $leadsData;
+                $leadsData = array_values($leadsData);
+
+                if (!empty($leadsData)) {
+                    $return['status'] = 'done';
+                    $return['message'] = 'Leads fetched successfully.';
+                    $return['result'] = $leadsData;
+                } else {
+                    $return['status'] = 'Fail';
+                    $return['message'] = 'No valid records found (all buyers missing required fields).';
+                }
             } else {
                 $return['status'] = 'Fail';
                 $return['message'] = 'No records found.';
@@ -126,6 +125,7 @@ unset($meeting);
 
     $this->response($return, REST_Controller::HTTP_OK);
 }
+
 
     
     public function statusGetLeadsData_post()
