@@ -773,5 +773,60 @@ public function updateLeadDealStatus_post() {
 }
 
 
+public function assignLeads_post()
+{
+    $return = array('status' => 'error', 'message' => '');
+
+    $json = file_get_contents('php://input');
+    $data = json_decode($json, true);
+
+    $token   = removeAllSpecialCharcter($data['token'] ?? '');
+    $userId  = removeAllSpecialCharcter($data['user_id'] ?? '');
+    $leadIds = $data['lead_ids'] ?? [];
+
+    if ($token == '') {
+        $return['message'] = 'Please pass a valid token.';
+    } elseif (empty($userId)) {
+        $return['message'] = 'Please pass a valid user id.';
+    } elseif (empty($leadIds) || !is_array($leadIds)) {
+        $return['message'] = 'Please provide at least one lead id.';
+    } else {
+        // check token
+        $checkToken = $this->Api_model->getRecordByColumn('token', $token, 'adminLogin');
+
+        if ($checkToken) {
+            // REMOVED USER ID CHECK - Just use the token validation
+            
+            $saved = 0;
+            foreach ($leadIds as $leadId) {
+                if (!is_numeric($leadId)) continue;
+
+                // check already assigned
+                $exists = $this->Api_model->getDataByMultipleColumns(
+                    array('leadid' => $leadId, 'userid' => $userId),
+                    'assigned_leads'
+                );
+
+                if (empty($exists)) {
+                    $insertData = array(
+                        'leadid' => (int)$leadId,
+                        'userid' => $userId,
+                        'rdate'  => date('Y-m-d')
+                    );
+                    $this->Api_model->insertData('assigned_leads', $insertData);
+                    $saved++;
+                }
+            }
+
+            $return['status']  = 'done';
+            $return['message'] = $saved . ' lead(s) assigned successfully.';
+        } else {
+            $return['message'] = 'Invalid token.';
+        }
+    }
+
+    $this->response($return, REST_Controller::HTTP_OK);
+}
+
 
 }

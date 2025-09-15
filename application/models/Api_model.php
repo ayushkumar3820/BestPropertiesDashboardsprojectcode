@@ -449,11 +449,4 @@ public function getPropertyDetailsForDeal($propertyId) {
 
 
 
-
-
-
-
-
-
-
 }
