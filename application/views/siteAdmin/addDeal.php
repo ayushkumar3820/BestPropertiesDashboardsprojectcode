@@ -32,6 +32,7 @@
                         <th>Sr. No.</th>
                         <th>Property Name</th>
                         <th>Status</th>
+                        <th>WhatsApp</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -42,11 +43,20 @@
                             <tr data-property-id="<?php echo $property->properties_id; ?>">
                                 <td><?php echo $i; ?></td>
                                 <td><?php echo $property->name; ?></td>
-                                <td     >
+                                <td>
                                     <select name="interestedDropDown" data-id="<?php echo $property->properties_id; ?>" style="width:35% !important;">
                                         <option value="Interested" <?php if ($property->status == 'Interested') echo 'selected'; ?>>Interested</option>
                                         <option value="Not Interested" <?php if ($property->status == 'Not Interested') echo 'selected'; ?>>Not Interested</option>
                                     </select>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-success send-whatsapp-btn" 
+                                            data-property-id="<?php echo $property->properties_id; ?>" 
+                                            data-property-name="<?php echo htmlspecialchars($property->name); ?>"
+                                            data-lead-phone="<?php echo $leadData->mobile; ?>"
+                                            data-lead-name="<?php echo htmlspecialchars($leadData->uName); ?>">
+                                        Send Message
+                                    </button>
                                 </td>
                             </tr>
                         <?php $i++;
@@ -155,7 +165,51 @@
                 }
             });
         });
+
+      // WhatsApp direct send functionality
+jQuery('.send-whatsapp-btn').click(function() {
+    var propertyId = jQuery(this).data('property-id');
+    var propertyName = jQuery(this).data('property-name');
+    var leadPhone = jQuery(this).data('lead-phone');
+    var leadName = jQuery(this).data('lead-name');
+
+    var message = 'Hi ' + leadName + ',\n\nI wanted to share details about: ' + propertyName + '\n\nPlease let me know if you have any questions.';
+
+    var formData = new FormData();
+    formData.append('propertyId', propertyId);
+    formData.append('leadPhone', leadPhone);
+    formData.append('leadId', '<?php echo $this->uri->segment("4"); ?>');
+    formData.append('message', message);
+
+    jQuery.ajax({
+        url: '<?php echo base_url("admin/leads/sendWhatsappFromDeal"); ?>',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        beforeSend: function() {
+            jQuery('.send-whatsapp-btn[data-property-id="'+propertyId+'"]').html('Checking...').prop('disabled', true);
+        },
+        success: function(response) {
+            try {
+                var res = (typeof response === 'object') ? response : JSON.parse(response);
+                if (res.status === 'success') {
+                    alert('Message sent successfully!');
+                } else {
+                    alert('Error: ' + res.msg);
+                }
+            } catch (e) {
+                alert('Unexpected response from server.');
+            }
+        },
+        error: function() {
+            alert('Error sending message. Please try again.');
+        },
+        complete: function() {
+            jQuery('.send-whatsapp-btn[data-property-id="'+propertyId+'"]').html('Send Message').prop('disabled', false);
+        }
     });
+});
 </script>
 
 <style>

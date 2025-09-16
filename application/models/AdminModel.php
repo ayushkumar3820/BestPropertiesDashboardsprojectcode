@@ -600,5 +600,17 @@ public function saveTags($tagsInput)
 
 
 
+public function get_meetings()
+{
+    $this->db->select('*');
+    $this->db->from('meetings');   // ✅ use your table
+    $this->db->order_by('meeting_date', 'DESC');
+    $query = $this->db->get();
+    return $query->result_array();
+}
+
+
+
+
 }
 ?>

@@ -62,4 +62,8 @@ class AgentController extends CI_Controller {
     $this->load->view('includes/admin/template', $data);
 
  }
+
+
+
+ 
 }

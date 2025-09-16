@@ -1181,4 +1181,120 @@ public function addDeal() {
             $updateData
         );
     }
+
+
+
+
+ public function sendWhatsappFromDeal()
+{
+    $propertyId = $this->input->post('propertyId', true);
+    $leadPhone  = $this->input->post('leadPhone', true);
+    $leadId     = $this->input->post('leadId', true);
+    $message    = $this->input->post('message', true);
+
+    if (empty($leadPhone) || empty($leadId) || empty($message)) {
+        echo json_encode(['status' => 'error', 'msg' => 'Missing parameters.']);
+        return;
+    }
+
+    // Normalize phone number
+    $digits = preg_replace('/\D+/', '', $leadPhone);
+    if (strlen($digits) < 10) {
+        echo json_encode(['status' => 'error', 'msg' => 'Invalid phone number.']);
+        return;
+    }
+    $last10 = substr($digits, -10);
+    $phone_e164 = '91' . $last10;
+
+    // Check buyers table
+    $this->db->group_start();
+    $this->db->where('mobile', $digits);
+    $this->db->or_where('mobile', $last10);
+    $this->db->or_where('mobile', $phone_e164);
+    $this->db->group_end();
+    $buyer = $this->db->get('buyers')->row();
+
+    if (empty($buyer)) {
+        echo json_encode(['status' => 'error', 'msg' => 'Lead number not found. Please add buyer first.']);
+        return;
+    }
+
+    // Check whatsapp_api table
+    $this->db->group_start();
+    $this->db->where('contact_number', $phone_e164);
+    $this->db->or_where('contact_number', $last10);
+    $this->db->or_where('contact_number', $digits);
+    $this->db->group_end();
+    $wa_exists = $this->db->get('whatsapp_api')->row();
+
+    if (empty($wa_exists)) {
+        echo json_encode(['status' => 'error', 'msg' => 'Number not registered for WhatsApp. Please register first.']);
+        return;
+    }
+
+    // Get phone_number_id
+    $wa_info = $this->db->get_where('whatsapp_info', ['contact_number' => $phone_e164])->row();
+    $phone_number_id = !empty($wa_info->phone_number_id) ? $wa_info->phone_number_id : '679719728549064';
+
+    $token = 'EAARGvMRMpHEBO4p5iCsPkZB14bZAnmsqk2HrwCaiFNq1ApElMZAofcDyaKZAZAuXC921nSwPrWldrhbnlF1myVakQw4xSwHxdGqt8ivx24hLrvQbbeWaluPOQv7jet7pNEoV3dC8ZBoMmkmJoZC6eYJiDId9qZAYzEaRelPcpnjnI250wyCd0hCHgMncbAaXMgtX9QZDZD';
+
+    $payload = [
+        "messaging_product" => "whatsapp",
+        "to" => $phone_e164,
+        "type" => "text",
+        "text" => ["body" => $message]
+    ];
+
+    $url = "https://graph.facebook.com/v19.0/{$phone_number_id}/messages";
+    $curl = curl_init();
+    curl_setopt_array($curl, [
+        CURLOPT_URL => $url,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST => true,
+        CURLOPT_POSTFIELDS => json_encode($payload),
+        CURLOPT_HTTPHEADER => [
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . $token
+        ],
+        CURLOPT_TIMEOUT => 30
+    ]);
+    
+    $response = curl_exec($curl);
+    $curlErr = curl_error($curl);
+    $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    curl_close($curl);
+
+    $log = "=== " . date('Y-m-d H:i:s') . " ===\n";
+    $log .= "To: {$phone_e164} | Original: {$leadPhone}\n";
+    $log .= "HTTP Code: {$httpCode} | Response: {$response}\n\n";
+    file_put_contents(FCPATH . 'whatsapp_deal_log.txt', $log, FILE_APPEND);
+
+    $resArr = json_decode($response, true);
+    if ($curlErr || ($httpCode < 200 || $httpCode >= 300) || isset($resArr['error'])) {
+        $errMsg = $curlErr ?: ($resArr['error']['message'] ?? 'WhatsApp API error');
+        echo json_encode(['status' => 'error', 'msg' => 'Failed: ' . $errMsg]);
+        return;
+    }
+
+    $message_id = '';
+    if (!empty($resArr['messages'][0]['id'])) {
+        $message_id = $resArr['messages'][0]['id'];
+    }
+
+    $insert = [
+        'user_id'        => $leadId,
+        'message'        => $message,
+        'whatsapp_image' => '',
+        'r_date'         => date('Y-m-d H:i:s'),
+        'r_type'         => 'user',
+        'contact_number' => $phone_e164,
+        'message_id'     => $message_id
+    ];
+    $this->db->insert('whatsapp_api', $insert);
+
+    echo json_encode(['status' => 'success', 'msg' => 'Message sent successfully.']);
+}
+
+
+
 }
