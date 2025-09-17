@@ -105,7 +105,7 @@ public function addMeeting_post()
         if ($checkToken) {
             $loginUser = $checkToken[0];
 
-            if (strtolower($loginUser['role']) === 'admin' && $loginUser['id'] == $userId) {
+if ((in_array(strtolower($loginUser['role']), ['admin','manager','agent'])) && $loginUser['id'] == $userId){
            
                 $propertyData = $data['property_id'] ?? [];
                 $propertyJson = json_encode($propertyData);

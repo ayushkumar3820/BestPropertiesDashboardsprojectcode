@@ -177,7 +177,7 @@ public function wtspmessage() {
                 "to" => $contact_number,
                 "type" => "template",
                 "template" => [
-                    "name" => "property_offer_alert", 
+                    "name" => "property_offer_alert", // this should match your approved template name
                     "language" => [
                         "code" => "en"
                     ],

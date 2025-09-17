@@ -594,23 +594,64 @@ public function saveTags($tagsInput)
 
  public function getSingleRow($table, $where) {
         $query = $this->db->get_where($table, $where);
-        return $query->row();   // single row return karega
+        return $query->row();   
     }
 
 
 
 
-public function get_meetings()
-{
-    $this->db->select('*');
-    $this->db->from('meetings');   // ✅ use your table
-    $this->db->order_by('meeting_date', 'DESC');
-    $query = $this->db->get();
-    return $query->result_array();
+
+
+
+public function checkWhatsappContact($mobile) {
+    try {
+        // Add country code if not present
+        $contact_number = (strlen($mobile) == 10) ? '91' . $mobile : $mobile;
+        
+        $this->db->where('contact_number', $contact_number);
+        $query = $this->db->get('whatsapp_api');
+        return $query->num_rows() > 0;
+    } catch (Exception $e) {
+        log_message('error', 'checkWhatsappContact Error: ' . $e->getMessage());
+        return false;
+    }
 }
 
 
+public function getPropertyById($property_id) {
+    try {
+        $this->db->select('*');
+        $this->db->where('id', $property_id);
+        $query = $this->db->get('properties'); 
+        return $query->row();
+    } catch (Exception $e) {
+        log_message('error', 'getPropertyById Error: ' . $e->getMessage());
+        return null;
+    }
+}
 
+
+public function getLeadById($lead_id) {
+    try {
+        $this->db->select('*');
+        $this->db->where('id', $lead_id);
+        $query = $this->db->get('buyers'); 
+        return $query->row();
+    } catch (Exception $e) {
+        log_message('error', 'getLeadById Error: ' . $e->getMessage());
+        return null;
+    }
+}
+
+
+public function insertWhatsappMessage($data) {
+    try {
+        return $this->db->insert('whatsapp_api', $data);
+    } catch (Exception $e) {
+        log_message('error', 'insertWhatsappMessage Error: ' . $e->getMessage());
+        return false;
+    }
+}
 
 }
 ?>

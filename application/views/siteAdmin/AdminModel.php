@@ -558,8 +558,5 @@ public function getMatchingProperties($lead) {
     return $query->result();
 }
 
-
-
-
 }
 ?>

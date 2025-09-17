@@ -11,6 +11,9 @@ class Cron extends CI_Controller {
 	
 	public function downloadDbBackup() {
         
+        $log = date('Y-m-d H:i:s').' || URL: '.$_SERVER['HTTP_HOST'].''.$_SERVER['REQUEST_URI'].' || Response:  '."\n";
+		file_put_contents(FCPATH.'log.txt', $log, FILE_APPEND); die('dd');
+
         $this->load->dbutil();
         $this->load->helper('file');
         //$this->load->helper('url');

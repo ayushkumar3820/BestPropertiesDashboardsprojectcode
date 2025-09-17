@@ -218,6 +218,8 @@ $route['admin/properties/export_page'] = 'Siteadmin/Properties/export_page';
 $route['admin/properties/export_data'] = 'Siteadmin/Properties/export_data';
 $route['admin/properties/import_page'] = 'Siteadmin/properties/import_page';
 $route['admin/properties/import_data'] = 'Siteadmin/properties/import_data';
+$route['admin/properties/exportSelected'] = 'Siteadmin/Properties/exportSelected';
+
 
 
 $route['admin/contact'] = 'Siteadmin/Properties/contact';
@@ -353,6 +355,12 @@ $route['whatsapp-api.php'] = 'Whatsapp_api/index';
 //Meeting api
 $route['api/meetings'] = 'Siteadmin/Leads/meeting_api';
 
+
+// Company Management Routes
+$route['admin/company'] = 'Siteadmin/Company/index';
+$route['admin/company/add'] = 'Siteadmin/Company/add';
+$route['admin/company/edit/(:num)'] = 'Siteadmin/Company/edit/$1';
+$route['admin/company/delete/(:num)'] = 'Siteadmin/Company/delete/$1';
 
 
 

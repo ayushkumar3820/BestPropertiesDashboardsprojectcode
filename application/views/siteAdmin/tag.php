@@ -1,9 +1,9 @@
 <div class="col main pt-5 mt-3">
             
-             <a href="<?php echo base_url('admin/tag/add');?>" style="float: right;margin: 14px 2px;" class="btn btn-sm btn-info back-btn">Add New</a>
+             <a href="<?php echo base_url('admin/tag/add');?>" style="float: right;margin: 14px 2px;" class="btn btn-sm btn-info back-btn">Add New1</a>
              
             <h1 class="d-sm-block heading"><?php echo $title; ?></h1>
-            <div class="clearfix"></div>
+            
              <?php
 	  $message = $this->session->flashdata('message');
 	  if($message != ''){

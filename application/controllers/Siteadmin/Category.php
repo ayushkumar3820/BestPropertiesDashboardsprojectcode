@@ -93,4 +93,9 @@ class Category extends CI_Controller {
     $data['category'] = $this->AdminModel->deleteRow($id,'category','id');
     redirect(base_url('admin/category'));
   }
-}
+
+  
+
+
+
+}	

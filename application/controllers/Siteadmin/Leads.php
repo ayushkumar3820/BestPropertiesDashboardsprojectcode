@@ -1185,115 +1185,142 @@ public function addDeal() {
 
 
 
- public function sendWhatsappFromDeal()
-{
-    $propertyId = $this->input->post('propertyId', true);
-    $leadPhone  = $this->input->post('leadPhone', true);
-    $leadId     = $this->input->post('leadId', true);
-    $message    = $this->input->post('message', true);
-
-    if (empty($leadPhone) || empty($leadId) || empty($message)) {
-        echo json_encode(['status' => 'error', 'msg' => 'Missing parameters.']);
-        return;
-    }
-
-    // Normalize phone number
-    $digits = preg_replace('/\D+/', '', $leadPhone);
-    if (strlen($digits) < 10) {
-        echo json_encode(['status' => 'error', 'msg' => 'Invalid phone number.']);
-        return;
-    }
-    $last10 = substr($digits, -10);
-    $phone_e164 = '91' . $last10;
-
-    // Check buyers table
-    $this->db->group_start();
-    $this->db->where('mobile', $digits);
-    $this->db->or_where('mobile', $last10);
-    $this->db->or_where('mobile', $phone_e164);
-    $this->db->group_end();
-    $buyer = $this->db->get('buyers')->row();
-
-    if (empty($buyer)) {
-        echo json_encode(['status' => 'error', 'msg' => 'Lead number not found. Please add buyer first.']);
-        return;
-    }
-
-    // Check whatsapp_api table
-    $this->db->group_start();
-    $this->db->where('contact_number', $phone_e164);
-    $this->db->or_where('contact_number', $last10);
-    $this->db->or_where('contact_number', $digits);
-    $this->db->group_end();
-    $wa_exists = $this->db->get('whatsapp_api')->row();
-
-    if (empty($wa_exists)) {
-        echo json_encode(['status' => 'error', 'msg' => 'Number not registered for WhatsApp. Please register first.']);
-        return;
-    }
-
-    // Get phone_number_id
-    $wa_info = $this->db->get_where('whatsapp_info', ['contact_number' => $phone_e164])->row();
-    $phone_number_id = !empty($wa_info->phone_number_id) ? $wa_info->phone_number_id : '679719728549064';
-
-    $token = 'EAARGvMRMpHEBO4p5iCsPkZB14bZAnmsqk2HrwCaiFNq1ApElMZAofcDyaKZAZAuXC921nSwPrWldrhbnlF1myVakQw4xSwHxdGqt8ivx24hLrvQbbeWaluPOQv7jet7pNEoV3dC8ZBoMmkmJoZC6eYJiDId9qZAYzEaRelPcpnjnI250wyCd0hCHgMncbAaXMgtX9QZDZD';
-
-    $payload = [
-        "messaging_product" => "whatsapp",
-        "to" => $phone_e164,
-        "type" => "text",
-        "text" => ["body" => $message]
-    ];
-
-    $url = "https://graph.facebook.com/v19.0/{$phone_number_id}/messages";
-    $curl = curl_init();
-    curl_setopt_array($curl, [
-        CURLOPT_URL => $url,
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_POST => true,
-        CURLOPT_POSTFIELDS => json_encode($payload),
-        CURLOPT_HTTPHEADER => [
-            'Content-Type: application/json',
-            'Authorization: Bearer ' . $token
-        ],
-        CURLOPT_TIMEOUT => 30
-    ]);
+public function sendWhatsappFromDeal() {
+    // Set JSON header
+    header('Content-Type: application/json');
     
-    $response = curl_exec($curl);
-    $curlErr = curl_error($curl);
-    $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-    curl_close($curl);
+    try {
+        if ($this->input->method() !== 'post') {
+            echo json_encode(['status' => 'error', 'msg' => 'Invalid request method']);
+            return;
+        }
 
-    $log = "=== " . date('Y-m-d H:i:s') . " ===\n";
-    $log .= "To: {$phone_e164} | Original: {$leadPhone}\n";
-    $log .= "HTTP Code: {$httpCode} | Response: {$response}\n\n";
-    file_put_contents(FCPATH . 'whatsapp_deal_log.txt', $log, FILE_APPEND);
+        $property_id = $this->input->post('propertyId');
+        $lead_phone = $this->input->post('leadPhone');
+        $lead_id = $this->input->post('leadId');
+        $message = $this->input->post('message');
 
-    $resArr = json_decode($response, true);
-    if ($curlErr || ($httpCode < 200 || $httpCode >= 300) || isset($resArr['error'])) {
-        $errMsg = $curlErr ?: ($resArr['error']['message'] ?? 'WhatsApp API error');
-        echo json_encode(['status' => 'error', 'msg' => 'Failed: ' . $errMsg]);
-        return;
+        // Debug log
+        error_log("WhatsApp Send - PropertyID: $property_id, LeadPhone: $lead_phone, LeadID: $lead_id");
+
+        // Validate required fields
+        if (empty($property_id) || empty($lead_phone) || empty($lead_id)) {
+            echo json_encode(['status' => 'error', 'msg' => 'Missing required fields']);
+            return;
+        }
+
+        // Load the model if not already loaded
+        $this->load->model('AdminModel');
+
+        // Get lead details
+        $leadData = $this->AdminModel->getLeadById($lead_id);
+        if (!$leadData) {
+            echo json_encode(['status' => 'error', 'msg' => 'Lead not found']);
+            return;
+        }
+
+        // Format phone number (add country code if needed)
+        $contact_number = (strlen($lead_phone) == 10) ? '91' . $lead_phone : $lead_phone;
+
+        // Check if WhatsApp contact exists
+        if (!$this->AdminModel->checkWhatsappContact($lead_phone)) {
+            echo json_encode(['status' => 'error', 'msg' => 'WhatsApp contact not found. Please add contact first.']);
+            return;
+        }
+
+        // Get property details
+        $property = $this->AdminModel->getPropertyById($property_id);
+        if (!$property) {
+            echo json_encode(['status' => 'error', 'msg' => 'Property not found']);
+            return;
+        }
+
+        // WhatsApp API credentials
+        $phone_number_id = '679719728549064';
+        $token = 'EAARGvMRMpHEBO4p5iCsPkZB14bZAnmsqk2HrwCaiFNq1ApElMZAofcDyaKZAZAuXC921nSwPrWldrhbnlF1myVakQw4xSwHxdGqt8ivx24hLrvQbbeWaluPOQv7jet7pNEoV3dC8ZBoMmkmJoZC6eYJiDId9qZAYzEaRelPcpnjnI250wyCd0hCHgMncbAaXMgtX9QZDZD';
+
+        // Create detailed message with property info
+        $detailed_message = "Hi " . $leadData->uName . ",\n\n";
+        $detailed_message .= "Here are the details for: " . $property->name . "\n\n";
+        $detailed_message .= "📍 Location: " . (isset($property->location) ? $property->location : 'N/A') . "\n";
+        $detailed_message .= "💰 Budget: ₹" . (isset($property->budget) ? number_format($property->budget) : 'N/A') . "\n";
+        $detailed_message .= "🏠 Type: " . (isset($property->property_type) ? $property->property_type : 'N/A') . "\n";
+        $detailed_message .= "\nFor more details, please contact us.\n";
+        $detailed_message .= "Thank you!";
+
+        // WhatsApp API payload
+        $payload = [
+            "messaging_product" => "whatsapp",
+            "to" => $contact_number,
+            "type" => "text",
+            "text" => ["body" => $detailed_message]
+        ];
+
+        // Send WhatsApp message
+        $curl = curl_init();
+        curl_setopt_array($curl, [
+            CURLOPT_URL => 'https://graph.facebook.com/v19.0/' . $phone_number_id . '/messages',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => json_encode($payload),
+            CURLOPT_HTTPHEADER => [
+                'Content-Type: application/json',
+                'Authorization: Bearer ' . $token
+            ],
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_TIMEOUT => 30
+        ]);
+
+        $response = curl_exec($curl);
+        $error = curl_error($curl);
+        $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        curl_close($curl);
+
+        // Log the API call
+        $logData = "Date: " . date('Y-m-d H:i:s') . "\n";
+        $logData .= "To: $contact_number\n";
+        $logData .= "Property ID: $property_id\n";
+        $logData .= "Lead ID: $lead_id\n";
+        $logData .= "HTTP Code: $httpCode\n";
+        $logData .= "Response: $response\n";
+        $logData .= "CURL Error: $error\n";
+        $logData .= "-----------------------------\n";
+        file_put_contents(FCPATH . 'whatsapp_deal_logs.txt', $logData, FILE_APPEND);
+
+        // Check if message sent successfully
+        if ($httpCode != 200 || !empty($error)) {
+            echo json_encode(['status' => 'error', 'msg' => 'Failed to send WhatsApp message. HTTP Code: ' . $httpCode . ' Error: ' . $error]);
+            return;
+        }
+
+        // Parse WhatsApp API response
+        $api_response = json_decode($response, true);
+        if (!$api_response || isset($api_response['error'])) {
+            echo json_encode(['status' => 'error', 'msg' => 'WhatsApp API Error: ' . (isset($api_response['error']['message']) ? $api_response['error']['message'] : 'Unknown error')]);
+            return;
+        }
+
+        // Save message to database
+        $user_id = $this->session->userdata('id') ?: 1; // Default to 1 if session not set
+        $data_insert = [
+            'message' => $detailed_message,
+            'whatsapp_image' => '',
+            'r_date' => date('Y-m-d H:i:s'),
+            'r_type' => 'user',
+            'contact_number' => $contact_number,
+            'user_id' => $user_id,
+        ];
+
+        $this->AdminModel->insertWhatsappMessage($data_insert);
+
+        echo json_encode(['status' => 'success', 'msg' => 'WhatsApp message sent successfully!']);
+
+    } catch (Exception $e) {
+        error_log("WhatsApp Send Error: " . $e->getMessage());
+        echo json_encode(['status' => 'error', 'msg' => 'Server error: ' . $e->getMessage()]);
     }
-
-    $message_id = '';
-    if (!empty($resArr['messages'][0]['id'])) {
-        $message_id = $resArr['messages'][0]['id'];
-    }
-
-    $insert = [
-        'user_id'        => $leadId,
-        'message'        => $message,
-        'whatsapp_image' => '',
-        'r_date'         => date('Y-m-d H:i:s'),
-        'r_type'         => 'user',
-        'contact_number' => $phone_e164,
-        'message_id'     => $message_id
-    ];
-    $this->db->insert('whatsapp_api', $insert);
-
-    echo json_encode(['status' => 'success', 'msg' => 'Message sent successfully.']);
 }
+
 
 
 

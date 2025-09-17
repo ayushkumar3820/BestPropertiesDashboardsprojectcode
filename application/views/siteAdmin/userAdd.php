@@ -58,20 +58,21 @@ defined('BASEPATH') or exit('No direct script access allowed');
 				</div>
 			</div>
 			
-		<div class="col-sm-6">
-    <div class="form-group">
+<div class="col-sm-6">
+    <div class="form-group-role">
         <label>Role*</label><br>
 
-        <label><input type="checkbox" name="role[]" value="Admin"> Admin</label><br>
-        <label><input type="checkbox" name="role[]" value="Manager"> Manager</label><br>
-        <label><input type="checkbox" name="role[]" value="Agent"> Sale Agent</label><br>
-        <label><input type="checkbox" name="role[]" value="Telecaller"> Telecaller</label><br>
-        <label><input type="checkbox" name="role[]" value="Marketing Exec"> Marketing Exec</label><br>
-        <label><input type="checkbox" name="role[]" value="CRM Executive"> CRM Executive</label><br>
-        <label><input type="checkbox" name="role[]" value="Documentation"> Documentation</label><br>
+        <!-- <label><input type="radio" name="role" value="Admin"> Admin</label><br> -->
+        <label><input type="radio" name="role" value="Manager"> Manager</label><br>
+        <label><input type="radio" name="role" value="Agent"> Sale Agent</label><br>
+        <label><input type="radio" name="role" value="Telecaller"> Telecaller</label><br>
+        <!-- <label><input type="radio" name="role" value="Marketing Exec"> Marketing Exec</label><br> -->
+        <!-- <label><input type="radio" name="role" value="CRM Executive"> CRM Executive</label><br> -->
+        <!-- <label><input type="radio" name="role" value="Documentation"> Documentation</label><br> -->
 
     </div>
 </div>
+
 
 
        </div>
@@ -84,3 +85,13 @@ defined('BASEPATH') or exit('No direct script access allowed');
 	</form>
  
 </div>
+
+
+<style>
+	.form-group-role{
+				display: flex;
+		padding-top: 37px;
+		gap: 20px;
+
+}
+</style>

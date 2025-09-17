@@ -125,7 +125,12 @@ public function dashboard() {
 
     // Existing logic (untouched)
     $data['lead_tasks'] = $this->AdminModel->get_tasks_with_conditions('Followup', '', $today); 
-    $data['meeting_tasks'] = $this->AdminModel->get_tasks_with_conditions('meeting', '', $today);
+
+    // Replace meeting_tasks with meetings data
+   $this->db->where('user_id', $userId);
+$this->db->order_by('meeting_date', 'DESC');
+$this->db->limit(5);
+$data['meetings'] = $this->AdminModel->getDataFromTable('meetings', 'id, lead_id, purpose, location, meeting_date, status');
 
     if (strpos($userRole, 'Agent') !==false) {
         $data['total_leads'] = $this->AdminModel->getTableRowCount('buyers', 'userid', $userId);

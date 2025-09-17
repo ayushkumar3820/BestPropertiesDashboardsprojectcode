@@ -39,6 +39,7 @@ if (in_array('Admin', $roles) || in_array('Manager', $roles)) { ?>
             <li class="nav-item"><a class="nav-link" href="<?php echo base_url('admin/contact'); ?>">Contact Us</a></li>
             <li class="nav-item"><a class="nav-link" href="<?php echo base_url('admin/category'); ?>">Category</a></li>
             <li class="nav-item"><a class="nav-link" href="<?php echo base_url('admin/tag'); ?>">Tag</a></li>
+			<li class="nav-item"><a class="nav-link" href="<?php echo base_url('admin/company'); ?>">Company Management</a></li>
 
         <?php
         }

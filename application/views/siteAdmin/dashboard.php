@@ -297,57 +297,42 @@ if (in_array('Manager', $roles) || in_array('Admin', $roles)) {
 <?php endif; ?>
 
  </div>
-<?php if (!empty($meeting_tasks)): ?>
+
+<?php if (!empty($meetings)): ?>
 <div class="col-xl-12 col-sm-12 py-2">
     <h6 style="color: #333; font-weight: bold; margin-bottom: 10px; font-size: 1.25rem; text-align: center;">Meetings</h6>
     <div class="table-scroll-div">
-    <table id="datatable1" class="table table-striped table-bordered table-sm display" cellspacing="0" width="100%">
-        <thead>
-            <tr>
-                <th>Sr. No.</th>
-                <th>Task Name</th>
-                <th>Name</th>
-                <th>Pref. Location</th>
-                <th>Budget</th>
-                <th>Requirement</th>
-                <th>Date /Time</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php 
-            $i = 1;
-            foreach ($meeting_tasks as $task) { ?>
+        <table id="datatable1" class="table table-striped table-bordered table-sm display" cellspacing="0" width="100%">
+            <thead>
                 <tr>
-                    <td><?php echo $i; ?></td>
-                    <td>
-                        <a href="<?php echo base_url('admin/leads/view/' . $task['leadId']); ?>" style="color: #3498db; text-decoration: none;">
-                            <?php echo $task['comment']; ?>
-                        </a>
-                    </td>
-                    <td><?php echo $task['uName']; ?></td>
-                    <td><?php echo $task['location']; ?></td>
-                    <td><?php echo $task['budget']; ?></td>
-                    <td>
-                        <?php 
-                        if (!empty($task['residential'])) {
-                            echo 'R: ' . $task['residential'];
-                        }
-                        if (!empty($task['commercial'])) {
-                            if (!empty($task['residential'])) {
-                                echo '<br>';
-                            }
-                            echo 'C: ' . $task['commercial'];
-                        }
-                        ?>
-                    </td>
-                    <td><?php echo date('d M Y h:iA', strtotime($task['nextdt'])); ?></td>
+                    <th>Sr. No.</th>
+                    <th>Purpose</th>
+                    <th>Location</th>
+                    <th>Meeting Date</th>
+                    <th>Status</th>
                 </tr>
-                <?php $i++;
-            } ?>
-        </tbody>
-    </table></div>
+            </thead>
+            <tbody>
+                <?php 
+                $i = 1;
+                foreach ($meetings as $meeting) { ?>
+                    <tr>
+                        <td><?php echo $i; ?></td>
+                        <td><?php echo $meeting->purpose; ?></td>
+                        <td><?php echo $meeting->location; ?></td>
+                        <td><?php echo date('d M Y h:iA', strtotime($meeting->meeting_date)); ?></td>
+                        <td><?php echo $meeting->status; ?></td>
+                    </tr>
+                    <?php $i++;
+                } ?>
+            </tbody>
+        </table>
+    </div>
 </div>
 <?php endif; ?>
+
+
+
  <?php } ?>
 
         <div class="col-xl-6 col-sm-12 py-2">

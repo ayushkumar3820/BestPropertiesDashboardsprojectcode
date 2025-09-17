@@ -13,6 +13,8 @@ $propertyAdvanceSearchVisible = !empty($_POST) ? 'block' : 'none';
                 
                 <a href="<?php echo base_url('admin/approvel'); ?>" class="btn btn-sm btn-info back-btn">Approval</a>
                 <button type="button" onclick="export_properties()" class="btn btn-sm btn-primary back-btn">Export</button>
+                <button id="exportSelected" class="btn btn-sm btn-primary back-btn">Export Selected</button>
+
                 <a href="<?php echo base_url('admin/properties/import_page'); ?>" class="btn btn-sm btn-success back-btn">Import</a>
             <?php endif; ?>
         </div>
@@ -577,7 +579,54 @@ function export_properties() {
 //}
 </script>
 
+<script>
+$("#exportSelected").click(function() {
+    var propertyIds = $(".property_checkbox:checked").map(function() {
+        return $(this).val();
+    }).get();
 
+    if (propertyIds.length == 0) {
+        alert("Please select at least one property to export.");
+        return;
+    }
+
+    // Prepare form data
+    var formData = new FormData();
+    propertyIds.forEach(function(id) {
+        formData.append('property_ids[]', id);
+    });
+
+    $.ajax({
+        url: "<?php echo base_url('admin/properties/exportSelected'); ?>",
+        type: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        xhrFields: {
+            responseType: 'blob'
+        },
+        success: function(blob, status, xhr) {
+            var filename = "properties_export.csv";
+            var disposition = xhr.getResponseHeader('Content-Disposition');
+            if (disposition && disposition.indexOf('attachment') !== -1) {
+                var matches = /filename="?([^"]+)"?/.exec(disposition);
+                if (matches != null && matches[1]) filename = matches[1];
+            }
+            var link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        },
+        error: function(xhr, status, error) {
+            alert("Error exporting properties: " + error);
+        }
+    });
+});
+
+</script>
+    
 <style>
 /* DataTables styling */
 div.dataTables_wrapper div.dataTables_length {
@@ -634,3 +683,4 @@ input:checked + .slider:before {
     border-radius: 50%;
 }
 </style>
+

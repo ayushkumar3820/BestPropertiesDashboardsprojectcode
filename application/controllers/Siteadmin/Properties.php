@@ -178,6 +178,37 @@ $this->db->join('adminLogin', 'properties.userid = adminLogin.id', 'left'); // â
     $this->load->view('includes/admin/template', $data);
 }
 
+public function exportSelected()
+{
+    $role = $this->session->userdata('role');
+    if (!check_permission($role, 'contact')) {
+        redirect(base_url('admin/dashboard'));
+    }
+
+    $property_ids = $this->input->post('property_ids');
+    if (empty($property_ids) || !is_array($property_ids)) {
+        show_error('No properties selected for export.', 400);
+    }
+
+    $this->load->dbutil();
+    $this->load->helper('download');
+
+    $this->db->from('properties');
+    $this->db->where_in('id', $property_ids);
+    $query = $this->db->get();
+
+    if ($query->num_rows() == 0) {
+        show_error('No data found for the selected properties.', 404);
+    }
+
+    $delimiter = ",";
+    $newline = "\r\n";
+    $filename = "properties_selected_export_" . date('Ymd_His') . ".csv";
+    $csv_data = $this->dbutil->csv_from_result($query, $delimiter, $newline);
+
+    force_download($filename, $csv_data);
+}
+
 public function updateStatus(){
 
             $id = $this->input->post('list_id');

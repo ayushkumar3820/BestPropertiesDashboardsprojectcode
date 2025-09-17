@@ -58,14 +58,16 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
             <?php
             $selected_roles = !empty($info->role) ? array_map('trim', explode(',', $info->role)) : [];
-            $all_roles = ['Admin', 'Manager', 'Agent', 'Telecaller', 'Marketing Exec', 'CRM Executive', 'Documentation'];
+            // $all_roles = ['Admin', 'Manager', 'Agent', 'Telecaller', 'Marketing Exec', 'CRM Executive', 'Documentation'];
+            $all_roles = ['Manager', 'Agent', 'Telecaller'];
+
             ?>
             <div class="col-sm-12">
-                <div class="form-group">
+                <div class="form-group-role">
                     <label>Role*</label><br>
                     <?php foreach ($all_roles as $role): ?>
                         <label>
-                            <input type="checkbox" name="role[]" value="<?php echo $role; ?>" 
+                            <input type="radio" name="role[]" value="<?php echo $role; ?>" 
                             <?php echo in_array($role, $selected_roles) ? 'checked' : ''; ?>> <?php echo $role; ?>
                         </label><br>
                     <?php endforeach; ?>
@@ -80,3 +82,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 </div>
 
     
+
+<style>
+	.form-group-role{
+				display: flex;
+		padding-top: 37px;
+		gap: 20px;
+
+}
+</style>
