@@ -57,6 +57,22 @@ defined('BASEPATH') or exit('No direct script access allowed');
 					<input type="password" name="password" value="" required class="form-control" placeholder="Password">
 				</div>
 			</div>
+
+			<div class="col-sm-6">
+    <div class="form-group">
+        <label>Company*</label>
+        <select name="company_id" class="form-control" required>
+            <option value="">-- Select Company --</option>
+            <?php foreach ($companies as $c): ?>
+                <option value="<?php echo $c['id']; ?>">
+                    <?php echo $c['company_name']; ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+</div>
+
+
 			
 <div class="col-sm-6">
     <div class="form-group-role">

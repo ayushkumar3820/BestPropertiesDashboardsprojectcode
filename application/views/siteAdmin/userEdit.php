@@ -56,6 +56,25 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 </div>
             </div>
 
+          <div class="col-sm-6">
+    <div class="form-group">
+        <label>Company*</label>
+        <select name="company_id_display" class="form-control" disabled>
+            <option value="">-- Select Company --</option>
+            <?php foreach ($companies as $c): ?>
+                <option value="<?php echo $c['id']; ?>"
+                    <?php echo ($info->company_id == $c['id']) ? 'selected' : ''; ?>>
+                    <?php echo $c['company_name']; ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+        <!-- hidden field ensures value is submitted -->
+        <input type="hidden" name="company_id" value="<?php echo $info->company_id; ?>">
+    </div>
+</div>
+
+
+
             <?php
             $selected_roles = !empty($info->role) ? array_map('trim', explode(',', $info->role)) : [];
             // $all_roles = ['Admin', 'Manager', 'Agent', 'Telecaller', 'Marketing Exec', 'CRM Executive', 'Documentation'];

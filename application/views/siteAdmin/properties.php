@@ -278,12 +278,12 @@ $propertyAdvanceSearchVisible = !empty($_POST) ? 'block' : 'none';
                                 <td class="d-none"><?php echo $property->status; ?></td>
 
                                 <td>
-                                    <a href="<?php echo base_url('admin/properties/edit/' . $property->id); ?>" class="btn btn-warning btn-sm" style="color:white;">
-                                        <i class="fas fa-edit"></i>
+                                    <a href="<?php echo base_url('admin/properties/edit/' . $property->id); ?>" class="btn btn-warning btn-sm editIcon" style="color:white;">
+                                        <i class="bi bi-pencil-square"></i>
                                     </a>
                                     <?php if ($this->session->userdata('role') !== 'Agent'): ?>
-                                        <a href="<?php echo base_url('admin/properties/delete/' . $property->id); ?>" class="btn btn-danger btn-sm" style="color:white;" onclick="return confirm('Are you sure?')">
-                                            <i class="fas fa-trash-alt"></i>
+                                        <a href="<?php echo base_url('admin/properties/delete/' . $property->id); ?>" class="btn btn-danger btn-sm deleteIcon" style="color:white;" onclick="return confirm('Are you sure?')">
+                                            <i class="bi bi-trash"></i>
                                         </a>
                                     <?php endif; ?>
                                     <?php if ($this->session->userdata('role') === 'Agent'): ?>

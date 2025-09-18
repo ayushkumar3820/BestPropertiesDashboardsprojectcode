@@ -32,8 +32,8 @@
                                         <tr>
                                        <td><?php echo $i;?></td>
                                        <td><?php echo $tag->title;?></td>
-                                        <td><a href="<?php echo base_url().'admin/tag/edit/'.$tag->id;?>" class="btn btn-success btn-sm">Edit</a>
-                                       <a href="<?php echo base_url().'admin/tag/delete/'.$tag->id;?>" class="btn btn-danger btn-sm">Delete</a></td>
+                                        <td><a href="<?php echo base_url().'admin/tag/edit/'.$tag->id;?>" class="btn btn-success btn-sm editIcon"><i class="bi bi-pencil-square"></i></a>
+                                       <a href="<?php echo base_url().'admin/tag/delete/'.$tag->id;?>" class="btn btn-danger btn-sm deleteIcon"><i class="bi bi-trash"></i></a></td>
                                       </tr>
 						  <?php
 						  $i++;

@@ -34,8 +34,8 @@
                                     <td><?php echo $i;?></td>
                                     <td><?php echo $c->company_name;?></td>
                                     <td>
-                                        <a href="<?php echo base_url().'admin/company/edit/'.$c->id;?>" class="btn btn-success btn-sm">Edit</a>
-                                        <a href="<?php echo base_url().'admin/company/delete/'.$c->id;?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</a>
+                                        <a href="<?php echo base_url().'admin/company/edit/'.$c->id;?>" class="btn btn-success btn-sm editIcon"><i class="bi bi-pencil-square"></i></a>
+                                        <a href="<?php echo base_url().'admin/company/delete/'.$c->id;?>" class="btn btn-danger btn-sm deleteIcon" onclick="return confirm('Are you sure?')"><i class="bi bi-trash"></i></a>
                                     </td>
                                 </tr>
                         <?php $i++; } } ?>

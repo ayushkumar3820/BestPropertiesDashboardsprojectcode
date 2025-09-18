@@ -1023,6 +1023,44 @@ public function approve() {
     $data['mainContent'] = 'siteAdmin/propertiesApproval';
     $this->load->view('includes/admin/template', $data);
 }
+public function chat($property_id = null)
+{
+    $role = $this->session->userdata('role');
+    if (!check_permission($role, 'contact')) {
+        redirect(base_url('admin/dashboard'));
+    }
+
+    $user_id = $this->input->get('user_id');
+    if (!$user_id) {
+        show_error('User ID is required.');
+    }
+
+    $data['title'] = 'Chat Page';
+    $data['user_id'] = $user_id;
+    $data['property_id'] = $property_id ? $property_id : 0;
+
+    $this->db->where('user_id', $user_id);
+    $this->db->order_by('r_date', 'ASC');
+    $data['messages'] = $this->db->get('messages')->result();
+
+    $data['mainContent'] = 'siteAdmin/chatPage';
+    $this->load->view('includes/admin/template', $data);
+}
+public function send_message() {
+    $user_id = $this->input->post('user_id');
+    $property_id = $this->input->post('property_id');
+    $message_text = $this->input->post('message_text');
+
+    $data = array(
+        'user_id' => $user_id,
+        'property_id' => $property_id,
+        'message_text' => $message_text,
+        'r_date' => date('Y-m-d H:i:s')
+    );
+
+    $this->db->insert('messages', $data);
+    echo json_encode(['success' => true]);
+}
 
 }
 ?>

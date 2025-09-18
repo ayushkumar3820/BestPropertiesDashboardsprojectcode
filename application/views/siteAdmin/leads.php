@@ -152,130 +152,151 @@ $advanceSearchVisible = !empty($_POST) ? 'block' : 'none';
     <div class="clearfix"></div>
     <div class="row">
         <div class="col-sm-12">
-            <div class="table-responsive">
-                <table id="datatable1" class="table table-striped table-bordered table-sm display" cellspacing="0"
-                    width="100%">
-                    <thead>
-                        <tr>
-                            <th>S.N.</th>
-                            <th>Client</th>
-                            <th>Mobile</th>
-                            <th>Pref. Location</th>
-                            <th>Budget</th>
-                            <th>Requirement</th>
+<div class="table-responsive">
+    <table id="datatable1" class="table table-striped table-bordered table-sm display" cellspacing="0"
+        width="100%">
+        <thead>
+            <tr>
+                <th>S.N.</th>
+                <th>Client</th>
+                <th>Mobile</th>
+                <th>Pref. Location</th>
+                <th>Budget</th>
+                <th>Requirement</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+            if (!empty($leads)) {
+                $i = 1;
+                foreach ($leads as $lead) {
 
-                            <th>Status</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+                    // Default row class
+                    $rowClass = '';
+
+                    if (!empty($lead->rDate) && !empty($lead->timeline)) {
+                        $today = new DateTime();
+                        $rDate = new DateTime($lead->rDate);
+                        $diffDays = $today->diff($rDate)->days;
+
+                        // Timeline condition check
+                        switch (trim($lead->timeline)) {
+                            case 'Immediate':
+                                if ($diffDays >= 7) $rowClass = 'bg-red';
+                                break;
+                            case 'Within Week':
+                                if ($diffDays >= 7) $rowClass = 'bg-red';
+                                break;
+                            case 'Within Month':
+                                if ($diffDays > 7 && $diffDays <= 30) $rowClass = 'bg-red';
+                                break;
+                            case '1-3 Months':
+                                if ($diffDays > 30 && $diffDays <= 90) $rowClass = 'bg-red';
+                                break;
+                            case '3-6 Months':
+                                if ($diffDays > 90 && $diffDays <= 180) $rowClass = 'bg-red';
+                                break;
+                            case '6+ Months':
+                                if ($diffDays > 180) $rowClass = 'bg-red';
+                                break;
+                        }
+                    }
+            ?>
+                <tr class="<?php echo $rowClass; ?>">
+                    <td><?php echo $i; ?></td>
+                    <td>
+                        <a href="<?php echo base_url() . 'admin/leads/view/' . $lead->id; ?>">
+                            <?php echo $lead->uName; ?>
+                        </a><br>
+                        <small><?php echo $lead->leads_type; ?></small>
+                    </td>
+                    <td><?php echo $lead->mobile; ?></td>
+                    <td><?php echo $lead->preferred_location; ?></td>
+                    <td>
                         <?php
-                        if (!empty($leads)) {
-                            $i = 1;
-                            foreach ($leads as $lead) {
-                                // Check if any of the required fields are empty
-                                $showUpdateButton = empty($lead->uName) || empty($lead->preferred_location) || empty($lead->budget) || (empty($lead->residential) && empty($lead->commercial));
-                                ?>
-                                <tr>
-                                    <td><?php echo $i; ?></td>
-                                    <td>
-                                        <a href="<?php echo base_url() . 'admin/leads/view/' . $lead->id; ?>">
-                                            <?php echo $lead->uName; ?>
+                        $budget = (float) $lead->budget;
 
-                                        </a><br>
-                                        <!--<small><?php echo strtoupper(substr($lead->leads_type, 0, 1)) ?></small>-->
-                                        <small><?php echo $lead->leads_type; ?></small? </td>
-                                    <td><?php echo $lead->mobile; ?></td>
-                                    <td><?php echo $lead->preferred_location; ?></td>
-                                    <td>
-                                        <?php
-                                        $budget = (float) $lead->budget;
+                        if ($budget >= 10000000) {
+                            echo number_format($budget / 10000000, 2) . ' Cr';
+                        } elseif ($budget >= 100000) {
+                            echo number_format($budget / 100000, 2) . ' Lakh';
+                        } else {
+                            echo number_format($budget, 2);
+                        }
+                        ?>
+                    </td>
 
-                                        if ($budget >= 10000000) {
-                                            // If 1 crore or more
-                                            echo number_format($budget / 10000000, 2) . ' Cr';
-                                        } elseif ($budget >= 100000) {
-                                            // If 1 lakh or more
-                                            echo number_format($budget / 100000, 2) . ' Lakh';
-                                        } else {
-                                            // Less than 1 lakh, show as is
-                                            echo number_format($budget, 2);
-                                        }
-                                        ?>
-                                    </td>
+                    <td><?php echo $lead->leads_type; ?></td>
 
+                    <td>
+                        <?php
+                        echo $lead->status;
 
+                        $statusToStars = [
+                            "Qualified" => 1,
+                            "Site Visited Scheduled" => 2,
+                            "Site Visited" => 3,
+                            "Negotiation" => 4,
+                            "Finalized / Closed" => 5
+                        ];
 
+                        $status = trim($lead->status);
 
+                        $role = $this->session->userdata('role');
+                        $roles = explode(',', str_replace(' ', '', $role));
 
-                                    <td><?php echo $lead->leads_type; ?></td>
-
-                                    <td>
-                                        <?php
-                                        echo $lead->status;
-
-                                        $statusToStars = [
-                                            "Qualified" => 1,
-                                            "Site Visited Scheduled" => 2,
-                                            "Site Visited" => 3,
-                                            "Negotiation" => 4,
-                                            "Finalized / Closed" => 5
-                                        ];
-
-                                        $status = trim($lead->status); // Remove any extra spaces
-                                
-
-                                        $role = $this->session->userdata('role');
-                                        $roles = explode(',', str_replace(' ', '', $role)); // role string to array
-                                
-                                        if (!in_array('SalePerson', $roles)) { // remove space if needed in DB field
-                                            if ($lead->status == 'New') {
-                                                echo " (New)";
-                                            } elseif ($lead->status == 'deactive') {
-                                                echo " (Deactive)";
-                                            }
-                                        }
-
-
-                                        $stars = $statusToStars[$status] ?? '';
-                                        echo "</br>";
-                                        //echo $stars;
-                                        if ($stars != '') {
-                                            echo str_repeat('<span style="color: #ffc107; font-size: 1.2rem;">★</span>', $stars);
-                                            echo str_repeat('<span style="color: #ccc; font-size: 1.2rem;">★</span>', 5 - $stars);
-                                        }
-
-                                        ?>
-
-                                    </td>
-
-                                    <?php
-                                    $role = $this->session->userdata('role');
-                                    $roles = explode(',', str_replace(' ', '', $role));
-                                    ?>
-
-                                    <td>
-                                        <!--a href="<?php echo base_url() . 'admin/leads/view/' . $lead->id; ?>" class="btn btn-success btn-sm">Follow Up</a-->
-
-                                        <a href="<?php echo base_url() . 'admin/leads/edit/' . $lead->id; ?>"
-                                            class="btn btn-warning btn-sm"> <i class="fas fa-edit"></i></a>
-
-                                        <?php if (!in_array('Agent', $roles)): ?>
-                                            <a href="<?php echo base_url() . 'admin/leads/delete/' . $lead->id; ?>"
-                                                class="btn btn-danger btn-sm"
-                                                onclick="return confirm('Are you sure you want to delete this lead?');"><i
-                                                    class="fas fa-trash-alt"></i></a>
-                                        <?php endif; ?>
-                                    </td>
-
-                                </tr>
-                                <?php
-                                $i++;
+                        if (!in_array('SalePerson', $roles)) {
+                            if ($lead->status == 'New') {
+                                echo " (New)";
+                            } elseif ($lead->status == 'deactive') {
+                                echo " (Deactive)";
                             }
-                        } ?>
-                    </tbody>
-                </table>
-            </div>
+                        }
+
+                        $stars = $statusToStars[$status] ?? '';
+                        echo "</br>";
+                        if ($stars != '') {
+                            echo str_repeat('<span style="color: #ffc107; font-size: 1.2rem;">★</span>', $stars);
+                            echo str_repeat('<span style="color: #ccc; font-size: 1.2rem;">★</span>', 5 - $stars);
+                        }
+                        ?>
+                    </td>
+
+                    <?php
+                    $role = $this->session->userdata('role');
+                    $roles = explode(',', str_replace(' ', '', $role));
+                    ?>
+
+                    <td>
+                        <a href="<?php echo base_url() . 'admin/leads/edit/' . $lead->id; ?>"
+                            class="btn btn-warning btn-sm editIcon"><i class="bi bi-pencil-square"></i></a>
+
+                        <?php if (!in_array('Agent', $roles)): ?>
+                            <a href="<?php echo base_url() . 'admin/leads/delete/' . $lead->id; ?>"
+                                class="btn btn-danger btn-sm deleteIcon"
+                                onclick="return confirm('Are you sure you want to delete this lead?');">
+                                <i class="bi bi-trash"></i>
+                                </a>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+            <?php
+                    $i++;
+                }
+            }
+            ?>
+        </tbody>
+    </table>
+</div>
+
+<style>
+.bg-red {
+    background-color: #ffcccc !important; /* light red */
+}
+</style>
+
         </div>
     </div>
     <!--/row-->

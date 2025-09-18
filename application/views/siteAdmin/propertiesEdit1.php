@@ -1953,9 +1953,11 @@ jQuery(document).ready(function () {
     });
 
     // Update tags if fields change
-    $("#categorySelector, #comPropertyType, #resPropertyType, input[name='city']").on("change keyup", function() {
+    $("#categorySelector, #comPropertyType, #resPropertyType, input[name='city']").on("change", function() {
         loadFieldsAsTags();
     });
+    
+
 
     // ================= Show/hide property age =================
     jQuery('#bhk_construction_status').on('change', function () {

@@ -446,6 +446,15 @@ public function getPropertyDetailsForDeal($propertyId) {
     return $query->num_rows() > 0 ? $query->row_array() : null;
 }
 
+public function getAgentForManager($managerId) {
+    $this->db->select('*');
+    $this->db->from('adminLogin');
+    $this->db->where('role', 'Agent');
+    $this->db->where('parent_id', $managerId);
+    $query = $this->db->get();
+
+    return $query->row(); 
+}
 
 
 

@@ -128,6 +128,7 @@ $route['update_lead_deal_status'] = 'api/AppApiMeeting/updateLeadDealStatus';
 
 //property api delete
 $route["property-get"] = 'api/Properties/getProperty';
+$route["property-user-get"] = 'api/Properties/getUserProperty';
 
 $route["property-delete"] = 'api/Properties/deleteProperty';
 
@@ -361,6 +362,23 @@ $route['admin/company'] = 'Siteadmin/Company/index';
 $route['admin/company/add'] = 'Siteadmin/Company/add';
 $route['admin/company/edit/(:num)'] = 'Siteadmin/Company/edit/$1';
 $route['admin/company/delete/(:num)'] = 'Siteadmin/Company/delete/$1';
+
+
+// Chat Routes
+$route['admin/chat'] = 'Siteadmin/Chat/index';
+$route['admin/chat/add'] = 'Siteadmin/Chat/chatAdd';
+$route['admin/chat/edit/(:num)'] = 'Siteadmin/Chat/chatEdit/$1';
+$route['admin/chat/delete/(:num)'] = 'Siteadmin/Chat/chatDelete/$1';
+
+// Chat Routes
+
+// $route['admin/projects/chat'] = 'Siteadmin/PropertiesProject/chatProjects';
+//$route['admin/projects/chat/(:num)/(:num)'] = 'Siteadmin/PropertiesProject/viewChat/$1/$2';
+//$route['admin/projects/send-reply'] = 'Siteadmin/PropertiesProject/sendReply';
+// main chat list + optional thread
+$route['admin/projects/chat/(:num)/(:num)'] = 'Siteadmin/PropertiesProject/chatProjects/$1/$2';
+$route['admin/projects/chat']               = 'Siteadmin/PropertiesProject/chatProjects';
+
 
 
 

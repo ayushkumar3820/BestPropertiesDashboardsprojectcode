@@ -40,7 +40,7 @@ foreach (array_reverse($whatsapp) as $info) {
                         ?>
                     </td>
                     <td><?= date('d M Y h:i A',strtotime($info["r_date"])) ?></td>
-                    <td><?php if($info['contact_number'] != '') { echo '<a href="'.base_url('admin/whatsapp/' . $info['contact_number']).'" class="btn btn-success btn-sm">View chat</a>'; } ?></td>
+                    <td><?php if($info['contact_number'] != '') { echo '<a href="'.base_url('admin/whatsapp/' . $info['contact_number']).'" class="btn btn-success btn-sm viewChat"><i class="bi bi-chat-text-fill"></i></a>'; } ?></td>
                 </tr>
                 <?php endforeach; ?>
             </tbody>

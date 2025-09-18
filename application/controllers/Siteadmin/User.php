@@ -38,6 +38,10 @@ class User extends CI_Controller {
 
     $sessionLogin = $this->session->userdata('adminLogged');
     
+    $this->db->select('id, company_name');
+    $query = $this->db->get('company_managment');
+    $data['companies'] = $query->result_array();
+    
 
     if (!($sessionLogin)) {
         redirect(base_url('site-admin'));
@@ -58,7 +62,17 @@ class User extends CI_Controller {
             $pwdSalt = hash_hmac("sha512", $pass, $this->salt);
             
             $roles = $this->input->post('role'); 
-             $roles_string = implode(',', $roles);
+            // Fix: Handle case when roles is NULL or empty
+            $roles_string = '';
+            if (!empty($roles) && is_array($roles)) {
+                $roles_string = implode(',', $roles);
+            } elseif (!empty($roles)) {
+                $roles_string = $roles;
+            }
+            // If roles_string is still empty, set a default value
+            if (empty($roles_string)) {
+                $roles_string = 'User'; // or whatever default role you want
+            }
              
             $insertData = array(
                 'fullName' => $this->input->post('name'),
@@ -66,8 +80,8 @@ class User extends CI_Controller {
                 'phone' => $this->input->post('mobile'),
                 'address' => $this->input->post('address'),
                 'password' => $pwdSalt,
-                
-                'role' => $roles_string
+                'role' => $roles_string,
+                'company_id' => $this->input->post('company_id')
             );
 
             $result = $this->AdminModel->addDataInTable($insertData, 'adminLogin');
@@ -75,7 +89,7 @@ class User extends CI_Controller {
             if ($result == TRUE) {
              
                 $this->session->set_flashdata('message', 'User added successfully.');
-                redirect(base_url('admin/user/add'));
+                redirect(base_url('admin/user'));
             }
         }
     }
@@ -90,6 +104,11 @@ public function userEdit() {
     $data['title'] = 'Edit User'; 
     $id = $this->uri->segment(4);
 
+    // Get companies for dropdown
+    $this->db->select('id, company_name');
+    $query = $this->db->get('company_managment');
+    $data['companies'] = $query->result_array();
+
     $user = $this->AdminModel->getDataFromTableByField($id, 'adminLogin', 'id');
     $user[0] = (object)$user[0]; // Convert to object
     $data['user'] = $user;
@@ -103,14 +122,27 @@ public function userEdit() {
 
         if ($this->form_validation->run()) { 
             $roles = $this->input->post('role');
-            $roles_string = is_array($roles) ? implode(',', $roles) : $roles;
+            
+            // Handle roles properly (whether single value or array)
+            $roles_string = '';
+            if (!empty($roles)) {
+                if (is_array($roles)) {
+                    $roles_string = implode(',', $roles);
+                } else {
+                    $roles_string = $roles;
+                }
+            } else {
+                // Keep existing role if none selected
+                $roles_string = $user[0]->role;
+            }
 
             $updateData = array(
                 'fullName' => $this->input->post('name'),
                 'email'    => $this->input->post('email'),
                 'phone'    => $this->input->post('mobile'),
                 'address'  => $this->input->post('address'),
-                'role'     => $roles_string
+                'role'     => $roles_string,
+                'company_id' => $this->input->post('company_id') 
             );
 
             $pass = trim($this->input->post('password'));
@@ -128,7 +160,8 @@ public function userEdit() {
             } else {
                 $this->session->set_flashdata('message', 'Failed to update user.');
             }
-            redirect(base_url('admin/user/edit/' . $id));
+        redirect(base_url('admin/user'));
+
         }
     }
 

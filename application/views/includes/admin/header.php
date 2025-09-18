@@ -14,6 +14,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css" />
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
       <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
        
       <link href="<?php echo base_url();?>assets/css/bootstrap.css" rel="stylesheet"> 
       <link href="<?php echo base_url();?>assets/css/style-admin.css?v=<?php echo rand(10,999);?>" rel="stylesheet">
@@ -39,7 +40,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             if(strstr($_SERVER['HTTP_HOST'],'krrissh')){
                 echo '<img  src="'.base_url().'/assets/images/krissh.png" class="img-fluid">';
             } else {
-                echo '<img  src="'.base_url().'/assets/images/logo.4f0aef3b00619eb99344.png" class="img-fluid">';
+                echo '<img  src="'.base_url().'/assets/images/Main-logo.png" class="img-fluid">';
             }
             ?>
             

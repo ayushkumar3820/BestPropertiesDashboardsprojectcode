@@ -42,8 +42,8 @@
                                   <input type="checkbox" value="deactivate" <?php if($property->status=='active'){?>checked<?php }?> name="status" class="status" data-id="<?php echo $property->id;?>">
                                   <span class="slider round"></span>
                                 </label></td>
-						                <td><a href="<?php echo base_url().'admin/rent/edit/'.$property->id;?>" class="btn btn-success btn-sm">Edit</a>
-						                <a href="<?php echo base_url().'admin/rent/delete/'.$property->id;?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</a>
+						                <td><a href="<?php echo base_url().'admin/rent/edit/'.$property->id;?>" class="btn btn-success btn-sm editIcon"><i class="bi bi-pencil-square"></i></a>
+						                <a href="<?php echo base_url().'admin/rent/delete/'.$property->id;?>" class="btn btn-danger btn-sm deleteIcon" onclick="return confirm('Are you sure?')"><i class="bi bi-trash"></i></a>
 						                </td>
 						              </tr>
 						              <?php 

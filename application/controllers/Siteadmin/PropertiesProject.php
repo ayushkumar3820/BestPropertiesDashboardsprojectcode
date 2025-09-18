@@ -333,6 +333,74 @@ public function updateApprovalStatus()
     } else {
         echo json_encode(['status' => 'error', 'message' => 'Invalid request.']);
     }
+	
+	}
+
+	public function chatProjects($property_id = null, $user_id = null)
+{
+    $data['title'] = 'Chat ';
+
+    // Left panel: grouped chat threads (use r_date instead of created_at)
+    $data['threads'] = $this->db
+        ->select('property_id, user_id, MAX(r_date) AS last_time')
+        ->group_by(['property_id','user_id'])
+        ->order_by('last_time','DESC')
+        ->get('messages')
+        ->result_array();
+
+    // Right panel: messages of selected thread
+    $data['messages'] = [];
+    if ($property_id && $user_id) {
+        $data['active_property'] = $property_id;
+        $data['active_user']     = $user_id;
+
+        $data['messages'] = $this->db
+            ->where('property_id', $property_id)
+            ->where('user_id', $user_id)
+            ->order_by('r_date', 'ASC')
+            ->get('messages')
+            ->result_array();
+    }
+
+    $data['mainContent'] = 'siteAdmin/chat_list';
+    $this->load->view('includes/admin/template', $data);
 }
+
+
+
+
+	public function viewChat($property_id, $user_id) {
+		$data['title'] = "Chat - Property #$property_id | User #$user_id";
+
+		$this->db->where('property_id', $property_id);
+		$this->db->where('user_id', $user_id);
+		$this->db->order_by('r_date', 'ASC');
+		$data['messages'] = $this->db->get('messages')->result();
+
+		$data['property_id'] = $property_id;
+		$data['user_id'] = $user_id;
+
+		$data['mainContent'] = 'siteAdmin/chat_detail';
+		$this->load->view('includes/admin/template', $data);
+	}
+
+	
+	public function sendReply() {
+		$property_id = $this->input->post('property_id');
+		$user_id = $this->input->post('user_id');
+		$message = $this->input->post('message');
+
+		$data = array(
+			'property_id' => $property_id,
+			'user_id'     => $user_id,
+			'message'     => $message,
+			'status'      => 'admin', // or 'Admin' depending on your convention
+		);
+
+		$this->db->insert('messages', $data);
+
+		$this->session->set_flashdata('message', 'Message sent successfully!');
+		redirect('admin/projects/chat/' . $property_id . '/' . $user_id);
+	}
 
 }

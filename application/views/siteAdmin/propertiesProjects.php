@@ -13,6 +13,7 @@ if (in_array('Admin', $roles)):  // Agar Admin role ho
         Approval
     </a> <?php endif; ?>
     <a href="<?php echo base_url('/admin/projects/add/');?>" style="float: right;margin: 14px 2px;" class="btn btn-sm btn-info back-btn">Add New</a>
+	<a href="<?php echo base_url('/admin/projects/chat/');?>" style="float: right;margin: 14px 2px;" class="btn btn-sm btn-info back-btn">Chat</a>
     
     <h1 class="d-sm-block heading"><?php echo $title; ?></h1>
     <div class="clearfix"></div>
@@ -59,13 +60,13 @@ if (in_array('Admin', $roles)):  // Agar Admin role ho
                                   <span class="slider round"></span>
                                 </label></td>
                                 <td>
-                                    <a href="<?php echo base_url().'admin/projects/edit/'.$project->id;?>" class="btn btn-success btn-sm">Edit</a>
+                                    <a href="<?php echo base_url().'admin/projects/edit/'.$project->id;?>" class="btn btn-success btn-sm editIcon"><i class="bi bi-pencil-square"></i></a>
                                   <?php 
 $role = $this->session->userdata('role');  // Session se role ko fetch kiya
 $roles = explode(',', str_replace(' ', '', $role));  // Roles ko comma se separate karke array mein convert kiya
 
 if (!in_array('Agent', $roles)): ?>
-                                   <a href="<?php echo base_url().'admin/projects/delete/'.$project->id;?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this project?')">Delete</a>
+                                   <a href="<?php echo base_url().'admin/projects/delete/'.$project->id;?>" class="btn btn-danger btn-sm deleteIcon" onclick="return confirm('Are you sure you want to delete this project?')"><i class="bi bi-trash"></i></a>
                                    <?php endif; ?>
                                 </td>
                             </tr>
